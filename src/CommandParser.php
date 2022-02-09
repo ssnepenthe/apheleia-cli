@@ -6,9 +6,8 @@ use InvalidArgumentException;
 use RuntimeException;
 use WP_CLI\SynopsisParser;
 
-// @todo Parser interface?
 // @todo Check SynopsisParser::parse() for better parameter patterns.
-class CommandParser
+class CommandParser implements CommandParserInterface
 {
     public function parse(string $command): Command
     {

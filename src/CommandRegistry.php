@@ -15,12 +15,12 @@ class CommandRegistry
     protected $namespace = [];
     protected $registeredCommands = [];
 
-    public function __construct(?InvocationStrategyInterface $invocationStrategy = null)
-    {
+    public function __construct(
+        ?InvocationStrategyInterface $invocationStrategy = null,
+        ?CommandParserInterface $commandParser = null
+    ) {
         $this->invocationStrategy = $invocationStrategy ?: new DefaultInvocationStrategy();
-
-        // @todo interface + injection
-        $this->commandParser = new CommandParser();
+        $this->commandParser = $commandParser ?: new CommandParser();
     }
 
     public function add(Command $command): void
