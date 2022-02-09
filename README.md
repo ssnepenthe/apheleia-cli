@@ -152,13 +152,13 @@ In my opinion, this syntax shines when used for simpler command definitions alon
 ```php
 $registry = new ToyWpCli\CommandRegistry(new ToyWpCli\InvokerBackedInvocationStrategy());
 
-$registry->command('example hello <name> [--type=<type>]', function($name, $type) {
+$registry->command('example hello <name> [--type=<type>]', function($name, $type = 'success') {
+	if (! in_array($type, ['success', 'error'], true)) {
+		$type = 'success';
+	}
+
 	WP_CLI::$type("Hello, $name!");
-})->defaults([
-	'--type' => 'success',
-])->options([
-	'--type' => ['success', 'error'],
-]);
+});
 
 $registry->initialize();
 ```
