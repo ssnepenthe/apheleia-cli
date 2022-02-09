@@ -104,7 +104,7 @@ class HelloCommand extends ToyWpCli\Command
 			->setWhen('after_wp_load');
 	}
 
-  // No more $args and $assoc_args - ask for command params by name.
+	// No more $args and $assoc_args - ask for command params by name.
 	public function handle($name, $type)
 	{
 		WP_CLI::$type("Hello, $name!");
@@ -155,9 +155,9 @@ $registry = new ToyWpCli\CommandRegistry(new ToyWpCli\InvokerBackedInvocationStr
 $registry->command('example hello <name> [--type=<type>]', function($name, $type) {
 	WP_CLI::$type("Hello, $name!");
 })->defaults([
-  '--type' => 'success',
+	'--type' => 'success',
 ])->options([
-  '--type' => ['success', 'error'],
+	'--type' => ['success', 'error'],
 ]);
 
 $registry->initialize();
