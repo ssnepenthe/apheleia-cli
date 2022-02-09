@@ -99,8 +99,8 @@ class Option
     {
         if ($this->valueIsOptional) {
             throw new RuntimeException(
-				'Cannot modify optional flag when valueIsOptional flag has been set to true'
-			);
+                'Cannot modify optional flag when valueIsOptional flag has been set to true'
+            );
         }
 
         $this->optional = $optional;
@@ -119,8 +119,8 @@ class Option
     {
         if (! $this->optional) {
             throw new RuntimeException(
-				'Cannot modify valueIsOptional flag when optional flag has been set to false'
-			);
+                'Cannot modify valueIsOptional flag when optional flag has been set to false'
+            );
         }
 
         $this->valueIsOptional = $valueIsOptional;

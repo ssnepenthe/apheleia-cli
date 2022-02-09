@@ -32,15 +32,15 @@ class Command
         if ($lastArgument instanceof Argument) {
             if ($lastArgument->getRepeating()) {
                 throw new RuntimeException(
-					'Cannot register additional arguments after a repeating argument'
-				);
+                    'Cannot register additional arguments after a repeating argument'
+                );
             }
 
             // Required arguments should never come after optional arguments.
             if ($lastArgument->getOptional() && ! $argument->getOptional()) {
                 throw new RuntimeException(
-					'Cannot register required argument after an optional argument'
-				);
+                    'Cannot register required argument after an optional argument'
+                );
             }
         }
 
@@ -107,10 +107,10 @@ class Command
         }
 
         throw new RuntimeException(
-			"Handler not set for command '{$this->getName()}'"
-			. ' - set explicitly using the \$command->setHandler() method'
-			. ' or implicitly by implementing the \'handle\' method on your command class'
-		);
+            "Handler not set for command '{$this->getName()}'"
+            . ' - set explicitly using the \$command->setHandler() method'
+            . ' or implicitly by implementing the \'handle\' method on your command class'
+        );
     }
 
     public function getUsage(): ?string

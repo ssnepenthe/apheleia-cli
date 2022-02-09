@@ -71,8 +71,8 @@ class CommandAdditionHelper
         foreach ($options as $param => $paramOptions) {
             if (! is_array($paramOptions)) {
                 throw new InvalidArgumentException(
-					'Parameter options must be specified as an array of string'
-				);
+                    'Parameter options must be specified as an array of string'
+                );
             }
 
             if ($this->describesOption($param)) {

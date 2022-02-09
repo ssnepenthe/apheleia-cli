@@ -49,8 +49,8 @@ class CommandParser
                 $command->setAcceptArbitraryOptions(true);
             } else {
                 throw new InvalidArgumentException(
-					'Unrecognized token - command string must adhere to WP-CLI command synopsis format'
-				);
+                    'Unrecognized token - command string must adhere to WP-CLI command synopsis format'
+                );
             }
 
             $token = array_shift($tokens);
@@ -65,8 +65,8 @@ class CommandParser
 
         if (! array_key_exists('type', $synopsis) || 'positional' !== $synopsis['type']) {
             throw new InvalidArgumentException(
-				'Attempting to create Argument from non-positional parameter signature'
-			);
+                'Attempting to create Argument from non-positional parameter signature'
+            );
         }
 
         if (! array_key_exists('name', $synopsis)) {
@@ -93,8 +93,8 @@ class CommandParser
 
         if (! array_key_exists('type', $synopsis) || 'assoc' !== $synopsis['type']) {
             throw new InvalidArgumentException(
-				'Attempting to create Option from non-associative parameter signature'
-			);
+                'Attempting to create Option from non-associative parameter signature'
+            );
         }
 
         if (! array_key_exists('name', $synopsis)) {
@@ -121,8 +121,8 @@ class CommandParser
 
         if (! array_key_exists('type', $synopsis) || 'flag' !== $synopsis['type']) {
             throw new InvalidArgumentException(
-				'Attempting to create Flag from non-flag parameter signature'
-			);
+                'Attempting to create Flag from non-flag parameter signature'
+            );
         }
 
         if (! array_key_exists('name', $synopsis)) {
