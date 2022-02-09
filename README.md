@@ -162,3 +162,7 @@ $registry->command('example hello <name> [--type=<type>]', function($name, $type
 
 $registry->initialize();
 ```
+
+## Notes
+
+Registering options with an optional value (`[--name[=<name>]]`) is not currently possible until https://github.com/wp-cli/wp-cli/pull/5618 or similar has been merged.
