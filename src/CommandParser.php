@@ -15,7 +15,7 @@ class CommandParser
         $tokens = array_filter(preg_split('/\s+/', $command));
 
         if (empty($tokens)) {
-            throw new RuntimeException('@todo empty command string');
+            throw new RuntimeException('Cannot parse empty command string');
         }
 
         $name = [];
@@ -28,7 +28,7 @@ class CommandParser
         }
 
         if (empty($name)) {
-            throw new InvalidArgumentException('@todo nameless command');
+            throw new InvalidArgumentException('Command string must start with the command name');
         }
 
         $command = new Command();
@@ -48,7 +48,9 @@ class CommandParser
             } elseif ($this->isGeneric($token)) {
                 $command->setAcceptArbitraryOptions(true);
             } else {
-                throw new InvalidArgumentException('@todo unrecognized token');
+                throw new InvalidArgumentException(
+					'Unrecognized token - command string must adhere to WP-CLI command synopsis format'
+				);
             }
 
             $token = array_shift($tokens);
@@ -62,12 +64,14 @@ class CommandParser
         $synopsis = SynopsisParser::parse($signature)[0] ?? [];
 
         if (! array_key_exists('type', $synopsis) || 'positional' !== $synopsis['type']) {
-            throw new InvalidArgumentException('@todo no type or non-positional type');
+            throw new InvalidArgumentException(
+				'Attempting to create Argument from non-positional parameter signature'
+			);
         }
 
         if (! array_key_exists('name', $synopsis)) {
             // @todo Is this even possible?
-            throw new InvalidArgumentException('@todo no argument name');
+            throw new InvalidArgumentException('Unable to extract name from argument signature');
         }
 
         $argument = new Argument($synopsis['name']);
@@ -88,12 +92,14 @@ class CommandParser
         $synopsis = SynopsisParser::parse($signature)[0] ?? [];
 
         if (! array_key_exists('type', $synopsis) || 'assoc' !== $synopsis['type']) {
-            throw new InvalidArgumentException('@todo no type or non-assoc type');
+            throw new InvalidArgumentException(
+				'Attempting to create Option from non-associative parameter signature'
+			);
         }
 
         if (! array_key_exists('name', $synopsis)) {
             // @todo Is this even possible?
-            throw new InvalidArgumentException('@todo no option name');
+            throw new InvalidArgumentException('Unable to extract name from option signature');
         }
 
         $option = new Option($synopsis['name']);
@@ -114,12 +120,14 @@ class CommandParser
         $synopsis = SynopsisParser::parse($signature)[0] ?? [];
 
         if (! array_key_exists('type', $synopsis) || 'flag' !== $synopsis['type']) {
-            throw new InvalidArgumentException('@todo no type of non-flag type');
+            throw new InvalidArgumentException(
+				'Attempting to create Flag from non-flag parameter signature'
+			);
         }
 
         if (! array_key_exists('name', $synopsis)) {
             // @todo Is this even possible?
-            throw new InvalidArgumentException('@todo no flag name');
+            throw new InvalidArgumentException('Unable to extract name from flag signature');
         }
 
         return new Flag($synopsis['name']);

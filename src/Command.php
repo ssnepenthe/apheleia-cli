@@ -30,14 +30,17 @@ class Command
         $lastArgument = end($this->arguments);
 
         if ($lastArgument instanceof Argument) {
-            // Repeating argument should be the last registered argument.
             if ($lastArgument->getRepeating()) {
-                throw new RuntimeException('@todo');
+                throw new RuntimeException(
+					'Cannot register additional arguments after a repeating argument'
+				);
             }
 
             // Required arguments should never come after optional arguments.
             if ($lastArgument->getOptional() && ! $argument->getOptional()) {
-                throw new RuntimeException('@todo');
+                throw new RuntimeException(
+					'Cannot register required argument after an optional argument'
+				);
             }
         }
 
@@ -103,7 +106,11 @@ class Command
             return [$this, 'handle'];
         }
 
-        throw new RuntimeException('@todo');
+        throw new RuntimeException(
+			"Handler not set for command '{$this->getName()}'"
+			. ' - set explicitly using the \$command->setHandler() method'
+			. ' or implicitly by implementing the \'handle\' method on your command class'
+		);
     }
 
     public function getUsage(): ?string
@@ -114,7 +121,7 @@ class Command
     public function getName(): string
     {
         if (! is_string($this->name) || '' === $this->name) {
-            throw new InvalidArgumentException('@todo');
+            throw new InvalidArgumentException('Command name must be non-empty string');
         }
 
         return $this->namespace ? "{$this->namespace} {$this->name}" : $this->name;

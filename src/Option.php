@@ -98,7 +98,9 @@ class Option
     public function setOptional(bool $optional)
     {
         if ($this->valueIsOptional) {
-            throw new RuntimeException('@todo');
+            throw new RuntimeException(
+				'Cannot modify optional flag when valueIsOptional flag has been set to true'
+			);
         }
 
         $this->optional = $optional;
@@ -116,7 +118,9 @@ class Option
     public function setValueIsOptional(bool $valueIsOptional)
     {
         if (! $this->optional) {
-            throw new RuntimeException('@todo');
+            throw new RuntimeException(
+				'Cannot modify valueIsOptional flag when optional flag has been set to false'
+			);
         }
 
         $this->valueIsOptional = $valueIsOptional;

@@ -70,13 +70,15 @@ class CommandAdditionHelper
         // @todo Throw for not-found params?
         foreach ($options as $param => $paramOptions) {
             if (! is_array($paramOptions)) {
-                throw new InvalidArgumentException('@todo');
+                throw new InvalidArgumentException(
+					'Parameter options must be specified as an array of string'
+				);
             }
 
             if ($this->describesOption($param)) {
                 if ($option = $this->findOption($param)) {
                     if ($option instanceof Flag) {
-                        throw new InvalidArgumentException('@todo');
+                        throw new InvalidArgumentException('Cannot set options for Flag params');
                     }
 
                     $option->setOptions(...$paramOptions);
