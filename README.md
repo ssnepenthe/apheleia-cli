@@ -4,7 +4,7 @@ An alternate syntax for writing WP-CLI commands that doesn't rely on docblock co
 
 ## Usage
 
-I think this is best explained through examples, so let's demonstrate some different ways we might implements the [`example hello` command from the WP-CLI handbook commands cookbook](https://make.wordpress.org/cli/handbook/guides/commands-cookbook/#annotating-with-phpdoc).
+I think this is best explained through examples, so let's demonstrate some different ways we might implement the [`example hello` command from the WP-CLI handbook commands cookbook](https://make.wordpress.org/cli/handbook/guides/commands-cookbook/#annotating-with-phpdoc).
 
 The intended primary approach is to write self contained command classes:
 
