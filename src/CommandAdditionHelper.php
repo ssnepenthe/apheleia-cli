@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ToyWpCli;
 
 use InvalidArgumentException;
@@ -94,7 +96,7 @@ class CommandAdditionHelper
                         "Cannot set options for unregistered option '{$param}'"
                     );
                 }
-                
+
                 if ($option instanceof Flag) {
                     throw new InvalidArgumentException('Cannot set options for Flag params');
                 }

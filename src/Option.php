@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ToyWpCli;
 
 use RuntimeException;
@@ -9,8 +11,8 @@ class Option
     protected $default;
     protected $description;
     protected $name;
-    protected $options = [];
     protected $optional = true;
+    protected $options = [];
     protected $valueIsOptional = false;
 
     public function __construct(string $name)
@@ -33,19 +35,14 @@ class Option
         return $this->name;
     }
 
-    public function getOptions(): array
-    {
-        return $this->options;
-    }
-
     public function getOptional(): bool
     {
         return $this->optional;
     }
 
-    public function getValueIsOptional(): bool
+    public function getOptions(): array
     {
-        return $this->valueIsOptional;
+        return $this->options;
     }
 
     public function getSynopsis(): array
@@ -79,6 +76,11 @@ class Option
         }
 
         return $synopsis;
+    }
+
+    public function getValueIsOptional(): bool
+    {
+        return $this->valueIsOptional;
     }
 
     public function setDefault(string $default)

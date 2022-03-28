@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ToyWpCli;
 
 use Closure;
@@ -60,10 +62,10 @@ class CommandRegistry
     }
 
     public function namespace(
-		string $namespace,
-		string $description,
-		?callable $callback = null
-	): void {
+        string $namespace,
+        string $description,
+        ?callable $callback = null
+    ): void {
         $command = new Command();
         $command->setName($namespace);
         $command->setHandler(NamespaceIdentifier::class);
@@ -71,22 +73,22 @@ class CommandRegistry
 
         $this->add($command);
 
-		if (is_callable($callback)) {
+        if (is_callable($callback)) {
             $preCallbackCommandCount = count($this->registeredCommands);
 
-        $this->namespace[] = $namespace;
+            $this->namespace[] = $namespace;
 
-        $callback($this);
+            $callback($this);
 
-        array_pop($this->namespace);
+            array_pop($this->namespace);
 
             if (
-                ! $this->allowChildlessNamespaces 
+                ! $this->allowChildlessNamespaces
                 && count($this->registeredCommands) === $preCallbackCommandCount
             ) {
                 array_pop($this->registeredCommands);
             }
-		}
+        }
     }
 
     protected function doInitialize(): void

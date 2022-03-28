@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ToyWpCli;
 
 use InvalidArgumentException;
@@ -81,6 +83,51 @@ class CommandParser implements CommandParserInterface
         return $argument;
     }
 
+    protected function flagFromSignature(string $signature): Flag
+    {
+        $synopsis = SynopsisParser::parse($signature)[0] ?? [];
+
+        if (! array_key_exists('type', $synopsis) || 'flag' !== $synopsis['type']) {
+            throw new InvalidArgumentException(
+                'Attempting to create Flag from non-flag parameter signature'
+            );
+        }
+
+        if (! array_key_exists('name', $synopsis)) {
+            throw new InvalidArgumentException('Unable to extract name from flag signature');
+        }
+
+        return new Flag($synopsis['name']);
+    }
+
+    protected function isArgument(string $token): bool
+    {
+        // SynopsisParser uses "/^<(([a-zA-Z-_|,0-9]+))>$/"
+        return 1 === preg_match('/^(\[)?<[^>]+>(?:\.{3})?(?(1)\])$/', $token);
+    }
+
+    protected function isFlag(string $token): bool
+    {
+        // SynopsisParser uses "/^--(?:\\[no-\\])?([a-z-_0-9]+)/"
+        return 1 === preg_match('/^\[--[^\[\]<>=]+\]$/', $token);
+    }
+
+    protected function isGeneric(string $token): bool
+    {
+        return 1 === preg_match('/^\[--<field>=<value>\]$/', $token);
+    }
+
+    protected function isName(string $token): bool
+    {
+        return 1 === preg_match('/^[^<\[\-\s].*[^>\]\.}]$/', $token);
+    }
+
+    protected function isOption(string $token): bool
+    {
+        // SynopsisParser uses "/^--(?:\\[no-\\])?([a-z-_0-9]+)/"
+        return 1 === preg_match('/^(\[)?--[^=\[\]<>]+(\[)?=<[^>]+>(?(2)\])(?(1)\])$/', $token);
+    }
+
     protected function optionFromSignature(string $signature): Option
     {
         $synopsis = SynopsisParser::parse($signature)[0] ?? [];
@@ -106,50 +153,5 @@ class CommandParser implements CommandParserInterface
         }
 
         return $option;
-    }
-
-    protected function flagFromSignature(string $signature): Flag
-    {
-        $synopsis = SynopsisParser::parse($signature)[0] ?? [];
-
-        if (! array_key_exists('type', $synopsis) || 'flag' !== $synopsis['type']) {
-            throw new InvalidArgumentException(
-                'Attempting to create Flag from non-flag parameter signature'
-            );
-        }
-
-        if (! array_key_exists('name', $synopsis)) {
-            throw new InvalidArgumentException('Unable to extract name from flag signature');
-        }
-
-        return new Flag($synopsis['name']);
-    }
-
-    protected function isName(string $token): bool
-    {
-        return 1 === preg_match('/^[^<\[\-\s].*[^>\]\.}]$/', $token);
-    }
-
-    protected function isArgument(string $token): bool
-    {
-        // SynopsisParser uses "/^<(([a-zA-Z-_|,0-9]+))>$/"
-        return 1 === preg_match('/^(\[)?<[^>]+>(?:\.{3})?(?(1)\])$/', $token);
-    }
-
-    protected function isFlag(string $token): bool
-    {
-        // SynopsisParser uses "/^--(?:\\[no-\\])?([a-z-_0-9]+)/"
-        return 1 === preg_match('/^\[--[^\[\]<>=]+\]$/', $token);
-    }
-
-    protected function isOption(string $token): bool
-    {
-        // SynopsisParser uses "/^--(?:\\[no-\\])?([a-z-_0-9]+)/"
-        return 1 === preg_match('/^(\[)?--[^=\[\]<>]+(\[)?=<[^>]+>(?(2)\])(?(1)\])$/', $token);
-    }
-
-    protected function isGeneric(string $token): bool
-    {
-        return preg_match('/^\[--<field>=<value>\]$/', $token);
     }
 }

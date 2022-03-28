@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ToyWpCli;
 
 use InvalidArgumentException;
@@ -112,11 +114,6 @@ class Command
         );
     }
 
-    public function getUsage(): ?string
-    {
-        return $this->usage;
-    }
-
     public function getName(): string
     {
         if (! is_string($this->name) || '' === $this->name) {
@@ -152,6 +149,11 @@ class Command
         }
 
         return $synopsis;
+    }
+
+    public function getUsage(): ?string
+    {
+        return $this->usage;
     }
 
     public function getWhen(): ?string
