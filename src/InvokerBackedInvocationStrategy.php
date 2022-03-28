@@ -5,7 +5,6 @@ namespace ToyWpCli;
 use Invoker\Invoker;
 use Invoker\InvokerInterface;
 
-// @todo include global args in values provided to callable
 class InvokerBackedInvocationStrategy implements InvocationStrategyInterface
 {
     protected $invoker;
@@ -22,7 +21,6 @@ class InvokerBackedInvocationStrategy implements InvocationStrategyInterface
 
     public function callCommandHandler(Command $command, array $args, array $assoc_args)
     {
-        // @todo Add config for whether we use snake case or camel case?
         $parameters = [
             'args' => $args,
             'arguments' => $args,
@@ -70,7 +68,6 @@ class InvokerBackedInvocationStrategy implements InvocationStrategyInterface
             }
         }
 
-        // @todo Configurable arbitrary options variable name.
         if ($command->getAcceptArbitraryOptions() && ! empty($assoc_args)) {
             $parameters['arbitraryOptions'] = $assoc_args;
             $parameters['arbitrary_options'] = $assoc_args;
@@ -79,8 +76,6 @@ class InvokerBackedInvocationStrategy implements InvocationStrategyInterface
         return $this->invoker->call($command->getHandler(), $parameters);
     }
 
-    // @todo According to the SynopsisParser class, options should match ([a-z-_0-9]+) and args
-    // should match ([a-zA-Z-_|,0-9]+). So these string helpers are likely insufficient.
     protected function camelCase(string $string): string
     {
         return lcfirst(str_replace(' ', '', ucwords(str_replace(['-', '_'], ' ', $string))));

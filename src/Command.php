@@ -5,7 +5,6 @@ namespace ToyWpCli;
 use InvalidArgumentException;
 use RuntimeException;
 
-// @todo CommandInterface?
 class Command
 {
     protected $acceptArbitraryOptions = false;

@@ -5,11 +5,9 @@ namespace ToyWpCli;
 use Closure;
 use WP_CLI;
 
-// @todo registry interface
-// @todo command aliases - I think we have to resort to reflection to achieve this.
-//       Alias is a private property on WP_CLI\Dispatcher\SubCommand and seems to only be set from docblock.
 class CommandRegistry
 {
+    protected $allowChildlessNamespaces = false;
     protected $commandParser;
     protected $invocationStrategy;
     protected $namespace = [];
@@ -32,6 +30,13 @@ class CommandRegistry
         $this->registeredCommands[] = $command;
     }
 
+    public function allowChildlessNamespaces(bool $allowChildlessNamespaces = true)
+    {
+        $this->allowChildlessNamespaces = $allowChildlessNamespaces;
+
+        return $this;
+    }
+
     public function command(string $command, $handler): CommandAdditionHelper
     {
         $command = $this->commandParser->parse($command);
@@ -44,7 +49,6 @@ class CommandRegistry
 
     public function initialize(string $when = 'plugins_loaded'): void
     {
-        // @todo WP_CLI::add_wp_hook()?
         add_action($when, function () {
             $this->doInitialize();
         });
@@ -55,10 +59,11 @@ class CommandRegistry
         $this->doInitialize();
     }
 
-    public function namespace(string $namespace, string $description, callable $callback): void
-    {
-        // @todo track previously registered namespaces?
-        // @todo Examples?
+    public function namespace(
+		string $namespace,
+		string $description,
+		?callable $callback = null
+	): void {
         $command = new Command();
         $command->setName($namespace);
         $command->setHandler(NamespaceIdentifier::class);
@@ -66,11 +71,22 @@ class CommandRegistry
 
         $this->add($command);
 
+		if (is_callable($callback)) {
+            $preCallbackCommandCount = count($this->registeredCommands);
+
         $this->namespace[] = $namespace;
 
         $callback($this);
 
         array_pop($this->namespace);
+
+            if (
+                ! $this->allowChildlessNamespaces 
+                && count($this->registeredCommands) === $preCallbackCommandCount
+            ) {
+                array_pop($this->registeredCommands);
+            }
+		}
     }
 
     protected function doInitialize(): void
@@ -114,7 +130,6 @@ class CommandRegistry
 
     protected function wrapCallback($callback): Closure
     {
-        // @todo accept ...$args?
         return function () use ($callback) {
             return $this->invocationStrategy->call($callback);
         };

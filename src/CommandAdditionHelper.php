@@ -29,7 +29,6 @@ class CommandAdditionHelper
 
     public function defaults(array $defaults)
     {
-        // @todo Throw nfor not-found params?
         foreach ($defaults as $param => $default) {
             if ($this->describesOption($param)) {
                 if ($option = $this->findOption($param)) {
@@ -47,7 +46,6 @@ class CommandAdditionHelper
 
     public function descriptions(string $commandDescription, array $paramDescriptions = [])
     {
-        // @todo Throw for not-found params?
         $this->command->setDescription($commandDescription);
 
         foreach ($paramDescriptions as $param => $description) {
@@ -67,7 +65,6 @@ class CommandAdditionHelper
 
     public function options(array $options)
     {
-        // @todo Throw for not-found params?
         foreach ($options as $param => $paramOptions) {
             if (! is_array($paramOptions)) {
                 throw new InvalidArgumentException(

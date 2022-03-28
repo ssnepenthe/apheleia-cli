@@ -6,7 +6,6 @@ use InvalidArgumentException;
 use RuntimeException;
 use WP_CLI\SynopsisParser;
 
-// @todo Check SynopsisParser::parse() for better parameter patterns.
 class CommandParser implements CommandParserInterface
 {
     public function parse(string $command): Command
@@ -69,7 +68,6 @@ class CommandParser implements CommandParserInterface
         }
 
         if (! array_key_exists('name', $synopsis)) {
-            // @todo Is this even possible?
             throw new InvalidArgumentException('Unable to extract name from argument signature');
         }
 
@@ -97,7 +95,6 @@ class CommandParser implements CommandParserInterface
         }
 
         if (! array_key_exists('name', $synopsis)) {
-            // @todo Is this even possible?
             throw new InvalidArgumentException('Unable to extract name from option signature');
         }
 
@@ -125,7 +122,6 @@ class CommandParser implements CommandParserInterface
         }
 
         if (! array_key_exists('name', $synopsis)) {
-            // @todo Is this even possible?
             throw new InvalidArgumentException('Unable to extract name from flag signature');
         }
 
