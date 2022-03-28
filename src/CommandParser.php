@@ -3,7 +3,6 @@
 namespace ToyWpCli;
 
 use InvalidArgumentException;
-use RuntimeException;
 use WP_CLI\SynopsisParser;
 
 class CommandParser implements CommandParserInterface
@@ -13,7 +12,7 @@ class CommandParser implements CommandParserInterface
         $tokens = array_filter(preg_split('/\s+/', $command));
 
         if (empty($tokens)) {
-            throw new RuntimeException('Cannot parse empty command string');
+            throw new InvalidArgumentException('Cannot parse empty command string');
         }
 
         $name = [];
@@ -46,9 +45,7 @@ class CommandParser implements CommandParserInterface
             } elseif ($this->isGeneric($token)) {
                 $command->setAcceptArbitraryOptions(true);
             } else {
-                throw new InvalidArgumentException(
-                    'Unrecognized token - command string must adhere to WP-CLI command synopsis format'
-                );
+                throw new InvalidArgumentException("Unrecognized token '{$token}'");
             }
 
             $token = array_shift($tokens);
@@ -148,11 +145,11 @@ class CommandParser implements CommandParserInterface
     protected function isOption(string $token): bool
     {
         // SynopsisParser uses "/^--(?:\\[no-\\])?([a-z-_0-9]+)/"
-        return 1 === preg_match('/^(\[)?--[^=\[<>]+(\[)?=<[^>]+>(?(2)\])(?(1)\])$/', $token);
+        return 1 === preg_match('/^(\[)?--[^=\[\]<>]+(\[)?=<[^>]+>(?(2)\])(?(1)\])$/', $token);
     }
 
     protected function isGeneric(string $token): bool
     {
-        return preg_match('/^(\[)?--<field>=<value>(?(1)\])$/', $token);
+        return preg_match('/^\[--<field>=<value>\]$/', $token);
     }
 }

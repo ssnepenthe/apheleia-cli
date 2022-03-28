@@ -31,13 +31,21 @@ class CommandAdditionHelper
     {
         foreach ($defaults as $param => $default) {
             if ($this->describesOption($param)) {
-                if ($option = $this->findOption($param)) {
-                    $option->setDefault($default);
+                if (! $option = $this->findOption($param)) {
+                    throw new InvalidArgumentException(
+                        "Cannot set default for unregistered option '{$param}'"
+                    );
                 }
+
+                $option->setDefault($default);
             } else {
-                if ($argument = $this->findArgument($param)) {
-                    $argument->setDefault($default);
+                if (! $argument = $this->findArgument($param)) {
+                    throw new InvalidArgumentException(
+                        "Cannot set default for unregistered argument '{$param}'"
+                    );
                 }
+
+                $argument->setDefault($default);
             }
         }
 
@@ -50,13 +58,21 @@ class CommandAdditionHelper
 
         foreach ($paramDescriptions as $param => $description) {
             if ($this->describesOption($param)) {
-                if ($option = $this->findOption($param)) {
-                    $option->setDescription($description);
+                if (! $option = $this->findOption($param)) {
+                    throw new InvalidArgumentException(
+                        "Cannot set description for unregistered option '{$param}'"
+                    );
                 }
+
+                $option->setDescription($description);
             } else {
-                if ($argument = $this->findArgument($param)) {
-                    $argument->setDescription($description);
+                if (! $argument = $this->findArgument($param)) {
+                    throw new InvalidArgumentException(
+                        "Cannot set description for unregistered argument '{$param}'"
+                    );
                 }
+
+                $argument->setDescription($description);
             }
         }
 
@@ -68,22 +84,30 @@ class CommandAdditionHelper
         foreach ($options as $param => $paramOptions) {
             if (! is_array($paramOptions)) {
                 throw new InvalidArgumentException(
-                    'Parameter options must be specified as an array of string'
+                    'Parameter options must be specified as an array of strings'
                 );
             }
 
             if ($this->describesOption($param)) {
-                if ($option = $this->findOption($param)) {
-                    if ($option instanceof Flag) {
-                        throw new InvalidArgumentException('Cannot set options for Flag params');
-                    }
+                if (! $option = $this->findOption($param)) {
+                    throw new InvalidArgumentException(
+                        "Cannot set options for unregistered option '{$param}'"
+                    );
+                }
+                
+                if ($option instanceof Flag) {
+                    throw new InvalidArgumentException('Cannot set options for Flag params');
+                }
 
-                    $option->setOptions(...$paramOptions);
-                }
+                $option->setOptions(...$paramOptions);
             } else {
-                if ($argument = $this->findArgument($param)) {
-                    $argument->setOptions(...$paramOptions);
+                if (! $argument = $this->findArgument($param)) {
+                    throw new InvalidArgumentException(
+                        "Cannot set options for unregistered argument '{$param}'"
+                    );
                 }
+
+                $argument->setOptions(...$paramOptions);
             }
         }
 

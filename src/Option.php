@@ -51,10 +51,10 @@ class Option
     public function getSynopsis(): array
     {
         $synopsis = [
+            'type' => 'assoc',
             'name' => $this->name,
             'optional' => $this->optional,
             'repeating' => false,
-            'type' => 'assoc',
         ];
 
         if ($this->description) {
@@ -97,9 +97,9 @@ class Option
 
     public function setOptional(bool $optional)
     {
-        if ($this->valueIsOptional) {
+        if ($this->valueIsOptional && ! $optional) {
             throw new RuntimeException(
-                'Cannot modify optional flag when valueIsOptional flag has been set to true'
+                'Cannot set "optional" to false when "valueIsOptional" is true'
             );
         }
 
@@ -117,9 +117,9 @@ class Option
 
     public function setValueIsOptional(bool $valueIsOptional)
     {
-        if (! $this->optional) {
+        if (! $this->optional && $valueIsOptional) {
             throw new RuntimeException(
-                'Cannot modify valueIsOptional flag when optional flag has been set to false'
+                'Cannot set "valueIsOptional" to true when "optional" is false'
             );
         }
 

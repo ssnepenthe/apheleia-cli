@@ -3,13 +3,19 @@
     "description": "An alternative syntax for writing WP-CLI commands",
     "license": "MIT",
     "type": "library",
-    "require": {},
     "require-dev": {
-        "php-di/invoker": "^2.3"
+        "php-di/invoker": "^2.3",
+        "phpunit/phpunit": "^9.5",
+        "wp-cli/wp-cli-bundle": "^2.6"
     },
     "autoload": {
         "psr-4": {
             "ToyWpCli\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ToyWpCLi\\Tests\\": "tests/"
         }
     },
     "config": {

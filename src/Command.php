@@ -141,13 +141,13 @@ class Command
             return $option->getSynopsis();
         }, $this->options);
 
-        $synopsis = array_merge($arguments, $options);
+        $synopsis = array_values(array_merge($arguments, $options));
 
         if ($this->acceptArbitraryOptions) {
             $synopsis[] = [
+                'type' => 'generic',
                 'optional' => true,
                 'repeating' => false,
-                'type' => 'generic',
             ];
         }
 
@@ -159,9 +159,9 @@ class Command
         return $this->when;
     }
 
-    public function setAcceptArbitraryOptions()
+    public function setAcceptArbitraryOptions(bool $acceptArbitraryOptions = true)
     {
-        $this->acceptArbitraryOptions = true;
+        $this->acceptArbitraryOptions = $acceptArbitraryOptions;
 
         return $this;
     }

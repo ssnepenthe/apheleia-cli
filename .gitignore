@@ -1,3 +1,4 @@
+.phpunit.cache
 scratch/
 vendor/
 .php-cs-fixer.cache

@@ -9,8 +9,8 @@ class DefaultInvocationStrategy implements InvocationStrategyInterface
         return $callback();
     }
 
-    public function callCommandHandler(Command $command, array $args, array $assoc_args)
+    public function callCommandHandler(Command $command, array $args, array $assocArgs)
     {
-        return ($command->getHandler())($args, $assoc_args);
+        return ($command->getHandler())($args, $assocArgs);
     }
 }
