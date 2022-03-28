@@ -1,15 +1,26 @@
 {
-  "name": "ssnepenthe/toy-wp-cli",
-  "description": "An alternative syntax for writing WP-CLI commands",
-  "type": "library",
-  "require": {},
-  "require-dev": {
-    "php-di/invoker": "^2.3"
-  },
-  "license": "MIT",
-  "autoload": {
-    "psr-4": {
-      "ToyWpCli\\": "src/"
+    "name": "ssnepenthe/toy-wp-cli",
+    "description": "An alternative syntax for writing WP-CLI commands",
+    "license": "MIT",
+    "type": "library",
+    "require": {},
+    "require-dev": {
+        "php-di/invoker": "^2.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "ToyWpCli\\": "src/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "ergebnis/composer-normalize": true
+        }
+    },
+    "extra": {
+        "composer-normalize": {
+            "indent-size": 4,
+            "indent-style": "space"
+        }
     }
-  }
 }
