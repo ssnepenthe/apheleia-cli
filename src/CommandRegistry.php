@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ToyWpCli;
 
 use Closure;
-use WP_CLI;
 
 class CommandRegistry
 {
@@ -14,13 +13,16 @@ class CommandRegistry
     protected $invocationStrategy;
     protected $namespace = [];
     protected $registeredCommands = [];
+    protected $wpCliAdapter;
 
     public function __construct(
         ?InvocationStrategyInterface $invocationStrategy = null,
-        ?CommandParserInterface $commandParser = null
+        ?CommandParserInterface $commandParser = null,
+        ?WpCliAdapterInterface $wpCliAdapter = null
     ) {
         $this->invocationStrategy = $invocationStrategy ?: new DefaultInvocationStrategy();
         $this->commandParser = $commandParser ?: new CommandParser();
+        $this->wpCliAdapter = $wpCliAdapter ?: new WpCliAdapter();
     }
 
     public function add(Command $command): void
@@ -51,7 +53,7 @@ class CommandRegistry
 
     public function initialize(string $when = 'plugins_loaded'): void
     {
-        add_action($when, function () {
+        $this->wpCliAdapter->addWpHook($when, function () {
             $this->doInitialize();
         });
     }
@@ -126,7 +128,7 @@ class CommandRegistry
                 $handler = $this->wrapCommandHandler($command);
             }
 
-            WP_CLI::add_command($command->getName(), $handler, $args);
+            $this->wpCliAdapter->addCommand($command->getName(), $handler, $args);
         }
     }
 

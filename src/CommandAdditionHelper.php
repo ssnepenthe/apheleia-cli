@@ -81,6 +81,11 @@ class CommandAdditionHelper
         return $this;
     }
 
+    public function getCommand(): Command
+    {
+        return $this->command;
+    }
+
     public function options(array $options)
     {
         foreach ($options as $param => $paramOptions) {
