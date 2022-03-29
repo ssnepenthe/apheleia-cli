@@ -21,15 +21,15 @@ class InvokerBackedInvocationStrategy implements InvocationStrategyInterface
         return $this->invoker->call($callback);
     }
 
-    public function callCommandHandler(Command $command, array $args, array $assoc_args)
+    public function callCommandHandler(Command $command, array $args, array $assocArgs)
     {
         $parameters = [
             'args' => $args,
             'arguments' => $args,
-            'assocArgs' => $assoc_args,
-            'assoc_args' => $assoc_args,
-            'opts' => $assoc_args,
-            'options' => $assoc_args,
+            'assocArgs' => $assocArgs,
+            'assoc_args' => $assocArgs,
+            'opts' => $assocArgs,
+            'options' => $assocArgs,
         ];
 
         $registeredArgs = $command->getArguments();
@@ -59,20 +59,20 @@ class InvokerBackedInvocationStrategy implements InvocationStrategyInterface
             $snakeName = $this->snakeCase($name);
             $camelName = $this->camelCase($name);
 
-            if (array_key_exists($name, $assoc_args)) {
-                $parameters[$snakeName] = $assoc_args[$name];
-                $parameters[$camelName] = $assoc_args[$name];
+            if (array_key_exists($name, $assocArgs)) {
+                $parameters[$snakeName] = $assocArgs[$name];
+                $parameters[$camelName] = $assocArgs[$name];
 
-                unset($assoc_args[$name]);
+                unset($assocArgs[$name]);
             } elseif ($option instanceof Flag) {
                 $parameters[$snakeName] = false;
                 $parameters[$camelName] = false;
             }
         }
 
-        if ($command->getAcceptArbitraryOptions() && ! empty($assoc_args)) {
-            $parameters['arbitraryOptions'] = $assoc_args;
-            $parameters['arbitrary_options'] = $assoc_args;
+        if ($command->getAcceptArbitraryOptions() && ! empty($assocArgs)) {
+            $parameters['arbitraryOptions'] = $assocArgs;
+            $parameters['arbitrary_options'] = $assocArgs;
         }
 
         return $this->invoker->call($command->getHandler(), $parameters);
