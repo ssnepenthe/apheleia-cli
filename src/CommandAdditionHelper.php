@@ -15,27 +15,33 @@ class CommandAdditionHelper
         $this->command = $command;
     }
 
-    public function after($callback)
+    public function after($callback): self
     {
         $this->command->setAfterInvokeCallback($callback);
 
         return $this;
     }
 
-    public function before($callback)
+    public function before($callback): self
     {
         $this->command->setBeforeInvokeCallback($callback);
 
         return $this;
     }
 
-    public function defaults(array $defaults)
+    public function defaults(array $defaults): self
     {
         foreach ($defaults as $param => $default) {
             if ($this->describesOption($param)) {
                 if (! $option = $this->findOption($param)) {
                     throw new InvalidArgumentException(
                         "Cannot set default for unregistered option '{$param}'"
+                    );
+                }
+
+                if ($option instanceof Flag) {
+                    throw new InvalidArgumentException(
+                        "Cannot set default for flag '{$param}' - flags always default to false"
                     );
                 }
 
@@ -54,7 +60,7 @@ class CommandAdditionHelper
         return $this;
     }
 
-    public function descriptions(string $commandDescription, array $paramDescriptions = [])
+    public function descriptions(string $commandDescription, array $paramDescriptions = []): self
     {
         $this->command->setDescription($commandDescription);
 
@@ -86,7 +92,7 @@ class CommandAdditionHelper
         return $this->command;
     }
 
-    public function options(array $options)
+    public function options(array $options): self
     {
         foreach ($options as $param => $paramOptions) {
             if (! is_array($paramOptions)) {
@@ -103,7 +109,9 @@ class CommandAdditionHelper
                 }
 
                 if ($option instanceof Flag) {
-                    throw new InvalidArgumentException('Cannot set options for Flag params');
+                    throw new InvalidArgumentException(
+                        "Cannot set options for flag '{$param}' - flags can only be true or false"
+                    );
                 }
 
                 $option->setOptions(...$paramOptions);
@@ -121,14 +129,14 @@ class CommandAdditionHelper
         return $this;
     }
 
-    public function usage(string $usage)
+    public function usage(string $usage): self
     {
         $this->command->setUsage($usage);
 
         return $this;
     }
 
-    public function when(string $when)
+    public function when(string $when): self
     {
         $this->command->setWhen($when);
 
@@ -140,13 +148,18 @@ class CommandAdditionHelper
         return '--' === substr($name, 0, 2);
     }
 
-    protected function findArgument(string $name)
+    protected function findArgument(string $name): ?Argument
     {
         if (array_key_exists($name, $this->command->getArguments())) {
             return $this->command->getArguments()[$name];
         }
+
+        return null;
     }
 
+    /**
+     * @return Flag|Option|null
+     */
     protected function findOption(string $name)
     {
         $name = substr($name, 2);
@@ -154,5 +167,7 @@ class CommandAdditionHelper
         if (array_key_exists($name, $this->command->getOptions())) {
             return $this->command->getOptions()[$name];
         }
+
+        return null;
     }
 }

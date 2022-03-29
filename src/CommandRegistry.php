@@ -8,11 +8,34 @@ use Closure;
 
 class CommandRegistry
 {
+    /**
+     * @var bool
+     */
     protected $allowChildlessNamespaces = false;
+
+    /**
+     * @var CommandParserInterface
+     */
     protected $commandParser;
+
+    /**
+     * @var InvocationStrategyInterface
+     */
     protected $invocationStrategy;
+
+    /**
+     * @var list<string>
+     */
     protected $namespace = [];
+
+    /**
+     * @var Command[]
+     */
     protected $registeredCommands = [];
+
+    /**
+     * @var WpCliAdapterInterface
+     */
     protected $wpCliAdapter;
 
     public function __construct(
@@ -34,7 +57,7 @@ class CommandRegistry
         $this->registeredCommands[] = $command;
     }
 
-    public function allowChildlessNamespaces(bool $allowChildlessNamespaces = true)
+    public function allowChildlessNamespaces(bool $allowChildlessNamespaces = true): self
     {
         $this->allowChildlessNamespaces = $allowChildlessNamespaces;
 
@@ -63,6 +86,9 @@ class CommandRegistry
         $this->doInitialize();
     }
 
+    /**
+     * @param non-empty-string $namespace
+     */
     public function namespace(
         string $namespace,
         string $description,
@@ -134,6 +160,9 @@ class CommandRegistry
 
     protected function wrapCallback($callback): Closure
     {
+        /**
+         * @return mixed
+         */
         return function () use ($callback) {
             return $this->invocationStrategy->call($callback);
         };
@@ -141,8 +170,8 @@ class CommandRegistry
 
     protected function wrapCommandHandler(Command $command): Closure
     {
-        return function ($args, $assoc_args) use ($command) {
-            return $this->invocationStrategy->callCommandHandler($command, $args, $assoc_args);
+        return function (array $args, array $assocArgs) use ($command) {
+            return $this->invocationStrategy->callCommandHandler($command, $args, $assocArgs);
         };
     }
 }

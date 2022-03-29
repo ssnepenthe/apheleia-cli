@@ -53,7 +53,7 @@ class CommandTest extends TestCase
         $command = new class () extends Command {
             public $configureWasCalled = false;
 
-            public function configure()
+            public function configure(): void
             {
                 $this->configureWasCalled = true;
             }

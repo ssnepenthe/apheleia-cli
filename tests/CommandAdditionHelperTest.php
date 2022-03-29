@@ -61,6 +61,21 @@ class CommandAdditionHelperTest extends TestCase
         );
     }
 
+    public function testDefaultsWithFlag()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot set default for flag \'--irrelevant-flag\'');
+
+        $command = $this->createCommand()
+            ->addFlag(new Flag('irrelevant-flag'));
+
+        $helper = new CommandAdditionHelper($command);
+
+        $helper->defaults([
+            '--irrelevant-flag' => 'irrelevant-default',
+        ]);
+    }
+
     public function testDefaultsWithInvalidArgument()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -198,7 +213,7 @@ class CommandAdditionHelperTest extends TestCase
     public function testOptionsWithFlag()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot set options for Flag params');
+        $this->expectExceptionMessage('Cannot set options for flag \'--irrelevant-flag\'');
 
         $command = $this->createCommand()
             ->addFlag(new Flag('irrelevant-flag'));

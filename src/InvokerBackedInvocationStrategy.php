@@ -9,6 +9,9 @@ use Invoker\InvokerInterface;
 
 class InvokerBackedInvocationStrategy implements InvocationStrategyInterface
 {
+    /**
+     * @var InvokerInterface
+     */
     protected $invoker;
 
     public function __construct(?InvokerInterface $invoker = null)
@@ -16,11 +19,17 @@ class InvokerBackedInvocationStrategy implements InvocationStrategyInterface
         $this->invoker = $invoker ?: new Invoker();
     }
 
+    /**
+     * @return mixed
+     */
     public function call($callback)
     {
         return $this->invoker->call($callback);
     }
 
+    /**
+     * @return mixed
+     */
     public function callCommandHandler(Command $command, array $args, array $assocArgs)
     {
         $parameters = [

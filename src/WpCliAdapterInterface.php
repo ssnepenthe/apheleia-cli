@@ -7,7 +7,7 @@ namespace ToyWpCli;
 interface WpCliAdapterInterface
 {
     /**
-     * @param callable|class-string<\WP_CLI\Dispatcher\CommandNamespace> $handler
+     * @param callable|class-string<\WP_CLI\Dispatcher\CommandNamespace> $callable
      * @param array $args
      */
     public function addCommand(string $name, $callable, array $args = []): bool;

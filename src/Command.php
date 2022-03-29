@@ -9,16 +9,51 @@ use RuntimeException;
 
 class Command
 {
+    /**
+     * @var bool
+     */
     protected $acceptArbitraryOptions = false;
+
     protected $afterInvokeCallback;
+
+    /**
+     * @var array<string, Argument>
+     */
     protected $arguments = [];
+
     protected $beforeInvokeCallback;
+
+    /**
+     * @var string|null
+     */
     protected $description;
+
     protected $handler;
+
+    /**
+     * @var non-empty-string
+     * @psalm-suppress PropertyNotSetInConstructor
+     */
     protected $name;
+
+    /**
+     * @var string|null
+     */
     protected $namespace;
+
+    /**
+     * @var array<string, Flag|Option>
+     */
     protected $options = [];
+
+    /**
+     * @var string|null
+     */
     protected $usage;
+
+    /**
+     * @var string|null
+     */
     protected $when;
 
     public function __construct()
@@ -26,7 +61,7 @@ class Command
         $this->configure();
     }
 
-    public function addArgument(Argument $argument)
+    public function addArgument(Argument $argument): self
     {
         $lastArgument = end($this->arguments);
 
@@ -50,14 +85,14 @@ class Command
         return $this;
     }
 
-    public function addFlag(Flag $flag)
+    public function addFlag(Flag $flag): self
     {
         $this->options[$flag->getName()] = $flag;
 
         return $this;
     }
 
-    public function addOption(Option $option)
+    public function addOption(Option $option): self
     {
         $this->options[$option->getName()] = $option;
 
@@ -78,6 +113,9 @@ class Command
         return $this->afterInvokeCallback;
     }
 
+    /**
+     * @return array<string, Argument>
+     */
     public function getArguments(): array
     {
         return $this->arguments;
@@ -123,6 +161,9 @@ class Command
         return $this->namespace ? "{$this->namespace} {$this->name}" : $this->name;
     }
 
+    /**
+     * @return array<string, Flag|Option>
+     */
     public function getOptions(): array
     {
         return $this->options;
@@ -130,13 +171,19 @@ class Command
 
     public function getSynopsis(): array
     {
-        $arguments = array_map(function ($argument) {
+        $arguments = array_map(function (Argument $argument): array {
             return $argument->getSynopsis();
         }, $this->arguments);
 
-        $options = array_map(function ($option) {
-            return $option->getSynopsis();
-        }, $this->options);
+        $options = array_map(
+            /**
+             * @param Flag|Option $option
+             */
+            function ($option): array {
+                return $option->getSynopsis();
+            },
+            $this->options
+        );
 
         $synopsis = array_values(array_merge($arguments, $options));
 
@@ -161,70 +208,73 @@ class Command
         return $this->when;
     }
 
-    public function setAcceptArbitraryOptions(bool $acceptArbitraryOptions = true)
+    public function setAcceptArbitraryOptions(bool $acceptArbitraryOptions = true): self
     {
         $this->acceptArbitraryOptions = $acceptArbitraryOptions;
 
         return $this;
     }
 
-    public function setAfterInvokeCallback($afterInvokeCallback)
+    public function setAfterInvokeCallback($afterInvokeCallback): self
     {
         $this->afterInvokeCallback = $afterInvokeCallback;
 
         return $this;
     }
 
-    public function setBeforeInvokeCallback($beforeInvokeCallback)
+    public function setBeforeInvokeCallback($beforeInvokeCallback): self
     {
         $this->beforeInvokeCallback = $beforeInvokeCallback;
 
         return $this;
     }
 
-    public function setDescription(string $description)
+    public function setDescription(string $description): self
     {
         $this->description = $description;
 
         return $this;
     }
 
-    public function setHandler($handler)
+    public function setHandler($handler): self
     {
         $this->handler = $handler;
 
         return $this;
     }
 
-    public function setName(string $name)
+    /**
+     * @param non-empty-string $name
+     */
+    public function setName(string $name): self
     {
         $this->name = $name;
 
         return $this;
     }
 
-    public function setNamespace(string $namespace)
+    public function setNamespace(string $namespace): self
     {
         $this->namespace = $namespace;
 
         return $this;
     }
 
-    public function setUsage(string $usage)
+    public function setUsage(string $usage): self
     {
         $this->usage = $usage;
 
         return $this;
     }
 
-    public function setWhen(string $when)
+    public function setWhen(string $when): self
     {
         $this->when = $when;
 
         return $this;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         // Nothing by default...
     }

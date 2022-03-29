@@ -6,6 +6,7 @@
     "require-dev": {
         "php-di/invoker": "^2.3",
         "phpunit/phpunit": "^9.5",
+        "vimeo/psalm": "^4.22",
         "wp-cli/wp-cli-bundle": "^2.6"
     },
     "autoload": {

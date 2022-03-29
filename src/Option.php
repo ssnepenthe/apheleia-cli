@@ -8,11 +8,34 @@ use RuntimeException;
 
 class Option
 {
+    /**
+     * @var string|null
+     */
     protected $default;
+
+    /**
+     * @var string|null
+     */
     protected $description;
+
+    /**
+     * @var string
+     */
     protected $name;
+
+    /**
+     * @var bool
+     */
     protected $optional = true;
+
+    /**
+     * @var list<string>
+     */
     protected $options = [];
+
+    /**
+     * @var bool
+     */
     protected $valueIsOptional = false;
 
     public function __construct(string $name)
@@ -40,11 +63,17 @@ class Option
         return $this->optional;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getOptions(): array
     {
         return $this->options;
     }
 
+    /**
+     * @return array{type: 'assoc', name: string, optional: bool, repeating: bool, description?: string, default?: string, options?: list<string>, value?: array{optional: true, name: string}}
+     */
     public function getSynopsis(): array
     {
         $synopsis = [
@@ -54,7 +83,7 @@ class Option
             'repeating' => false,
         ];
 
-        if ($this->description) {
+        if (is_string($this->description)) {
             $synopsis['description'] = $this->description;
         }
 
@@ -83,21 +112,21 @@ class Option
         return $this->valueIsOptional;
     }
 
-    public function setDefault(string $default)
+    public function setDefault(string $default): self
     {
         $this->default = $default;
 
         return $this;
     }
 
-    public function setDescription(string $description)
+    public function setDescription(string $description): self
     {
         $this->description = $description;
 
         return $this;
     }
 
-    public function setOptional(bool $optional)
+    public function setOptional(bool $optional): self
     {
         if ($this->valueIsOptional && ! $optional) {
             throw new RuntimeException(
@@ -110,14 +139,14 @@ class Option
         return $this;
     }
 
-    public function setOptions(string ...$options)
+    public function setOptions(string ...$options): self
     {
         $this->options = $options;
 
         return $this;
     }
 
-    public function setValueIsOptional(bool $valueIsOptional)
+    public function setValueIsOptional(bool $valueIsOptional): self
     {
         if (! $this->optional && $valueIsOptional) {
             throw new RuntimeException(

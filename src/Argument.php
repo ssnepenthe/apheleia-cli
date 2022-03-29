@@ -6,11 +6,34 @@ namespace ToyWpCli;
 
 class Argument
 {
+    /**
+     * @var string|null
+     */
     protected $default;
+
+    /**
+     * @var string|null
+     */
     protected $description;
+
+    /**
+     * @var string
+     */
     protected $name;
+
+    /**
+     * @var bool
+     */
     protected $optional = false;
+
+    /**
+     * @var list<string>
+     */
     protected $options = [];
+
+    /**
+     * @var bool
+     */
     protected $repeating = false;
 
     public function __construct(string $name)
@@ -38,6 +61,9 @@ class Argument
         return $this->optional;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getOptions(): array
     {
         return $this->options;
@@ -48,6 +74,9 @@ class Argument
         return $this->repeating;
     }
 
+    /**
+     * @return array{type: 'positional', name: string, optional: bool, repeating: bool, description?: string, default?: string, options?: list<string>}
+     */
     public function getSynopsis(): array
     {
         $synopsis = [
@@ -72,35 +101,35 @@ class Argument
         return $synopsis;
     }
 
-    public function setDefault(string $default)
+    public function setDefault(string $default): self
     {
         $this->default = $default;
 
         return $this;
     }
 
-    public function setDescription(string $description)
+    public function setDescription(string $description): self
     {
         $this->description = $description;
 
         return $this;
     }
 
-    public function setOptional(bool $optional)
+    public function setOptional(bool $optional): self
     {
         $this->optional = $optional;
 
         return $this;
     }
 
-    public function setOptions(string ...$options)
+    public function setOptions(string ...$options): self
     {
         $this->options = $options;
 
         return $this;
     }
 
-    public function setRepeating(bool $repeating)
+    public function setRepeating(bool $repeating): self
     {
         $this->repeating = $repeating;
 

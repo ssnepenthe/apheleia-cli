@@ -6,7 +6,14 @@ namespace ToyWpCli;
 
 class Flag
 {
+    /**
+     * @var string|null
+     */
     protected $description;
+
+    /**
+     * @var string
+     */
     protected $name;
 
     public function __construct(string $name)
@@ -24,6 +31,9 @@ class Flag
         return $this->name;
     }
 
+    /**
+     * @return array{type: 'flag', name: string, optional: bool, repeating: bool, description?: string}
+     */
     public function getSynopsis(): array
     {
         $synopsis = [
@@ -40,7 +50,7 @@ class Flag
         return $synopsis;
     }
 
-    public function setDescription(string $description)
+    public function setDescription(string $description): self
     {
         $this->description = $description;
 
