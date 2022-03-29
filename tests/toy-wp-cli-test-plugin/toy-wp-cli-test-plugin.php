@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 /*
- * Plugin Name: Toy WP-CLI Test Plugin
+ * Plugin Name: Apheleia CLI Test Plugin
  * Plugin URI:
  * Description:
  * Version: 0.1.0
@@ -25,7 +25,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 $registry = new CommandRegistry();
 
-$registry->namespace('toy', 'Toy WP-CLI Test Plugin', function (CommandRegistry $registry) {
+$registry->namespace('apheleia', 'Apheleia CLI Test Plugin', function (CommandRegistry $registry) {
     $registry->add(
         (new Command())
             ->setName('inline')

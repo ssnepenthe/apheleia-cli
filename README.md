@@ -1,4 +1,4 @@
-# toy-wp-cli
+# apheleia-cli
 
 An alternate syntax for writing WP-CLI commands that doesn't rely on docblock command definitions. Loosely modeled after [symfony/console](https://github.com/symfony/console) and [mnapoli/silly](https://github.com/mnapoli/silly/).
 
