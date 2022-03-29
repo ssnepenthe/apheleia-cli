@@ -11,7 +11,7 @@ The intended primary approach is to write self contained command classes:
 ```php
 class HelloCommand extends ToyWpCli\Command
 {
-	public function configure()
+	public function configure(): void
 	{
 		$this->setName('hello')
 			->setDescription('Prints a greeting.')
@@ -86,7 +86,7 @@ You can also set a custom handler invocation strategy:
 ```php
 class HelloCommand extends ToyWpCli\Command
 {
-	public function configure()
+	public function configure(): void
 	{
 		$this->setName('hello')
 			->setDescription('Prints a greeting.')
