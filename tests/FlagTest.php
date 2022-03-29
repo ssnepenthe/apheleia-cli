@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ToyWpCli\Tests;
+namespace ApheleiaCli\Tests;
 
+use ApheleiaCli\Flag;
 use PHPUnit\Framework\TestCase;
-use ToyWpCli\Flag;
 
 class FlagTest extends TestCase
 {

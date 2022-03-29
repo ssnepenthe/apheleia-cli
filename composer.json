@@ -1,5 +1,5 @@
 {
-    "name": "ssnepenthe/toy-wp-cli",
+    "name": "ssnepenthe/apheleia-cli",
     "description": "An alternative syntax for writing WP-CLI commands",
     "license": "MIT",
     "type": "library",
@@ -11,12 +11,12 @@
     },
     "autoload": {
         "psr-4": {
-            "ToyWpCli\\": "src/"
+            "ApheleiaCli\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "ToyWpCLi\\Tests\\": "tests/"
+            "ApheleiaCli\\Tests\\": "tests/"
         }
     },
     "config": {

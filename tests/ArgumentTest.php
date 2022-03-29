@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ToyWpCli\Tests;
+namespace ApheleiaCli\Tests;
 
+use ApheleiaCli\Argument;
 use PHPUnit\Framework\TestCase;
-use ToyWpCli\Argument;
 
 class ArgumentTest extends TestCase
 {

@@ -9,18 +9,18 @@ I think this is best explained through examples, so let's demonstrate some diffe
 The intended primary approach is to write self contained command classes:
 
 ```php
-class HelloCommand extends ToyWpCli\Command
+class HelloCommand extends ApheleiaCli\Command
 {
 	public function configure(): void
 	{
 		$this->setName('hello')
 			->setDescription('Prints a greeting.')
 			->addArgument(
-				(new ToyWpCli\Argument('name'))
+				(new ApheleiaCli\Argument('name'))
 					->setDescription('The name of the person to greet.')
 			)
 			->addOption(
-				(new ToyWpCli\Option('type'))
+				(new ApheleiaCli\Option('type'))
 					->setDescription('Whether or not to greet the person with success or error.')
 					->setDefault('success')
 					->setOptions('success', 'error')
@@ -38,7 +38,7 @@ class HelloCommand extends ToyWpCli\Command
 	}
 }
 
-$registry = new ToyWpCli\CommandRegistry();
+$registry = new ApheleiaCli\CommandRegistry();
 
 $registry->namespace('example', 'Implements example command.', function($scopedRegistry) {
 	$scopedRegistry->add(new HelloCommand());
@@ -50,18 +50,18 @@ $registry->initialize();
 Alternatively, you might want to define a command on the fly:
 
 ```php
-$registry = new ToyWpCli\CommandRegistry();
+$registry = new ApheleiaCli\CommandRegistry();
 
 $registry->namespace('example', 'Implements example command.', function($scopedRegistry) {
-	$command = (new ToyWpCli\Command())
+	$command = (new ApheleiaCli\Command())
 		->setName('hello')
 		->setDescription('Prints a greeting.')
 		->addArgument(
-			(new ToyWpCli\Argument('name'))
+			(new ApheleiaCli\Argument('name'))
 				->setDescription('The name of the person to greet.')
 		)
 		->addOption(
-			(new ToyWpCli\Option('type'))
+			(new ApheleiaCli\Option('type'))
 				->setDescription('Whether or not to greet the person with success or error.')
 				->setDefault('success')
 				->setOptions('success', 'error')
@@ -84,18 +84,18 @@ $registry->initialize();
 You can also set a custom handler invocation strategy:
 
 ```php
-class HelloCommand extends ToyWpCli\Command
+class HelloCommand extends ApheleiaCli\Command
 {
 	public function configure(): void
 	{
 		$this->setName('hello')
 			->setDescription('Prints a greeting.')
 			->addArgument(
-				(new ToyWpCli\Argument('name'))
+				(new ApheleiaCli\Argument('name'))
 					->setDescription('The name of the person to greet.')
 			)
 			->addOption(
-				(new ToyWpCli\Option('type'))
+				(new ApheleiaCli\Option('type'))
 					->setDescription('Whether or not to greet the person with success or error.')
 					->setDefault('success')
 					->setOptions('success', 'error')
@@ -112,7 +112,7 @@ class HelloCommand extends ToyWpCli\Command
 }
 
 // InvokerBackedInvocationStrategy calls command handlers using the php-di/invoker package.
-$registry = new ToyWpCli\CommandRegistry(new ToyWpCli\InvokerBackedInvocationStrategy());
+$registry = new ApheleiaCli\CommandRegistry(new ApheleiaCli\InvokerBackedInvocationStrategy());
 
 $registry->namespace('example', 'Implements example command.', function($scopedRegistry) {
 	$scopedRegistry->add(new HelloCommand());
@@ -124,7 +124,7 @@ $registry->initialize();
 There is also an alternate syntax:
 
 ```php
-$registry = new ToyWpCli\CommandRegistry();
+$registry = new ApheleiaCli\CommandRegistry();
 
 $registry->namespace('example', 'Implements example command.', function($scopedRegistry) {
 	$scopedRegistry->command('hello <name> [--type=<type>]', function($args, $assoc_args) {
@@ -150,7 +150,7 @@ $registry->initialize();
 In my opinion, this syntax shines when used for simpler command definitions along with php-di/invoker:
 
 ```php
-$registry = new ToyWpCli\CommandRegistry(new ToyWpCli\InvokerBackedInvocationStrategy());
+$registry = new ApheleiaCli\CommandRegistry(new ApheleiaCli\InvokerBackedInvocationStrategy());
 
 $registry->command('example hello <name> [--type=<type>]', function($name, $type = 'success') {
 	if (! in_array($type, ['success', 'error'], true)) {

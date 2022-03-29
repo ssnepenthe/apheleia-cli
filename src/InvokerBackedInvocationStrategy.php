@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ToyWpCli;
+namespace ApheleiaCli;
 
 use Invoker\Invoker;
 use Invoker\InvokerInterface;

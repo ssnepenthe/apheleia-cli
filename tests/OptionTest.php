@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ToyWpCli\Tests;
+namespace ApheleiaCli\Tests;
 
+use ApheleiaCli\Option;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use ToyWpCli\Option;
 
 class OptionTest extends TestCase
 {

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace ToyWpCli\Tests;
+namespace ApheleiaCli\Tests;
 
+use ApheleiaCli\Argument;
+use ApheleiaCli\Command;
+use ApheleiaCli\Flag;
+use ApheleiaCli\InvokerBackedInvocationStrategy;
+use ApheleiaCli\Option;
 use PHPUnit\Framework\TestCase;
-use ToyWpCli\Argument;
-use ToyWpCli\Command;
-use ToyWpCli\Flag;
-use ToyWpCli\InvokerBackedInvocationStrategy;
-use ToyWpCli\Option;
 
 class InvokerBackedInvocationStrategyTest extends TestCase
 {

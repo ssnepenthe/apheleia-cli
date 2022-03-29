@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace ToyWpCli\Tests;
+namespace ApheleiaCli\Tests;
 
+use ApheleiaCli\Argument;
+use ApheleiaCli\Command;
+use ApheleiaCli\CommandRegistry;
+use ApheleiaCli\Flag;
+use ApheleiaCli\NamespaceIdentifier;
+use ApheleiaCli\Option;
+use ApheleiaCli\WpCliAdapterInterface;
 use Closure;
 use PHPUnit\Framework\TestCase;
-use ToyWpCli\Argument;
-use ToyWpCli\Command;
-use ToyWpCli\CommandRegistry;
-use ToyWpCli\Flag;
-use ToyWpCli\NamespaceIdentifier;
-use ToyWpCli\Option;
-use ToyWpCli\WpCliAdapterInterface;
 
 class CommandRegistryTest extends TestCase
 {

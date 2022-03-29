@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ToyWpCli\Tests;
+namespace ApheleiaCli\Tests;
 
+use ApheleiaCli\Command;
+use ApheleiaCli\DefaultInvocationStrategy;
 use PHPUnit\Framework\TestCase;
-use ToyWpCli\Command;
-use ToyWpCli\DefaultInvocationStrategy;
 
 class DefaultInvocationStrategyTest extends TestCase
 {

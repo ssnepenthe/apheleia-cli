@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace ToyWpCli\Tests;
+namespace ApheleiaCli\Tests;
 
+use ApheleiaCli\Argument;
+use ApheleiaCli\Command;
+use ApheleiaCli\CommandAdditionHelper;
+use ApheleiaCli\Flag;
+use ApheleiaCli\Option;
 use Closure;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use ToyWpCli\Argument;
-use ToyWpCli\Command;
-use ToyWpCli\CommandAdditionHelper;
-use ToyWpCli\Flag;
-use ToyWpCli\Option;
 
 class CommandAdditionHelperTest extends TestCase
 {
