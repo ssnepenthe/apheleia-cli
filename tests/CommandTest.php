@@ -48,6 +48,67 @@ class CommandTest extends TestCase
 
         $command->addArgument(new Argument('also-irrelevant'));
     }
+
+    public function testAddArgumentThrowsWhenArgumentWithSameNameExists()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('parameter with this name already exists');
+
+        $command = new Command();
+        $command->addArgument(new Argument('irrelevant'));
+        $command->addArgument(new Argument('irrelevant'));
+    }
+
+    public function testAddArgumentThrowsWhenOptionWithSameNameExists()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('parameter with this name already exists');
+
+        $command = new Command();
+        $command->addOption(new Option('irrelevant'));
+        $command->addArgument(new Argument('irrelevant'));
+    }
+
+    public function testAddFlagThrowsWhenArgumentWithSameNameExists()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('parameter with this name already exists');
+
+        $command = new Command();
+        $command->addArgument(new Argument('irrelevant'));
+        $command->addFlag(new Flag('irrelevant'));
+    }
+
+    public function testAddFlagThrowsWhenOptionWithSameNameExists()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('parameter with this name already exists');
+
+        $command = new Command();
+        $command->addOption(new Option('irrelevant'));
+        $command->addFlag(new Flag('irrelevant'));
+    }
+
+    public function testAddOptionThrowsWhenArgumentWithSameNameExists()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('parameter with this name already exists');
+
+        $command = new Command();
+        $command->addArgument(new Argument('irrelevant'));
+        $command->addOption(new Option('irrelevant'));
+    }
+
+    public function testAddOptionThrowsWhenOptionWithSameNameExists()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('parameter with this name already exists');
+
+        $command = new Command();
+        $command->addOption(new Option('irrelevant'));
+        $command->addOption(new Option('irrelevant'));
+    }
+
     public function testConstructorCallsConfigureMethod()
     {
         $command = new class () extends Command {

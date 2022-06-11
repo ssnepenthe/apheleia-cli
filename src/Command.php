@@ -63,6 +63,14 @@ class Command
 
     public function addArgument(Argument $argument): self
     {
+        $name = $argument->getName();
+
+        if ($this->hasParameter($name)) {
+            throw new RuntimeException(
+                "Cannot register argument '{$name}' - parameter with this name already exists"
+            );
+        }
+
         $lastArgument = end($this->arguments);
 
         if ($lastArgument instanceof Argument) {
@@ -80,21 +88,37 @@ class Command
             }
         }
 
-        $this->arguments[$argument->getName()] = $argument;
+        $this->arguments[$name] = $argument;
 
         return $this;
     }
 
     public function addFlag(Flag $flag): self
     {
-        $this->options[$flag->getName()] = $flag;
+        $name = $flag->getName();
+
+        if ($this->hasParameter($name)) {
+            throw new RuntimeException(
+                "Cannot register flag '{$name}' - parameter with this name already exists"
+            );
+        }
+
+        $this->options[$name] = $flag;
 
         return $this;
     }
 
     public function addOption(Option $option): self
     {
-        $this->options[$option->getName()] = $option;
+        $name = $option->getName();
+
+        if ($this->hasParameter($name)) {
+            throw new RuntimeException(
+                "Cannot register option '{$name}' - parameter with this name already exists"
+            );
+        }
+
+        $this->options[$name] = $option;
 
         return $this;
     }
@@ -277,5 +301,11 @@ class Command
     protected function configure(): void
     {
         // Nothing by default...
+    }
+
+    protected function hasParameter(string $name): bool
+    {
+        return \array_key_exists($name, $this->arguments)
+            || \array_key_exists($name, $this->options);
     }
 }
