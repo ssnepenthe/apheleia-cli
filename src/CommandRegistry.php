@@ -201,7 +201,9 @@ class CommandRegistry
     protected function wrapCommandHandler(Command $command): Closure
     {
         return function (array $args, array $assocArgs) use ($command) {
-            return $this->invocationStrategy->callCommandHandler($command, $args, $assocArgs);
+            return $this->invocationStrategy
+                ->withContext(compact('args', 'assocArgs'))
+                ->callCommandHandler($command);
         };
     }
 }

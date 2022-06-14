@@ -7,7 +7,7 @@ namespace ApheleiaCli;
 use Invoker\Invoker;
 use Invoker\InvokerInterface;
 
-class InvokerBackedInvocationStrategy implements InvocationStrategyInterface
+class InvokerBackedInvocationStrategy extends AbstractInvocationStrategy
 {
     /**
      * @var InvokerInterface
@@ -24,19 +24,23 @@ class InvokerBackedInvocationStrategy implements InvocationStrategyInterface
      */
     public function call($callback)
     {
-        return $this->invoker->call($callback);
+        return $this->invoker->call($callback, ['context' => $this->context, ...$this->context]);
     }
 
     /**
      * @return mixed
      */
-    public function callCommandHandler(Command $command, array $args, array $assocArgs)
+    public function callCommandHandler(Command $command)
     {
+        $args = $this->context['args'] ?? [];
+        $assocArgs = $this->context['assocArgs'] ?? [];
+
         $parameters = [
             'args' => $args,
             'arguments' => $args,
             'assocArgs' => $assocArgs,
             'assoc_args' => $assocArgs,
+            'context' => $this->context,
             'opts' => $assocArgs,
             'options' => $assocArgs,
         ];

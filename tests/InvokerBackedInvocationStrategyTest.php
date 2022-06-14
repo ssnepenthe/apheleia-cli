@@ -28,6 +28,21 @@ class InvokerBackedInvocationStrategyTest extends TestCase
     public function testCallCommandHandler()
     {
         $count = 0;
+        $callback = function () use (&$count) {
+            $count++;
+        };
+        $command = (new Command())
+            ->setName('irrelevant')
+            ->setHandler($callback);
+
+        (new InvokerBackedInvocationStrategy())->callCommandHandler($command);
+
+        $this->assertSame(1, $count);
+    }
+
+    public function testCallCommandHandlerWithContext()
+    {
+        $count = 0;
         $receivedArgs = [];
 
         $callback = function (
@@ -48,7 +63,8 @@ class InvokerBackedInvocationStrategyTest extends TestCase
             $optOne,
             $opt_one,
             $arbitraryOptions,
-            $arbitrary_options
+            $arbitrary_options,
+            $context
         ) use (&$count, &$receivedArgs) {
             $count++;
             $receivedArgs = compact(
@@ -70,6 +86,7 @@ class InvokerBackedInvocationStrategyTest extends TestCase
                 'opt_one',
                 'arbitraryOptions',
                 'arbitrary_options',
+                'context',
             );
         };
 
@@ -97,7 +114,11 @@ class InvokerBackedInvocationStrategyTest extends TestCase
         ];
 
         (new InvokerBackedInvocationStrategy())
-            ->callCommandHandler($command, $args, [...$assocArgs, ...$arbitraryOptions]);
+            ->withContext($context = [
+                'args' => $args,
+                'assocArgs' => [...$assocArgs, ...$arbitraryOptions],
+            ])
+            ->callCommandHandler($command);
 
         $this->assertSame(1, $count);
 
@@ -126,6 +147,32 @@ class InvokerBackedInvocationStrategyTest extends TestCase
             // If command accepts arbitrary options, remaining options are bundled together
             'arbitraryOptions' => $arbitraryOptions,
             'arbitrary_options' => $arbitraryOptions,
+
+            // Full context array is also available
+            'context' => $context,
         ], $receivedArgs);
+    }
+
+    public function testCallWithContext()
+    {
+        $count = 0;
+        $receivedKey = '';
+        $receivedContext = [];
+
+        $callback = function ($key, $context) use (&$count, &$receivedKey, &$receivedContext) {
+            $count++;
+            $receivedKey = $key;
+            $receivedContext = $context;
+        };
+
+        $context = ['key' => 'value'];
+
+        (new InvokerBackedInvocationStrategy())
+            ->withContext($context)
+            ->call($callback);
+
+        $this->assertSame(1, $count);
+        $this->assertSame('value', $receivedKey);
+        $this->assertSame($context, $receivedContext);
     }
 }

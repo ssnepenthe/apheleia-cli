@@ -25,24 +25,71 @@ class DefaultInvocationStrategyTest extends TestCase
     public function testCallCommandHandler()
     {
         $count = 0;
-        $receivedArgs = [];
-        $receivedAssocArgs = [];
+        $receivedArgs = $receivedAssocArgs = $receivedContext = [];
 
-        $callback = function ($args, $assocArgs) use (&$count, &$receivedArgs, &$receivedAssocArgs) {
+        $callback = function ($args, $assocArgs, $context) use (&$count, &$receivedArgs, &$receivedAssocArgs, &$receivedContext) {
             $count++;
             $receivedArgs = $args;
             $receivedAssocArgs = $assocArgs;
+            $receivedContext = $context;
         };
 
         $command = (new Command())
             ->setName('irrelevant')
             ->setHandler($callback);
 
-        (new DefaultInvocationStrategy())
-            ->callCommandHandler($command, ['args'], ['assoc' => 'args']);
+        (new DefaultInvocationStrategy())->callCommandHandler($command);
 
         $this->assertSame(1, $count);
-        $this->assertSame(['args'], $receivedArgs);
-        $this->assertSame(['assoc' => 'args'], $receivedAssocArgs);
+        $this->assertSame([], $receivedArgs);
+        $this->assertSame([], $receivedAssocArgs);
+        $this->assertSame([], $receivedContext);
+    }
+
+    public function testCallCommandHandlerWithContext()
+    {
+        $count = 0;
+        $receivedArgs = $receivedAssocArgs = $receivedContext = [];
+
+        $callback = function ($args, $assocArgs, $context) use (&$count, &$receivedArgs, &$receivedAssocArgs, &$receivedContext) {
+            $count++;
+            $receivedArgs = $args;
+            $receivedAssocArgs = $assocArgs;
+            $receivedContext = $context;
+        };
+
+        $command = (new Command())
+            ->setName('irrelevant')
+            ->setHandler($callback);
+
+        $args = ['args'];
+        $assocArgs = ['assoc' => 'args'];
+        $context = compact('args', 'assocArgs');
+
+        (new DefaultInvocationStrategy())
+            ->withContext($context)
+            ->callCommandHandler($command);
+
+        $this->assertSame(1, $count);
+        $this->assertSame($args, $receivedArgs);
+        $this->assertSame($assocArgs, $receivedAssocArgs);
+        $this->assertSame($context, $receivedContext);
+    }
+
+    public function testCallWithContext()
+    {
+        $count = 0;
+        $receivedContext = [];
+        $callback = function ($context) use (&$count, &$receivedContext) {
+            $count++;
+            $receivedContext = $context;
+        };
+
+        (new DefaultInvocationStrategy())
+            ->withContext($context = ['some' => 'context'])
+            ->call($callback);
+
+        $this->assertSame(1, $count);
+        $this->assertSame($context, $receivedContext);
     }
 }
