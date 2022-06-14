@@ -195,17 +195,16 @@ class Command
 
     public function getSynopsis(): array
     {
-        $arguments = array_map(function (Argument $argument): array {
-            return $argument->getSynopsis();
-        }, $this->arguments);
+        $arguments = array_map(
+            fn (Argument $argument): array => $argument->getSynopsis(),
+            $this->arguments
+        );
 
         $options = array_map(
             /**
              * @param Flag|Option $option
              */
-            function ($option): array {
-                return $option->getSynopsis();
-            },
+            fn ($option): array => $option->getSynopsis(),
             $this->options
         );
 

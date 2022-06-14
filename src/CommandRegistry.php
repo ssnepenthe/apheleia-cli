@@ -93,9 +93,7 @@ class CommandRegistry
 
     public function initialize(string $when = 'plugins_loaded'): void
     {
-        $this->wpCliAdapter->addWpHook($when, function () {
-            $this->doInitialize();
-        });
+        $this->wpCliAdapter->addWpHook($when, fn () => $this->doInitialize());
     }
 
     public function initializeImmediately(): void
@@ -167,11 +165,11 @@ class CommandRegistry
             }
 
             if ($beforeInvoke = $command->getBeforeInvokeCallback()) {
-                $args['before_invoke'] = $this->wrapCallback($beforeInvoke);
+                $args['before_invoke'] = fn () => $this->invocationStrategy->call($beforeInvoke);
             }
 
             if ($afterInvoke = $command->getAfterInvokeCallback()) {
-                $args['after_invoke'] = $this->wrapCallback($afterInvoke);
+                $args['after_invoke'] = fn () => $this->invocationStrategy->call($afterInvoke);
             }
 
             if ($when = $command->getWhen()) {
@@ -188,22 +186,10 @@ class CommandRegistry
         }
     }
 
-    protected function wrapCallback($callback): Closure
-    {
-        /**
-         * @return mixed
-         */
-        return function () use ($callback) {
-            return $this->invocationStrategy->call($callback);
-        };
-    }
-
     protected function wrapCommandHandler(Command $command): Closure
     {
-        return function (array $args, array $assocArgs) use ($command) {
-            return $this->invocationStrategy
-                ->withContext(compact('args', 'assocArgs'))
-                ->callCommandHandler($command);
-        };
+        return fn (array $args, array $assocArgs) => $this->invocationStrategy
+            ->withContext(compact('args', 'assocArgs'))
+            ->callCommandHandler($command);
     }
 }
