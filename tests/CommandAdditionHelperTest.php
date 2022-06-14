@@ -80,7 +80,7 @@ class CommandAdditionHelperTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Cannot set default for unregistered argument \'unregistered-arg\''
+            'Cannot set default for unregistered parameter \'unregistered-arg\''
         );
 
         $command = $this->createCommand();
@@ -96,7 +96,7 @@ class CommandAdditionHelperTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Cannot set default for unregistered option \'--unregistered-opt\''
+            'Cannot set default for unregistered parameter \'--unregistered-opt\''
         );
 
         $command = $this->createCommand();
@@ -143,7 +143,7 @@ class CommandAdditionHelperTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Cannot set description for unregistered argument \'unregistered-arg\''
+            'Cannot set description for unregistered parameter \'unregistered-arg\''
         );
 
         $command = $this->createCommand();
@@ -159,7 +159,7 @@ class CommandAdditionHelperTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Cannot set description for unregistered option \'--unregistered-flag\''
+            'Cannot set description for unregistered parameter \'--unregistered-flag\''
         );
 
         $command = $this->createCommand();
@@ -175,7 +175,7 @@ class CommandAdditionHelperTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Cannot set description for unregistered option \'--unregistered-opt\''
+            'Cannot set description for unregistered parameter \'--unregistered-opt\''
         );
 
         $command = $this->createCommand();
@@ -229,7 +229,7 @@ class CommandAdditionHelperTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Cannot set options for unregistered argument \'unregistered-arg\''
+            'Cannot set options for unregistered parameter \'unregistered-arg\''
         );
 
         $command = $this->createCommand();
@@ -245,7 +245,7 @@ class CommandAdditionHelperTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Cannot set options for unregistered option \'--unregistered-opt\''
+            'Cannot set options for unregistered parameter \'--unregistered-opt\''
         );
 
         $command = $this->createCommand();

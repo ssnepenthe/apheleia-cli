@@ -32,29 +32,25 @@ class CommandAdditionHelper
     public function defaults(array $defaults): self
     {
         foreach ($defaults as $param => $default) {
-            if ($this->describesOption($param)) {
-                if (! $option = $this->findOption($param)) {
-                    throw new InvalidArgumentException(
-                        "Cannot set default for unregistered option '{$param}'"
-                    );
-                }
+            $parameter = $this->findArgument($param);
 
-                if ($option instanceof Flag) {
-                    throw new InvalidArgumentException(
-                        "Cannot set default for flag '{$param}' - flags always default to false"
-                    );
-                }
-
-                $option->setDefault($default);
-            } else {
-                if (! $argument = $this->findArgument($param)) {
-                    throw new InvalidArgumentException(
-                        "Cannot set default for unregistered argument '{$param}'"
-                    );
-                }
-
-                $argument->setDefault($default);
+            if (null === $parameter) {
+                $parameter = $this->findOption($param);
             }
+
+            if ($parameter instanceof Flag) {
+                throw new InvalidArgumentException(
+                    "Cannot set default for flag '{$param}' - flags always default to false"
+                );
+            }
+
+            if (null === $parameter) {
+                throw new InvalidArgumentException(
+                    "Cannot set default for unregistered parameter '{$param}'"
+                );
+            }
+
+            $parameter->setDefault($default);
         }
 
         return $this;
@@ -65,23 +61,19 @@ class CommandAdditionHelper
         $this->command->setDescription($commandDescription);
 
         foreach ($paramDescriptions as $param => $description) {
-            if ($this->describesOption($param)) {
-                if (! $option = $this->findOption($param)) {
-                    throw new InvalidArgumentException(
-                        "Cannot set description for unregistered option '{$param}'"
-                    );
-                }
+            $parameter = $this->findArgument($param);
 
-                $option->setDescription($description);
-            } else {
-                if (! $argument = $this->findArgument($param)) {
-                    throw new InvalidArgumentException(
-                        "Cannot set description for unregistered argument '{$param}'"
-                    );
-                }
-
-                $argument->setDescription($description);
+            if (null === $parameter) {
+                $parameter = $this->findOption($param);
             }
+
+            if (null === $parameter) {
+                throw new InvalidArgumentException(
+                    "Cannot set description for unregistered parameter '{$param}'"
+                );
+            }
+
+            $parameter->setDescription($description);
         }
 
         return $this;
@@ -101,29 +93,25 @@ class CommandAdditionHelper
                 );
             }
 
-            if ($this->describesOption($param)) {
-                if (! $option = $this->findOption($param)) {
-                    throw new InvalidArgumentException(
-                        "Cannot set options for unregistered option '{$param}'"
-                    );
-                }
+            $parameter = $this->findArgument($param);
 
-                if ($option instanceof Flag) {
-                    throw new InvalidArgumentException(
-                        "Cannot set options for flag '{$param}' - flags can only be true or false"
-                    );
-                }
-
-                $option->setOptions(...$paramOptions);
-            } else {
-                if (! $argument = $this->findArgument($param)) {
-                    throw new InvalidArgumentException(
-                        "Cannot set options for unregistered argument '{$param}'"
-                    );
-                }
-
-                $argument->setOptions(...$paramOptions);
+            if (null === $parameter) {
+                $parameter = $this->findOption($param);
             }
+
+            if ($parameter instanceof Flag) {
+                throw new InvalidArgumentException(
+                    "Cannot set options for flag '{$param}' - flags can only be true or false"
+                );
+            }
+
+            if (null === $parameter) {
+                throw new InvalidArgumentException(
+                    "Cannot set options for unregistered parameter '{$param}'"
+                );
+            }
+
+            $parameter->setOptions(...$paramOptions);
         }
 
         return $this;
@@ -143,11 +131,6 @@ class CommandAdditionHelper
         return $this;
     }
 
-    protected function describesOption(string $name): bool
-    {
-        return '--' === substr($name, 0, 2);
-    }
-
     protected function findArgument(string $name): ?Argument
     {
         if (array_key_exists($name, $this->command->getArguments())) {
@@ -162,7 +145,9 @@ class CommandAdditionHelper
      */
     protected function findOption(string $name)
     {
-        $name = substr($name, 2);
+        if ('--' === substr($name, 0, 2)) {
+            $name = substr($name, 2);
+        }
 
         if (array_key_exists($name, $this->command->getOptions())) {
             return $this->command->getOptions()[$name];
