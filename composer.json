@@ -3,6 +3,9 @@
     "description": "An alternative syntax for writing WP-CLI commands",
     "license": "MIT",
     "type": "library",
+    "require": {
+        "php": "^7.4 || ^8.0"
+    },
     "require-dev": {
         "php-di/invoker": "^2.3",
         "phpunit/phpunit": "^9.5",
