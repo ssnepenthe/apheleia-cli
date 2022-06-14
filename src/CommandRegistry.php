@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ApheleiaCli;
 
 use Closure;
+use RuntimeException;
 
 class CommandRegistry
 {
@@ -29,7 +30,7 @@ class CommandRegistry
     protected $namespace = [];
 
     /**
-     * @var Command[]
+     * @var array<string, Command>
      */
     protected $registeredCommands = [];
 
@@ -54,7 +55,15 @@ class CommandRegistry
             $command->setNamespace(implode(' ', $this->namespace));
         }
 
-        $this->registeredCommands[] = $command;
+        $name = $command->getName();
+
+        if (\array_key_exists($name, $this->registeredCommands)) {
+            throw new RuntimeException(
+                "Cannot register command '{$name}' - command with this name already exists"
+            );
+        }
+
+        $this->registeredCommands[$name] = $command;
     }
 
     public function allowChildlessNamespaces(bool $allowChildlessNamespaces = true): self
@@ -72,6 +81,14 @@ class CommandRegistry
         $this->add($command);
 
         return new CommandAdditionHelper($command);
+    }
+
+    /**
+     * @return array<string, Command>
+     */
+    public function getRegisteredCommands(): array
+    {
+        return $this->registeredCommands;
     }
 
     public function initialize(string $when = 'plugins_loaded'): void
@@ -114,9 +131,22 @@ class CommandRegistry
                 ! $this->allowChildlessNamespaces
                 && count($this->registeredCommands) === $preCallbackCommandCount
             ) {
-                array_pop($this->registeredCommands);
+                $this->remove($command);
             }
         }
+    }
+
+    public function remove(Command $command): void
+    {
+        $name = $command->getName();
+
+        if (! \array_key_exists($name, $this->registeredCommands)) {
+            throw new RuntimeException(
+                "Cannot remove command '{$name}' - no command with this name has been registered"
+            );
+        }
+
+        unset($this->registeredCommands[$name]);
     }
 
     protected function doInitialize(): void

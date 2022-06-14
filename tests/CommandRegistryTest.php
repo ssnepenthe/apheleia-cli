@@ -13,9 +13,21 @@ use ApheleiaCli\Option;
 use ApheleiaCli\WpCliAdapterInterface;
 use Closure;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class CommandRegistryTest extends TestCase
 {
+    public function testAddDoesNotAllowMultipleCommandsWithSameName()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('command with this name already exists');
+
+        $registry = new CommandRegistry();
+
+        $registry->add((new Command())->setName('irrelevant'));
+        $registry->add((new Command())->setName('irrelevant'));
+    }
+
     public function testAddWithNamespace()
     {
         $one = (new Command())->setName('one');
@@ -183,35 +195,47 @@ class CommandRegistryTest extends TestCase
 
     public function testNamespaceWithNoCommandsAndChildlessNamespacesAllowed()
     {
-        $wpCliAdapterMock = $this->createMock(WpCliAdapterInterface::class);
-        $wpCliAdapterMock
-            ->expects($this->once())
-            ->method('addCommand')
-            ->with('namespace', NamespaceIdentifier::class, [
-                'shortdesc' => 'description',
-            ]);
-
-        $registry = new CommandRegistry(null, null, $wpCliAdapterMock);
+        $registry = new CommandRegistry();
         $registry->allowChildlessNamespaces();
 
         $registry->namespace('namespace', 'description', function () {
         });
 
-        $registry->initializeImmediately();
+        $this->assertCount(1, $registry->getRegisteredCommands());
     }
 
     public function testNamespaceWithNoCommandsAndChildlessNamespacesForbidden()
     {
-        $wpCliAdapterMock = $this->createMock(WpCliAdapterInterface::class);
-        $wpCliAdapterMock
-            ->expects($this->never())
-            ->method('addCommand');
-
-        $registry = new CommandRegistry(null, null, $wpCliAdapterMock);
+        $registry = new CommandRegistry();
 
         $registry->namespace('namespace', 'description', function () {
         });
 
-        $registry->initializeImmediately();
+        $this->assertCount(0, $registry->getRegisteredCommands());
+    }
+
+    public function testRemove()
+    {
+        $registry = new CommandRegistry();
+
+        $registry->add($one = (new Command())->setName('one'));
+        $registry->add($two = (new Command())->setName('two'));
+
+        $registry->remove($two);
+
+        $registeredCommands = $registry->getRegisteredCommands();
+
+        $this->assertCount(1, $registeredCommands);
+        $this->assertSame($one, current($registeredCommands));
+    }
+
+    public function testRemoveWhenCommandHasNotBeenRegistered()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('no command with this name has been registered');
+
+        $registry = new CommandRegistry();
+
+        $registry->remove((new Command())->setName('irrelevant'));
     }
 }
