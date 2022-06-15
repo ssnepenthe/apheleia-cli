@@ -6,6 +6,7 @@ namespace ApheleiaCli\Tests;
 
 use ApheleiaCli\Argument;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class ArgumentTest extends TestCase
 {
@@ -19,6 +20,21 @@ class ArgumentTest extends TestCase
             'optional' => false,
             'repeating' => false,
         ], $argument->getSynopsis());
+    }
+
+    public function testGetSynopsisWhenArgumentIsRequiredAndArgumentHasDefault()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(
+            'Required argument \'some-name\' cannot have a default value'
+        );
+
+        $argument = new Argument('some-name');
+
+        $argument->setOptional(false);
+        $argument->setDefault('some-value');
+
+        $argument->getSynopsis();
     }
 
     public function testGetSynopsisWithNonDefaultSettings()

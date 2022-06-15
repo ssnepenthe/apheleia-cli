@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ApheleiaCli;
 
+use RuntimeException;
+
 class Argument
 {
     /**
@@ -79,6 +81,8 @@ class Argument
      */
     public function getSynopsis(): array
     {
+        $this->validate();
+
         $synopsis = [
             'type' => 'positional',
             'name' => $this->name,
@@ -134,5 +138,14 @@ class Argument
         $this->repeating = $repeating;
 
         return $this;
+    }
+
+    protected function validate(): void
+    {
+        if (is_string($this->default) && ! $this->optional) {
+            throw new RuntimeException(
+                "Required argument '{$this->name}' cannot have a default value"
+            );
+        }
     }
 }

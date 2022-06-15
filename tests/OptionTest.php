@@ -22,6 +22,21 @@ class OptionTest extends TestCase
         ], $option->getSynopsis());
     }
 
+    public function testGetSynopsisWhenOptionIsRequiredAndValueIsOptional()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(
+            'Required option \'some-name\' cannot have an optional value'
+        );
+
+        $option = new Option('some-name');
+
+        $option->setValueIsOptional(true);
+        $option->setOptional(false);
+
+        $option->getSynopsis();
+    }
+
     public function testGetSynopsisWhenValueIsOptional()
     {
         $option = new Option('some-name');
@@ -58,31 +73,5 @@ class OptionTest extends TestCase
             'default' => 'Apple',
             'options' => ['one', 'two', 'three'],
         ], $option->getSynopsis());
-    }
-
-    public function testSetOptionalWhenValueIsOptionalTrue()
-    {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage(
-            'Cannot set "optional" to false when "valueIsOptional" is true'
-        );
-
-        $option = new Option('some-name');
-
-        $option->setValueIsOptional(true);
-        $option->setOptional(false);
-    }
-
-    public function testSetValueIsOptionalWhenOptionalFalse()
-    {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage(
-            'Cannot set "valueIsOptional" to true when "optional" is false'
-        );
-
-        $option = new Option('some-name');
-
-        $option->setOptional(false);
-        $option->setValueIsOptional(true);
     }
 }

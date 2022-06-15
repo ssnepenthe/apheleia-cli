@@ -76,6 +76,8 @@ class Option
      */
     public function getSynopsis(): array
     {
+        $this->validate();
+
         $synopsis = [
             'type' => 'assoc',
             'name' => $this->name,
@@ -128,12 +130,6 @@ class Option
 
     public function setOptional(bool $optional): self
     {
-        if ($this->valueIsOptional && ! $optional) {
-            throw new RuntimeException(
-                'Cannot set "optional" to false when "valueIsOptional" is true'
-            );
-        }
-
         $this->optional = $optional;
 
         return $this;
@@ -148,14 +144,17 @@ class Option
 
     public function setValueIsOptional(bool $valueIsOptional): self
     {
-        if (! $this->optional && $valueIsOptional) {
-            throw new RuntimeException(
-                'Cannot set "valueIsOptional" to true when "optional" is false'
-            );
-        }
-
         $this->valueIsOptional = $valueIsOptional;
 
         return $this;
+    }
+
+    protected function validate(): void
+    {
+        if (! $this->optional && $this->valueIsOptional) {
+            throw new RuntimeException(
+                "Required option '{$this->name}' cannot have an optional value"
+            );
+        }
     }
 }
