@@ -31,26 +31,31 @@ class CommandAdditionHelper
 
     public function defaults(array $defaults): self
     {
+        $registeredParameters = [
+            ...$this->command->getArguments(),
+            ...$this->command->getOptions(),
+        ];
+
         foreach ($defaults as $param => $default) {
-            $parameter = $this->findArgument($param);
-
-            if (null === $parameter) {
-                $parameter = $this->findOption($param);
+            if ('--' === substr($param, 0, 2)) {
+                $param = substr($param, 2);
             }
 
-            if ($parameter instanceof Flag) {
-                throw new InvalidArgumentException(
-                    "Cannot set default for flag '{$param}' - flags always default to false"
-                );
-            }
-
-            if (null === $parameter) {
+            if (! array_key_exists($param, $registeredParameters)) {
                 throw new InvalidArgumentException(
                     "Cannot set default for unregistered parameter '{$param}'"
                 );
             }
 
-            $parameter->setDefault($default);
+            $found = $registeredParameters[$param];
+
+            if ($found instanceof Flag) {
+                throw new InvalidArgumentException(
+                    "Cannot set default for flag '{$param}' - flags always default to false"
+                );
+            }
+
+            $found->setDefault($default);
         }
 
         return $this;
@@ -60,20 +65,23 @@ class CommandAdditionHelper
     {
         $this->command->setDescription($commandDescription);
 
-        foreach ($paramDescriptions as $param => $description) {
-            $parameter = $this->findArgument($param);
+        $registeredParameters = [
+            ...$this->command->getArguments(),
+            ...$this->command->getOptions(),
+        ];
 
-            if (null === $parameter) {
-                $parameter = $this->findOption($param);
+        foreach ($paramDescriptions as $param => $description) {
+            if ('--' === substr($param, 0, 2)) {
+                $param = substr($param, 2);
             }
 
-            if (null === $parameter) {
+            if (! array_key_exists($param, $registeredParameters)) {
                 throw new InvalidArgumentException(
                     "Cannot set description for unregistered parameter '{$param}'"
                 );
             }
 
-            $parameter->setDescription($description);
+            $registeredParameters[$param]->setDescription($description);
         }
 
         return $this;
@@ -86,6 +94,11 @@ class CommandAdditionHelper
 
     public function options(array $options): self
     {
+        $registeredParameters = [
+            ...$this->command->getArguments(),
+            ...$this->command->getOptions(),
+        ];
+
         foreach ($options as $param => $paramOptions) {
             if (! is_array($paramOptions)) {
                 throw new InvalidArgumentException(
@@ -93,25 +106,25 @@ class CommandAdditionHelper
                 );
             }
 
-            $parameter = $this->findArgument($param);
-
-            if (null === $parameter) {
-                $parameter = $this->findOption($param);
+            if ('--' === substr($param, 0, 2)) {
+                $param = substr($param, 2);
             }
 
-            if ($parameter instanceof Flag) {
-                throw new InvalidArgumentException(
-                    "Cannot set options for flag '{$param}' - flags can only be true or false"
-                );
-            }
-
-            if (null === $parameter) {
+            if (! array_key_exists($param, $registeredParameters)) {
                 throw new InvalidArgumentException(
                     "Cannot set options for unregistered parameter '{$param}'"
                 );
             }
 
-            $parameter->setOptions(...$paramOptions);
+            $found = $registeredParameters[$param];
+
+            if ($found instanceof Flag) {
+                throw new InvalidArgumentException(
+                    "Cannot set options for flag '{$param}' - flags can only be true or false"
+                );
+            }
+
+            $found->setOptions(...$paramOptions);
         }
 
         return $this;
@@ -129,30 +142,5 @@ class CommandAdditionHelper
         $this->command->setWhen($when);
 
         return $this;
-    }
-
-    protected function findArgument(string $name): ?Argument
-    {
-        if (array_key_exists($name, $this->command->getArguments())) {
-            return $this->command->getArguments()[$name];
-        }
-
-        return null;
-    }
-
-    /**
-     * @return Flag|Option|null
-     */
-    protected function findOption(string $name)
-    {
-        if ('--' === substr($name, 0, 2)) {
-            $name = substr($name, 2);
-        }
-
-        if (array_key_exists($name, $this->command->getOptions())) {
-            return $this->command->getOptions()[$name];
-        }
-
-        return null;
     }
 }

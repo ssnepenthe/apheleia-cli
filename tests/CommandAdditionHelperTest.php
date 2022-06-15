@@ -64,7 +64,7 @@ class CommandAdditionHelperTest extends TestCase
     public function testDefaultsWithFlag()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot set default for flag \'--irrelevant-flag\'');
+        $this->expectExceptionMessage('Cannot set default for flag \'irrelevant-flag\'');
 
         $command = $this->createCommand()
             ->addFlag(new Flag('irrelevant-flag'));
@@ -96,7 +96,7 @@ class CommandAdditionHelperTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Cannot set default for unregistered parameter \'--unregistered-opt\''
+            'Cannot set default for unregistered parameter \'unregistered-opt\''
         );
 
         $command = $this->createCommand();
@@ -159,7 +159,7 @@ class CommandAdditionHelperTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Cannot set description for unregistered parameter \'--unregistered-flag\''
+            'Cannot set description for unregistered parameter \'unregistered-flag\''
         );
 
         $command = $this->createCommand();
@@ -175,7 +175,7 @@ class CommandAdditionHelperTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Cannot set description for unregistered parameter \'--unregistered-opt\''
+            'Cannot set description for unregistered parameter \'unregistered-opt\''
         );
 
         $command = $this->createCommand();
@@ -213,7 +213,7 @@ class CommandAdditionHelperTest extends TestCase
     public function testOptionsWithFlag()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot set options for flag \'--irrelevant-flag\'');
+        $this->expectExceptionMessage('Cannot set options for flag \'irrelevant-flag\'');
 
         $command = $this->createCommand()
             ->addFlag(new Flag('irrelevant-flag'));
@@ -245,7 +245,7 @@ class CommandAdditionHelperTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            'Cannot set options for unregistered parameter \'--unregistered-opt\''
+            'Cannot set options for unregistered parameter \'unregistered-opt\''
         );
 
         $command = $this->createCommand();
