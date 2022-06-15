@@ -24,7 +24,10 @@ class InvokerBackedInvocationStrategy extends AbstractInvocationStrategy
      */
     public function call($callback)
     {
-        return $this->invoker->call($callback, ['context' => $this->context, ...$this->context]);
+        return $this->invoker->call(
+            $callback,
+            array_merge(['context' => $this->context], $this->context)
+        );
     }
 
     /**

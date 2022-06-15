@@ -31,10 +31,10 @@ class CommandAdditionHelper
 
     public function defaults(array $defaults): self
     {
-        $registeredParameters = [
-            ...$this->command->getArguments(),
-            ...$this->command->getOptions(),
-        ];
+        $registeredParameters = array_merge(
+            $this->command->getArguments(),
+            $this->command->getOptions()
+        );
 
         foreach ($defaults as $param => $default) {
             if ('--' === substr($param, 0, 2)) {
@@ -65,10 +65,10 @@ class CommandAdditionHelper
     {
         $this->command->setDescription($commandDescription);
 
-        $registeredParameters = [
-            ...$this->command->getArguments(),
-            ...$this->command->getOptions(),
-        ];
+        $registeredParameters = array_merge(
+            $this->command->getArguments(),
+            $this->command->getOptions()
+        );
 
         foreach ($paramDescriptions as $param => $description) {
             if ('--' === substr($param, 0, 2)) {
@@ -94,10 +94,10 @@ class CommandAdditionHelper
 
     public function options(array $options): self
     {
-        $registeredParameters = [
-            ...$this->command->getArguments(),
-            ...$this->command->getOptions(),
-        ];
+        $registeredParameters = array_merge(
+            $this->command->getArguments(),
+            $this->command->getOptions()
+        );
 
         foreach ($options as $param => $paramOptions) {
             if (! is_array($paramOptions)) {
