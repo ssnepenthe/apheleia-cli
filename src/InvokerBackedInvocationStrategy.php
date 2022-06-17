@@ -54,8 +54,8 @@ class InvokerBackedInvocationStrategy extends AbstractInvocationStrategy
             $current = array_shift($registeredArgs);
 
             $name = $current->getName();
-            $snakeName = $this->snakeCase($name);
-            $camelName = $this->camelCase($name);
+            $snakeName = Support::snakeCase($name);
+            $camelName = Support::camelCase($name);
 
             if ($current->getRepeating()) {
                 $parameters[$snakeName] = $args;
@@ -72,8 +72,8 @@ class InvokerBackedInvocationStrategy extends AbstractInvocationStrategy
 
         foreach ($command->getOptions() as $option) {
             $name = $option->getName();
-            $snakeName = $this->snakeCase($name);
-            $camelName = $this->camelCase($name);
+            $snakeName = Support::snakeCase($name);
+            $camelName = Support::camelCase($name);
 
             if (array_key_exists($name, $assocArgs)) {
                 $parameters[$snakeName] = $assocArgs[$name];
@@ -92,15 +92,5 @@ class InvokerBackedInvocationStrategy extends AbstractInvocationStrategy
         }
 
         return $this->invoker->call($command->getHandler(), $parameters);
-    }
-
-    protected function camelCase(string $string): string
-    {
-        return lcfirst(str_replace(' ', '', ucwords(str_replace(['-', '_'], ' ', $string))));
-    }
-
-    protected function snakeCase(string $string): string
-    {
-        return strtolower(str_replace('-', '_', $string));
     }
 }

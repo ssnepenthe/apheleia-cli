@@ -30,6 +30,11 @@ class CommandRegistry
     protected $namespace = [];
 
     /**
+     * @var array<int, callable(string):string>
+     */
+    protected $parameterNameMappers = [];
+
+    /**
      * @var array<string, Command>
      */
     protected $registeredCommands = [];
@@ -76,11 +81,13 @@ class CommandRegistry
     public function command(string $command, $handler): CommandAdditionHelper
     {
         $command = $this->commandParser->parse($command);
-        $command->setHandler($handler);
+
+        $addition = new CommandAdditionHelper($command, $this->parameterNameMappers);
+        $addition->handler($handler);
 
         $this->add($command);
 
-        return new CommandAdditionHelper($command);
+        return $addition;
     }
 
     /**
@@ -145,6 +152,13 @@ class CommandRegistry
         }
 
         unset($this->registeredCommands[$name]);
+    }
+
+    public function setParameterNameMappers(callable ...$parameterNameMappers): self
+    {
+        $this->parameterNameMappers = $parameterNameMappers;
+
+        return $this;
     }
 
     protected function doInitialize(): void

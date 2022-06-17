@@ -9,10 +9,18 @@ use InvalidArgumentException;
 class CommandAdditionHelper
 {
     protected $command;
+    protected $parameterNameMappers;
 
-    public function __construct(Command $command)
+    public function __construct(Command $command, array $parameterNameMappers = [])
     {
         $this->command = $command;
+        $this->setParameterNameMappers(...($parameterNameMappers ?: [
+            fn (string $string): string => $string,
+            [Support::class, 'kebabCase'],
+            [Support::class, 'snakeCase'],
+            [Support::class, 'camelCase'],
+            [Support::class, 'pascalCase'],
+        ]));
     }
 
     public function after($callback): self
@@ -92,6 +100,15 @@ class CommandAdditionHelper
         return $this->command;
     }
 
+    public function handler($handler): self
+    {
+        $this->command->setHandler($handler);
+
+        $this->setHandlerDefaultsViaReflection();
+
+        return $this;
+    }
+
     public function options(array $options): self
     {
         $registeredParameters = array_merge(
@@ -142,5 +159,50 @@ class CommandAdditionHelper
         $this->command->setWhen($when);
 
         return $this;
+    }
+
+    protected function setHandlerDefaultsViaReflection(): void
+    {
+        $handler = $this->command->getHandler();
+
+        if (! is_callable($handler)) {
+            return;
+        }
+
+        $registeredParameters = array_merge(
+            $this->command->getArguments(),
+            $this->command->getOptions()
+        );
+
+        $reflector = Support::callableReflector($handler);
+
+        foreach ($reflector->getParameters() as $parameter) {
+            if (! $parameter->isDefaultValueAvailable()) {
+                continue;
+            }
+
+            $name = $parameter->getName();
+
+            foreach ($this->parameterNameMappers as $mapper) {
+                $realName = $mapper($name);
+
+                if (! \array_key_exists($realName, $registeredParameters)) {
+                    continue;
+                }
+
+                $found = $registeredParameters[$realName];
+
+                if (! $found instanceof Flag) {
+                    $found->setDefault($parameter->getDefaultValue());
+                }
+
+                break;
+            }
+        }
+    }
+
+    protected function setParameterNameMappers(callable ...$parameterNameMappers): void
+    {
+        $this->parameterNameMappers = $parameterNameMappers;
     }
 }

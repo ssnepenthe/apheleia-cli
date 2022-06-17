@@ -187,6 +187,53 @@ class CommandAdditionHelperTest extends TestCase
         ]);
     }
 
+    public function testHandler()
+    {
+        $command = $this->createCommand();
+
+        $helper = new CommandAdditionHelper($command);
+
+        $helper->handler('somehandler');
+
+        $this->assertSame('somehandler', $command->getHandler());
+    }
+
+    public function testHandlerWithDefaultValues()
+    {
+        $command = $this->createCommand()
+            ->addArgument(new Argument('arg-one'))
+            ->addArgument(new Argument('arg_two'))
+            ->addArgument(new Argument('argThree'))
+            ->addArgument(new Argument('ArgFour'));
+
+        $addition = new CommandAdditionHelper($command);
+
+        $handler = function ($ArgOne = '1', $argTwo = '2', $arg_three = '3', $arg_four = '4') {
+        };
+
+        $addition->handler($handler);
+
+        $this->assertSame('1', $command->getArguments()['arg-one']->getDefault());
+        $this->assertSame('2', $command->getArguments()['arg_two']->getDefault());
+        $this->assertSame('3', $command->getArguments()['argThree']->getDefault());
+        $this->assertSame('4', $command->getArguments()['ArgFour']->getDefault());
+    }
+
+    public function testHandlerWithDefaultValuesAndCustomParameterNameMappers()
+    {
+        $command = $this->createCommand()
+            ->addArgument(new Argument('arg1'));
+
+        $addition = new CommandAdditionHelper($command, [
+            fn ($name) => str_replace('one', '1', $name),
+        ]);
+
+        $addition->handler(function ($argone = '1') {
+        });
+
+        $this->assertSame('1', $command->getArguments()['arg1']->getDefault());
+    }
+
     public function testOptions()
     {
         $command = $this->createCommand()

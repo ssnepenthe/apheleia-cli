@@ -63,7 +63,39 @@ class CommandRegistryTest extends TestCase
 
         $command = $registry->command('command', $handler)->getCommand();
 
+        $this->assertSame('command', $command->getName());
         $this->assertSame($handler, $command->getHandler());
+    }
+
+    public function testCommandWithHandlerWithDefaults()
+    {
+        $registry = new CommandRegistry();
+
+        $addition = $registry->command(
+            'command [<arg>] [--opt=<opt>]',
+            function ($arg = 'one', $opt = 'two') {
+            }
+        );
+        $command = $addition->getCommand();
+
+        $this->assertSame('one', $command->getArguments()['arg']->getDefault());
+        $this->assertSame('two', $command->getOptions()['opt']->getDefault());
+    }
+
+    public function testCommandWithHandlerWithDefaultsAndCustomParameterNameMappers()
+    {
+        $registry = new CommandRegistry();
+        $registry->setParameterNameMappers(fn ($name) => str_replace('one', '1', $name));
+
+        $addition = $registry->command(
+            'command [<1arg>] [--1opt=<1opt>]',
+            function ($onearg = 'one', $oneopt = 'two') {
+            }
+        );
+        $command = $addition->getCommand();
+
+        $this->assertSame('one', $command->getArguments()['1arg']->getDefault());
+        $this->assertSame('two', $command->getOptions()['1opt']->getDefault());
     }
 
     public function testInitialize()
