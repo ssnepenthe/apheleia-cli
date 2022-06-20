@@ -35,60 +35,47 @@ class InvokerBackedInvocationStrategy extends AbstractInvocationStrategy
      */
     public function callCommandHandler(Command $command)
     {
-        $args = $this->context['args'] ?? [];
-        $assocArgs = $this->context['assocArgs'] ?? [];
+        $args = $argsCopy = $this->context['args'] ?? [];
+        $assocArgs = $assocArgsCopy = $this->context['assocArgs'] ?? [];
 
         $parameters = [
             'args' => $args,
-            'arguments' => $args,
             'assocArgs' => $assocArgs,
-            'assoc_args' => $assocArgs,
-            'context' => $this->context,
-            'opts' => $assocArgs,
+            'arguments' => $args,
             'options' => $assocArgs,
+            'context' => $this->context,
         ];
 
         $registeredArgs = $command->getArguments();
 
-        while (count($args)) {
+        while (count($argsCopy)) {
             $current = array_shift($registeredArgs);
 
             $name = $current->getName();
-            $snakeName = Support::snakeCase($name);
-            $camelName = Support::camelCase($name);
 
             if ($current->getRepeating()) {
-                $parameters[$snakeName] = $args;
-                $parameters[$camelName] = $args;
+                $parameters[$name] = $argsCopy;
 
-                $args = [];
+                $argsCopy = [];
             } else {
-                $arg = array_shift($args);
+                $arg = array_shift($argsCopy);
 
-                $parameters[$snakeName] = $arg;
-                $parameters[$camelName] = $arg;
+                $parameters[$name] = $arg;
             }
         }
 
         foreach ($command->getOptions() as $option) {
             $name = $option->getName();
-            $snakeName = Support::snakeCase($name);
-            $camelName = Support::camelCase($name);
 
             if (array_key_exists($name, $assocArgs)) {
-                $parameters[$snakeName] = $assocArgs[$name];
-                $parameters[$camelName] = $assocArgs[$name];
+                $parameters[$name] = $assocArgsCopy[$name];
 
-                unset($assocArgs[$name]);
-            } elseif ($option instanceof Flag) {
-                $parameters[$snakeName] = false;
-                $parameters[$camelName] = false;
+                unset($assocArgsCopy[$name]);
             }
         }
 
-        if ($command->getAcceptArbitraryOptions() && ! empty($assocArgs)) {
-            $parameters['arbitraryOptions'] = $assocArgs;
-            $parameters['arbitrary_options'] = $assocArgs;
+        if ($command->getAcceptArbitraryOptions() && ! empty($assocArgsCopy)) {
+            $parameters['arbitraryOptions'] = $assocArgsCopy;
         }
 
         return $this->invoker->call($command->getHandler(), $parameters);

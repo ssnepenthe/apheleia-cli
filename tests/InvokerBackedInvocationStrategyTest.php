@@ -47,66 +47,47 @@ class InvokerBackedInvocationStrategyTest extends TestCase
 
         $callback = function (
             $args,
-            $arguments,
             $assocArgs,
-            $assoc_args,
-            $opts,
+            $arguments,
             $options,
             $argOne,
-            $arg_one,
             $argTwo,
-            $arg_two,
             $flagOne,
-            $flag_one,
-            $flagTwo,
-            $flag_two,
             $optOne,
-            $opt_one,
             $arbitraryOptions,
-            $arbitrary_options,
             $context
         ) use (&$count, &$receivedArgs) {
             $count++;
             $receivedArgs = compact(
                 'args',
-                'arguments',
                 'assocArgs',
-                'assoc_args',
-                'opts',
+                'arguments',
                 'options',
                 'argOne',
-                'arg_one',
                 'argTwo',
-                'arg_two',
                 'flagOne',
-                'flag_one',
-                'flagTwo',
-                'flag_two',
                 'optOne',
-                'opt_one',
                 'arbitraryOptions',
-                'arbitrary_options',
                 'context',
             );
         };
 
         $command = (new Command())
             ->setName('irrelevant')
-            ->addArgument(new Argument('arg-one'))
+            ->addArgument(new Argument('argOne'))
             ->addArgument(
-                (new Argument('arg-two'))
+                (new Argument('argTwo'))
                     ->setRepeating(true)
             )
-            ->addFlag(new Flag('flag-one'))
-            ->addFlag(new Flag('flag-two'))
-            ->addOption(new Option('opt-one'))
+            ->addFlag(new Flag('flagOne'))
+            ->addOption(new Option('optOne'))
             ->setAcceptArbitraryOptions(true)
             ->setHandler($callback);
 
         $args = ['apple', 'banana', 'cherry'];
         $assocArgs = [
-            'flag-one' => true,
-            'opt-one' => 'zebra',
+            'flagOne' => true,
+            'optOne' => 'zebra',
         ];
         $arbitraryOptions = [
             'this' => 'goes',
@@ -124,29 +105,19 @@ class InvokerBackedInvocationStrategyTest extends TestCase
 
         $this->assertSame([
             'args' => $args,
-            'arguments' => $args,
             'assocArgs' => [...$assocArgs, ...$arbitraryOptions],
-            'assoc_args' => [...$assocArgs, ...$arbitraryOptions],
-            'opts' => [...$assocArgs, ...$arbitraryOptions],
+            'arguments' => $args,
             'options' => [...$assocArgs, ...$arbitraryOptions],
             'argOne' => $args[0],
-            'arg_one' => $args[0],
 
             // If the last argument is repeating, all remaining arguments are bundled together
             'argTwo' => [$args[1], $args[2]],
-            'arg_two' => [$args[1], $args[2]],
             'flagOne' => true,
-            'flag_one' => true,
 
-            // Flags that aren't explicitly set default to false
-            'flagTwo' => false,
-            'flag_two' => false,
-            'optOne' => $assocArgs['opt-one'],
-            'opt_one' => $assocArgs['opt-one'],
+            'optOne' => $assocArgs['optOne'],
 
             // If command accepts arbitrary options, remaining options are bundled together
             'arbitraryOptions' => $arbitraryOptions,
-            'arbitrary_options' => $arbitraryOptions,
 
             // Full context array is also available
             'context' => $context,
