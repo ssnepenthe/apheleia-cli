@@ -97,7 +97,7 @@ class InvokerBackedInvocationStrategyTest extends TestCase
         (new InvokerBackedInvocationStrategy())
             ->withContext($context = [
                 'args' => $args,
-                'assocArgs' => [...$assocArgs, ...$arbitraryOptions],
+                'assocArgs' => array_merge($assocArgs, $arbitraryOptions),
             ])
             ->callCommandHandler($command);
 
@@ -105,9 +105,9 @@ class InvokerBackedInvocationStrategyTest extends TestCase
 
         $this->assertSame([
             'args' => $args,
-            'assocArgs' => [...$assocArgs, ...$arbitraryOptions],
+            'assocArgs' => array_merge($assocArgs, $arbitraryOptions),
             'arguments' => $args,
-            'options' => [...$assocArgs, ...$arbitraryOptions],
+            'options' => array_merge($assocArgs, $arbitraryOptions),
             'argOne' => $args[0],
 
             // If the last argument is repeating, all remaining arguments are bundled together
