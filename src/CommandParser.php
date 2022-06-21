@@ -103,13 +103,17 @@ class CommandParser implements CommandParserInterface
     protected function isArgument(string $token): bool
     {
         // SynopsisParser uses "/^<(([a-zA-Z-_|,0-9]+))>$/"
-        return 1 === preg_match('/^(\[)?<[^>]+>(?:\.{3})?(?(1)\])$/', $token);
+        $pattern = sprintf('/^(\[)?<[%s]+>(?:\.{3})?(?(1)\])$/', Argument::NAME_PATTERN);
+
+        return 1 === preg_match($pattern, $token);
     }
 
     protected function isFlag(string $token): bool
     {
         // SynopsisParser uses "/^--(?:\\[no-\\])?([a-z-_0-9]+)/"
-        return 1 === preg_match('/^\[--[^\[\]<>=]+\]$/', $token);
+        $pattern = sprintf('/^\[--[%s]+\]$/', Flag::NAME_PATTERN);
+
+        return 1 === preg_match($pattern, $token);
     }
 
     protected function isGeneric(string $token): bool
@@ -124,8 +128,15 @@ class CommandParser implements CommandParserInterface
 
     protected function isOption(string $token): bool
     {
-        // SynopsisParser uses "/^--(?:\\[no-\\])?([a-z-_0-9]+)/"
-        return 1 === preg_match('/^(\[)?--[^=\[\]<>]+(\[)?=<[^>]+>(?(2)\])(?(1)\])$/', $token);
+        // SynopsisParser uses "/^--(?:\\[no-\\])?([a-z-_0-9]+)/" for the option name and
+        // "/^=<([a-zA-Z-_|,0-9]+)>$/" for the option value.
+        $pattern = sprintf(
+            '/^(\[)?--[%s]+(\[)?=<[%s]+>(?(2)\])(?(1)\])$/',
+            Option::NAME_PATTERN,
+            Option::VALUE_PATTERN
+        );
+
+        return 1 === preg_match($pattern, $token);
     }
 
     protected function optionFromSignature(string $signature): Option

@@ -5,11 +5,20 @@ declare(strict_types=1);
 namespace ApheleiaCli\Tests;
 
 use ApheleiaCli\Option;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class OptionTest extends TestCase
 {
+    public function testConstructWithInvalidName()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid option name');
+
+        new Option('!@#');
+    }
+
     public function testGetSynopsis()
     {
         $option = new Option('some-name');
@@ -73,5 +82,12 @@ class OptionTest extends TestCase
             'default' => 'Apple',
             'options' => ['one', 'two', 'three'],
         ], $option->getSynopsis());
+    }
+
+    public function testIsValidName()
+    {
+        $this->assertTrue(Option::isValidName('abc123-_'));
+        $this->assertFalse(Option::isValidName('abc!123'));
+        $this->assertFalse(Option::isValidName('!@#'));
     }
 }

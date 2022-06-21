@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace ApheleiaCli;
 
+use InvalidArgumentException;
 use RuntimeException;
 
 class Option
 {
+    public const NAME_PATTERN = 'a-z\-_0-9';
+    public const VALUE_PATTERN = 'a-zA-Z\-_0-9';
+
     /**
      * @var string|null
      */
@@ -40,6 +44,12 @@ class Option
 
     public function __construct(string $name)
     {
+        if (! static::isValidName($name)) {
+            throw new InvalidArgumentException(
+                'Invalid option name - must only contain lowercase letters, numbers, -, and _'
+            );
+        }
+
         $this->name = $name;
     }
 
@@ -112,6 +122,13 @@ class Option
     public function getValueIsOptional(): bool
     {
         return $this->valueIsOptional;
+    }
+
+    public static function isValidName(string $name): bool
+    {
+        $pattern = sprintf('/[^%s]/', static::NAME_PATTERN);
+
+        return preg_replace($pattern, '', $name) === $name;
     }
 
     public function setDefault(string $default): self

@@ -6,6 +6,10 @@ namespace ApheleiaCli;
 
 use Invoker\Invoker;
 use Invoker\InvokerInterface;
+use Invoker\ParameterResolver\AssociativeArrayResolver;
+use Invoker\ParameterResolver\DefaultValueResolver;
+use Invoker\ParameterResolver\NumericArrayResolver;
+use Invoker\ParameterResolver\ResolverChain;
 
 class InvokerBackedInvocationStrategy extends AbstractInvocationStrategy
 {
@@ -16,7 +20,14 @@ class InvokerBackedInvocationStrategy extends AbstractInvocationStrategy
 
     public function __construct(?InvokerInterface $invoker = null)
     {
-        $this->invoker = $invoker ?: new Invoker();
+        $this->invoker = $invoker ?: new Invoker(
+            new ResolverChain([
+                new NumericArrayResolver(),
+                new AssociativeArrayResolver(),
+                new TransformingAssociativeArrayParameterResolver(),
+                new DefaultValueResolver(),
+            ])
+        );
     }
 
     /**

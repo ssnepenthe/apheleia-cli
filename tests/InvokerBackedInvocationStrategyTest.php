@@ -74,20 +74,20 @@ class InvokerBackedInvocationStrategyTest extends TestCase
 
         $command = (new Command())
             ->setName('irrelevant')
-            ->addArgument(new Argument('argOne'))
+            ->addArgument(new Argument('arg-one'))
             ->addArgument(
-                (new Argument('argTwo'))
+                (new Argument('arg-two'))
                     ->setRepeating(true)
             )
-            ->addFlag(new Flag('flagOne'))
-            ->addOption(new Option('optOne'))
+            ->addFlag(new Flag('flag-one'))
+            ->addOption(new Option('opt-one'))
             ->setAcceptArbitraryOptions(true)
             ->setHandler($callback);
 
         $args = ['apple', 'banana', 'cherry'];
         $assocArgs = [
-            'flagOne' => true,
-            'optOne' => 'zebra',
+            'flag-one' => true,
+            'opt-one' => 'zebra',
         ];
         $arbitraryOptions = [
             'this' => 'goes',
@@ -114,7 +114,7 @@ class InvokerBackedInvocationStrategyTest extends TestCase
             'argTwo' => [$args[1], $args[2]],
             'flagOne' => true,
 
-            'optOne' => $assocArgs['optOne'],
+            'optOne' => $assocArgs['opt-one'],
 
             // If command accepts arbitrary options, remaining options are bundled together
             'arbitraryOptions' => $arbitraryOptions,

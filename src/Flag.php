@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace ApheleiaCli;
 
+use InvalidArgumentException;
+
 class Flag
 {
+    public const NAME_PATTERN = 'a-z\-_0-9';
+
     /**
      * @var string|null
      */
@@ -18,6 +22,12 @@ class Flag
 
     public function __construct(string $name)
     {
+        if (! static::isValidName($name)) {
+            throw new InvalidArgumentException(
+                'Invalid flag name - must only contain lowercase letters, numbers, -, and _'
+            );
+        }
+
         $this->name = $name;
     }
 
@@ -48,6 +58,13 @@ class Flag
         }
 
         return $synopsis;
+    }
+
+    public static function isValidName(string $name): bool
+    {
+        $pattern = sprintf('/[^%s]/', static::NAME_PATTERN);
+
+        return preg_replace($pattern, '', $name) === $name;
     }
 
     public function setDescription(string $description): self
