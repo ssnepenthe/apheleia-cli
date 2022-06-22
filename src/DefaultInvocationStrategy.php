@@ -19,10 +19,16 @@ class DefaultInvocationStrategy extends AbstractInvocationStrategy
      */
     public function callCommandHandler(Command $command)
     {
-        return ($command->getHandler())(
-            $this->context['args'] ?? [],
-            $this->context['assocArgs'] ?? [],
-            $this->context
-        );
+        $args = $assocArgs = [];
+
+        if (isset($this->context['args']) && is_array($this->context['args'])) {
+            $args = $this->context['args'];
+        }
+
+        if (isset($this->context['assocArgs']) && is_array($this->context['assocArgs'])) {
+            $assocArgs = $this->context['assocArgs'];
+        }
+
+        return ($command->getHandler())($args, $assocArgs, $this->context);
     }
 }
