@@ -54,7 +54,7 @@ class CommandRegistry
         $this->wpCliAdapter = $wpCliAdapter ?: new WpCliAdapter();
     }
 
-    public function add(Command $command): void
+    public function add(Command $command): Command
     {
         if (! empty($this->namespace)) {
             $command->setNamespace(implode(' ', $this->namespace));
@@ -69,6 +69,8 @@ class CommandRegistry
         }
 
         $this->registeredCommands[$name] = $command;
+
+        return $command;
     }
 
     public function allowChildlessNamespaces(bool $allowChildlessNamespaces = true): self
@@ -115,7 +117,7 @@ class CommandRegistry
         string $namespace,
         string $description,
         ?callable $callback = null
-    ): void {
+    ): Command {
         $command = new Command();
         $command->setName($namespace);
         $command->setHandler(NamespaceIdentifier::class);
@@ -139,6 +141,8 @@ class CommandRegistry
                 $this->remove($command);
             }
         }
+
+        return $command;
     }
 
     public function remove(Command $command): void
