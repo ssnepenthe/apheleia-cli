@@ -6,7 +6,7 @@ namespace ApheleiaCli\Tests;
 
 use ApheleiaCli\Argument;
 use ApheleiaCli\Command;
-use ApheleiaCli\CommandAdditionHelper;
+use ApheleiaCli\ParsedCommandHelper;
 use ApheleiaCli\Flag;
 use ApheleiaCli\Option;
 use Closure;
@@ -14,12 +14,12 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
-class CommandAdditionHelperTest extends TestCase
+class ParsedCommandHelperTest extends TestCase
 {
     public function testAfter()
     {
         $command = $this->createCommand();
-        $helper = new CommandAdditionHelper($command);
+        $helper = new ParsedCommandHelper($command);
 
         $helper->after(function () {
         });
@@ -30,7 +30,7 @@ class CommandAdditionHelperTest extends TestCase
     public function testBefore()
     {
         $command = $this->createCommand();
-        $helper = new CommandAdditionHelper($command);
+        $helper = new ParsedCommandHelper($command);
 
         $helper->before(function () {
         });
@@ -44,7 +44,7 @@ class CommandAdditionHelperTest extends TestCase
             ->addArgument(new Argument('irrelevant-arg'))
             ->addOption(new Option('irrelevant-opt'));
 
-        $helper = new CommandAdditionHelper($command);
+        $helper = new ParsedCommandHelper($command);
 
         $helper->defaults([
             'irrelevant-arg' => 'arg-default',
@@ -69,7 +69,7 @@ class CommandAdditionHelperTest extends TestCase
         $command = $this->createCommand()
             ->addFlag(new Flag('irrelevant-flag'));
 
-        $helper = new CommandAdditionHelper($command);
+        $helper = new ParsedCommandHelper($command);
 
         $helper->defaults([
             '--irrelevant-flag' => 'irrelevant-default',
@@ -85,7 +85,7 @@ class CommandAdditionHelperTest extends TestCase
 
         $command = $this->createCommand();
 
-        $helper = new CommandAdditionHelper($command);
+        $helper = new ParsedCommandHelper($command);
 
         $helper->defaults([
             'unregistered-arg' => 'arg-default',
@@ -101,7 +101,7 @@ class CommandAdditionHelperTest extends TestCase
 
         $command = $this->createCommand();
 
-        $helper = new CommandAdditionHelper($command);
+        $helper = new ParsedCommandHelper($command);
 
         $helper->defaults([
             '--unregistered-opt' => 'opt-default',
@@ -115,7 +115,7 @@ class CommandAdditionHelperTest extends TestCase
             ->addOption(new Option('irrelevant-opt'))
             ->addFlag(new Flag('irrelevant-flag'));
 
-        $helper = new CommandAdditionHelper($command);
+        $helper = new ParsedCommandHelper($command);
 
         $helper->descriptions('Command description', [
             'irrelevant-arg' => 'Argument description',
@@ -148,7 +148,7 @@ class CommandAdditionHelperTest extends TestCase
 
         $command = $this->createCommand();
 
-        $helper = new CommandAdditionHelper($command);
+        $helper = new ParsedCommandHelper($command);
 
         $helper->descriptions('Irrelevant command description', [
             'unregistered-arg' => 'Irrelevant argument description',
@@ -164,7 +164,7 @@ class CommandAdditionHelperTest extends TestCase
 
         $command = $this->createCommand();
 
-        $helper = new CommandAdditionHelper($command);
+        $helper = new ParsedCommandHelper($command);
 
         $helper->descriptions('Irrelevant command description', [
             '--unregistered-flag' => 'Irrelevant flag description',
@@ -180,7 +180,7 @@ class CommandAdditionHelperTest extends TestCase
 
         $command = $this->createCommand();
 
-        $helper = new CommandAdditionHelper($command);
+        $helper = new ParsedCommandHelper($command);
 
         $helper->descriptions('Irrelevant command description', [
             '--unregistered-opt' => 'Irrelevant option description',
@@ -191,7 +191,7 @@ class CommandAdditionHelperTest extends TestCase
     {
         $command = $this->createCommand();
 
-        $helper = new CommandAdditionHelper($command);
+        $helper = new ParsedCommandHelper($command);
 
         $helper->handler('somehandler');
 
@@ -206,7 +206,7 @@ class CommandAdditionHelperTest extends TestCase
             ->addArgument(new Argument('argThree'))
             ->addArgument(new Argument('ArgFour'));
 
-        $addition = new CommandAdditionHelper($command);
+        $addition = new ParsedCommandHelper($command);
 
         $handler = function ($ArgOne = '1', $argTwo = '2', $arg_three = '3', $arg_four = '4') {
         };
@@ -224,7 +224,7 @@ class CommandAdditionHelperTest extends TestCase
         $command = $this->createCommand()
             ->addArgument(new Argument('arg1'));
 
-        $addition = new CommandAdditionHelper($command, [
+        $addition = new ParsedCommandHelper($command, [
             fn ($name) => str_replace('one', '1', $name),
         ]);
 
@@ -240,7 +240,7 @@ class CommandAdditionHelperTest extends TestCase
             ->addArgument(new Argument('irrelevant-arg'))
             ->addOption(new Option('irrelevant-opt'));
 
-        $helper = new CommandAdditionHelper($command);
+        $helper = new ParsedCommandHelper($command);
 
         $helper->options([
             'irrelevant-arg' => ['arg-one', 'arg-two'],
@@ -265,7 +265,7 @@ class CommandAdditionHelperTest extends TestCase
         $command = $this->createCommand()
             ->addFlag(new Flag('irrelevant-flag'));
 
-        $helper = new CommandAdditionHelper($command);
+        $helper = new ParsedCommandHelper($command);
 
         $helper->options([
             '--irrelevant-flag' => [],
@@ -281,7 +281,7 @@ class CommandAdditionHelperTest extends TestCase
 
         $command = $this->createCommand();
 
-        $helper = new CommandAdditionHelper($command);
+        $helper = new ParsedCommandHelper($command);
 
         $helper->options([
             'unregistered-arg' => ['arg-one', 'arg-two'],
@@ -297,7 +297,7 @@ class CommandAdditionHelperTest extends TestCase
 
         $command = $this->createCommand();
 
-        $helper = new CommandAdditionHelper($command);
+        $helper = new ParsedCommandHelper($command);
 
         $helper->options([
             '--unregistered-opt' => ['opt-one', 'opt-two'],
@@ -311,7 +311,7 @@ class CommandAdditionHelperTest extends TestCase
 
         $command = $this->createCommand();
 
-        $helper = new CommandAdditionHelper($command);
+        $helper = new ParsedCommandHelper($command);
 
         $helper->options([
             'irrelevant-arg' => 'this-should-be-an-array',
@@ -322,7 +322,7 @@ class CommandAdditionHelperTest extends TestCase
     {
         $command = $this->createCommand();
 
-        $helper = new CommandAdditionHelper($command);
+        $helper = new ParsedCommandHelper($command);
 
         $helper->usage('Irrelevant usage string');
 
@@ -333,7 +333,7 @@ class CommandAdditionHelperTest extends TestCase
     {
         $command = $this->createCommand();
 
-        $helper = new CommandAdditionHelper($command);
+        $helper = new ParsedCommandHelper($command);
 
         $helper->when('irrelevant-when-string');
 

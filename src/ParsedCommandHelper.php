@@ -6,7 +6,7 @@ namespace ApheleiaCli;
 
 use InvalidArgumentException;
 
-class CommandAdditionHelper
+class ParsedCommandHelper
 {
     protected $command;
     protected $parameterNameMappers;

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ApheleiaCli;
 
-use Closure;
 use RuntimeException;
 
 class CommandRegistry
@@ -40,7 +39,7 @@ class CommandRegistry
     protected $parameterNameMappers = [];
 
     /**
-     * @var array<string, Command>
+     * @var array<string, CommandAddition>
      */
     protected $registeredCommands = [];
 
@@ -73,7 +72,13 @@ class CommandRegistry
             );
         }
 
-        $this->registeredCommands[$name] = $command;
+        $this->registeredCommands[$name] = new CommandAddition(
+            $command,
+            $this->invocationStrategy,
+            $this->wpCliAdapter
+        );
+        $this->registeredCommands[$name]->setAutoExit($this->autoExit);
+
 
         return $command;
     }
@@ -85,11 +90,11 @@ class CommandRegistry
         return $this;
     }
 
-    public function command(string $command, $handler): CommandAdditionHelper
+    public function command(string $command, $handler): ParsedCommandHelper
     {
         $command = $this->commandParser->parse($command);
 
-        $addition = new CommandAdditionHelper($command, $this->parameterNameMappers);
+        $addition = new ParsedCommandHelper($command, $this->parameterNameMappers);
         $addition->handler($handler);
 
         $this->add($command);
@@ -102,7 +107,10 @@ class CommandRegistry
      */
     public function getRegisteredCommands(): array
     {
-        return $this->registeredCommands;
+        return array_map(
+            fn (CommandAddition $addition) => $addition->getCommand(),
+            $this->registeredCommands
+        );
     }
 
     public function initialize(string $when = 'plugins_loaded'): void
@@ -179,63 +187,12 @@ class CommandRegistry
 
     protected function doInitialize(): void
     {
-        foreach ($this->registeredCommands as $command) {
-            $args = [];
-
-            if ($shortdesc = $command->getDescription()) {
-                $args['shortdesc'] = $shortdesc;
-            }
-
-            if (! empty($synopsis = $command->getSynopsis())) {
-                $args['synopsis'] = $synopsis;
-            }
-
-            if ($longdesc = $command->getUsage()) {
-                $args['longdesc'] = $longdesc;
-            }
-
-            if ($beforeInvoke = $command->getBeforeInvokeCallback()) {
-                $args['before_invoke'] = fn () => $this->invocationStrategy->call($beforeInvoke);
-            }
-
-            if ($afterInvoke = $command->getAfterInvokeCallback()) {
-                $args['after_invoke'] = fn () => $this->invocationStrategy->call($afterInvoke);
-            }
-
-            if ($when = $command->getWhen()) {
-                $args['when'] = $when;
-            }
-
-            $handler = $command->getHandler();
-
-            if (NamespaceIdentifier::class !== $handler) {
-                $handler = $this->wrapCommandHandler($command);
-            }
-
-            $this->wpCliAdapter->addCommand($command->getName(), $handler, $args);
+        foreach ($this->registeredCommands as $addition) {
+            $this->wpCliAdapter->addCommand(
+                $addition->getName(),
+                $addition->getHandler(),
+                $addition->getArgs()
+            );
         }
-    }
-
-    protected function wrapCommandHandler(Command $command): Closure
-    {
-        return function (array $args, array $assocArgs) use ($command) {
-            $status = $this->invocationStrategy
-                ->withContext(compact('args', 'assocArgs'))
-                ->callCommandHandler($command);
-
-            if (! is_int($status) || $status < 0) {
-                $status = 0;
-            }
-
-            if ($status > 255) {
-                $status = 255;
-            }
-
-            if ($this->autoExit) {
-                $this->wpCliAdapter->halt($status);
-            }
-
-            return $status;
-        };
     }
 }
