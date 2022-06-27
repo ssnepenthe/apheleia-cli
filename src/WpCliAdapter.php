@@ -21,4 +21,12 @@ class WpCliAdapter implements WpCliAdapterInterface
     ): void {
         WP_CLI::add_wp_hook($tag, $callback, $priority, $acceptedArgs);
     }
+
+    /**
+     * @return never
+     */
+    public function halt(int $code)
+    {
+        WP_CLI::halt($code);
+    }
 }

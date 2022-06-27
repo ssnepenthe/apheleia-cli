@@ -9,6 +9,10 @@ use RuntimeException;
 
 class Command
 {
+    public const STATUS_FAILURE = 1;
+    public const STATUS_INVALID = 2;
+    public const STATUS_SUCCESS = 0;
+
     /**
      * @var bool
      */

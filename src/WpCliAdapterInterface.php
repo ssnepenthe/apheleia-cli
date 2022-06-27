@@ -17,4 +17,8 @@ interface WpCliAdapterInterface
         int $priority = 10,
         int $acceptedArgs = 1
     ): void;
+    /**
+     * @return never
+     */
+    public function halt(int $code);
 }

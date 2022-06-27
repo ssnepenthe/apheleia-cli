@@ -15,6 +15,11 @@ class CommandRegistry
     protected $allowChildlessNamespaces = false;
 
     /**
+     * @var bool
+     */
+    protected $autoExit = true;
+
+    /**
      * @var CommandParserInterface
      */
     protected $commandParser;
@@ -158,6 +163,13 @@ class CommandRegistry
         unset($this->registeredCommands[$name]);
     }
 
+    public function setAutoExit(bool $autoExit): self
+    {
+        $this->autoExit = $autoExit;
+
+        return $this;
+    }
+
     public function setParameterNameMappers(callable ...$parameterNameMappers): self
     {
         $this->parameterNameMappers = $parameterNameMappers;
@@ -206,8 +218,24 @@ class CommandRegistry
 
     protected function wrapCommandHandler(Command $command): Closure
     {
-        return fn (array $args, array $assocArgs) => $this->invocationStrategy
-            ->withContext(compact('args', 'assocArgs'))
-            ->callCommandHandler($command);
+        return function (array $args, array $assocArgs) use ($command) {
+            $status = $this->invocationStrategy
+                ->withContext(compact('args', 'assocArgs'))
+                ->callCommandHandler($command);
+
+            if (! is_int($status) || $status < 0) {
+                $status = 0;
+            }
+
+            if ($status > 255) {
+                $status = 255;
+            }
+
+            if ($this->autoExit) {
+                $this->wpCliAdapter->halt($status);
+            }
+
+            return $status;
+        };
     }
 }
