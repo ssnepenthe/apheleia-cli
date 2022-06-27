@@ -115,12 +115,18 @@ class CommandRegistry
 
     public function initialize(string $when = 'plugins_loaded'): void
     {
-        $this->wpCliAdapter->addWpHook($when, fn () => $this->doInitialize());
+        $this->wpCliAdapter->addWpHook($when, fn () => $this->initializeImmediately());
     }
 
     public function initializeImmediately(): void
     {
-        $this->doInitialize();
+        foreach ($this->registeredCommands as $addition) {
+            $this->wpCliAdapter->addCommand(
+                $addition->getName(),
+                $addition->getHandler(),
+                $addition->getArgs()
+            );
+        }
     }
 
     /**
@@ -183,16 +189,5 @@ class CommandRegistry
         $this->parameterNameMappers = $parameterNameMappers;
 
         return $this;
-    }
-
-    protected function doInitialize(): void
-    {
-        foreach ($this->registeredCommands as $addition) {
-            $this->wpCliAdapter->addCommand(
-                $addition->getName(),
-                $addition->getHandler(),
-                $addition->getArgs()
-            );
-        }
     }
 }
