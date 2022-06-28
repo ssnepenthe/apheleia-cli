@@ -29,4 +29,9 @@ class WpCliAdapter implements WpCliAdapterInterface
     {
         WP_CLI::halt($code);
     }
+
+    public function isWpCli(): bool
+    {
+        return defined('WP_CLI') && WP_CLI;
+    }
 }

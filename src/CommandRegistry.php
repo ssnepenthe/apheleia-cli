@@ -120,6 +120,10 @@ class CommandRegistry
 
     public function initializeImmediately(): void
     {
+        if (! $this->wpCliAdapter->isWpCli()) {
+            return;
+        }
+
         foreach ($this->registeredCommands as $addition) {
             $this->wpCliAdapter->addCommand(
                 $addition->getName(),
