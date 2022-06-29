@@ -115,7 +115,7 @@ class CommandRegistry
 
     public function initialize(string $when = 'plugins_loaded'): void
     {
-        $this->wpCliAdapter->addWpHook($when, fn () => $this->initializeImmediately());
+        $this->wpCliAdapter->addWpHook($when, [$this, 'initializeImmediately']);
     }
 
     public function initializeImmediately(): void

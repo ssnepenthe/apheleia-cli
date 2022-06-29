@@ -12,6 +12,7 @@ use ApheleiaCli\NamespaceIdentifier;
 use ApheleiaCli\Option;
 use ApheleiaCli\WpCliAdapterInterface;
 use Closure;
+use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -105,7 +106,7 @@ class CommandRegistryTest extends TestCase
         $wpCliAdapterMock
             ->expects($this->once())
             ->method('addWpHook')
-            ->with('plugins_loaded', $this->isInstanceOf(Closure::class));
+            ->with('plugins_loaded', $this->isType(IsType::TYPE_CALLABLE));
 
         $registry = new CommandRegistry(null, null, $wpCliAdapterMock);
 
