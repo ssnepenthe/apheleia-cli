@@ -4,12 +4,8 @@ declare(strict_types=1);
 
 namespace ApheleiaCli\Tests;
 
-use ApheleiaCli\Argument;
 use ApheleiaCli\Command;
 use ApheleiaCli\CommandRegistry;
-use ApheleiaCli\Flag;
-use ApheleiaCli\NamespaceIdentifier;
-use ApheleiaCli\Option;
 use ApheleiaCli\WpCliAdapterInterface;
 use Closure;
 use PHPUnit\Framework\Constraint\IsType;
@@ -171,92 +167,6 @@ class CommandRegistryTest extends TestCase
 
         $registry->command('command <arg> [--option=<option>]', function () {
         });
-
-        $registry->initializeImmediately();
-    }
-
-    public function testInitializeImmediatelyWithAllOptionsConfigured()
-    {
-        $wpCliAdapterMock = $this->createMock(WpCliAdapterInterface::class);
-        $wpCliAdapterMock
-            ->expects($this->once())
-            ->method('isWpCli')
-            ->willReturn(true);
-        $wpCliAdapterMock
-            ->expects($this->exactly(2))
-            ->method('addCommand')
-            ->withConsecutive(
-                [
-                    'group',
-                    NamespaceIdentifier::class,
-                    [
-                        'shortdesc' => 'Group description',
-                    ]
-                ],
-                [
-                    'group command',
-                    $this->isInstanceOf(Closure::class),
-                    $this->callback(function ($subject) {
-                        return is_array($subject)
-                            && array_key_exists('shortdesc', $subject)
-                            && 'A description string' === $subject['shortdesc']
-                            && array_key_exists('synopsis', $subject)
-                            && [
-                                [
-                                    'type' => 'positional',
-                                    'name' => 'arg',
-                                    'optional' => false,
-                                    'repeating' => false,
-                                ],
-                                [
-                                    'type' => 'flag',
-                                    'name' => 'flag',
-                                    'optional' => true,
-                                    'repeating' => false,
-                                ],
-                                [
-                                    'type' => 'assoc',
-                                    'name' => 'opt',
-                                    'optional' => true,
-                                    'repeating' => false,
-                                ],
-                            ] === $subject['synopsis']
-                            && array_key_exists('longdesc', $subject)
-                            && 'A usage string' === $subject['longdesc']
-                            && array_key_exists('before_invoke', $subject)
-                            && $subject['before_invoke'] instanceof Closure
-                            && array_key_exists('after_invoke', $subject)
-                            && $subject['after_invoke'] instanceof Closure
-                            && array_key_exists('when', $subject)
-                            && 'when-string' === $subject['when'];
-                    })
-                ],
-            );
-
-        $registry = new CommandRegistry(null, null, $wpCliAdapterMock);
-
-        $registry->group(
-            'group',
-            'Group description',
-            function (CommandRegistry $registry) {
-                $registry->add(
-                    (new Command())
-                        ->setName('command')
-                        ->addArgument(new Argument('arg'))
-                        ->addFlag(new Flag('flag'))
-                        ->addOption(new Option('opt'))
-                        ->setDescription('A description string')
-                        ->setUsage('A usage string')
-                        ->setBeforeInvokeCallback(function () {
-                        })
-                        ->setAfterInvokeCallback(function () {
-                        })
-                        ->setWhen('when-string')
-                        ->setHandler(function () {
-                        })
-                );
-            }
-        );
 
         $registry->initializeImmediately();
     }
