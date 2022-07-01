@@ -11,7 +11,7 @@ class CommandRegistry
     /**
      * @var bool
      */
-    protected $allowChildlessNamespaces = false;
+    protected $allowChildlessGroups = false;
 
     /**
      * @var bool
@@ -24,14 +24,14 @@ class CommandRegistry
     protected $commandParser;
 
     /**
+     * @var list<string>
+     */
+    protected $groups = [];
+
+    /**
      * @var InvocationStrategyInterface
      */
     protected $invocationStrategy;
-
-    /**
-     * @var list<string>
-     */
-    protected $namespace = [];
 
     /**
      * @var array<int, callable(string):string>
@@ -60,8 +60,8 @@ class CommandRegistry
 
     public function add(Command $command): Command
     {
-        if (! empty($this->namespace)) {
-            $command->setNamespace(implode(' ', $this->namespace));
+        if (! empty($this->groups)) {
+            $command->setNamespace(implode(' ', $this->groups));
         }
 
         $name = $command->getName();
@@ -83,9 +83,9 @@ class CommandRegistry
         return $command;
     }
 
-    public function allowChildlessNamespaces(bool $allowChildlessNamespaces = true): self
+    public function allowChildlessGroups(bool $allowChildlessGroups = true): self
     {
-        $this->allowChildlessNamespaces = $allowChildlessNamespaces;
+        $this->allowChildlessGroups = $allowChildlessGroups;
 
         return $this;
     }
@@ -113,6 +113,31 @@ class CommandRegistry
         );
     }
 
+    /**
+     * @param non-empty-string $group
+     */
+    public function group(string $group, string $description, callable $callback): Command
+    {
+        $command = $this->namespace($group, $description);
+
+        $preCallbackCommandCount = count($this->registeredCommands);
+
+        $this->groups[] = $group;
+
+        $callback($this);
+
+        array_pop($this->groups);
+
+        if (
+            ! $this->allowChildlessGroups
+            && count($this->registeredCommands) === $preCallbackCommandCount
+        ) {
+            $this->remove($command);
+        }
+
+        return $command;
+    }
+
     public function initialize(string $when = 'plugins_loaded'): void
     {
         $this->wpCliAdapter->addWpHook($when, [$this, 'initializeImmediately']);
@@ -136,34 +161,14 @@ class CommandRegistry
     /**
      * @param non-empty-string $namespace
      */
-    public function namespace(
-        string $namespace,
-        string $description,
-        ?callable $callback = null
-    ): Command {
+    public function namespace(string $namespace, string $description): Command
+    {
         $command = new Command();
         $command->setName($namespace);
         $command->setHandler(NamespaceIdentifier::class);
         $command->setDescription($description);
 
         $this->add($command);
-
-        if (is_callable($callback)) {
-            $preCallbackCommandCount = count($this->registeredCommands);
-
-            $this->namespace[] = $namespace;
-
-            $callback($this);
-
-            array_pop($this->namespace);
-
-            if (
-                ! $this->allowChildlessNamespaces
-                && count($this->registeredCommands) === $preCallbackCommandCount
-            ) {
-                $this->remove($command);
-            }
-        }
 
         return $command;
     }

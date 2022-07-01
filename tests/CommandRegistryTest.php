@@ -29,21 +29,21 @@ class CommandRegistryTest extends TestCase
         $registry->add((new Command())->setName('irrelevant'));
     }
 
-    public function testAddWithNamespace()
+    public function testAddWithGroup()
     {
         $one = (new Command())->setName('one');
         $two = (new Command())->setName('two');
 
         $registry = new CommandRegistry();
 
-        $registry->namespace(
-            'ns-one',
+        $registry->group(
+            'group-one',
             'description',
             function (CommandRegistry $registry) use ($one, $two) {
                 $registry->add($one);
 
-                $registry->namespace(
-                    'ns-two',
+                $registry->group(
+                    'group-two',
                     'description',
                     function (CommandRegistry $registry) use ($two) {
                         $registry->add($two);
@@ -52,8 +52,8 @@ class CommandRegistryTest extends TestCase
             }
         );
 
-        $this->assertSame('ns-one one', $one->getName());
-        $this->assertSame('ns-one ns-two two', $two->getName());
+        $this->assertSame('group-one one', $one->getName());
+        $this->assertSame('group-one group-two two', $two->getName());
     }
 
     public function testCommand()
@@ -97,6 +97,27 @@ class CommandRegistryTest extends TestCase
 
         $this->assertSame('one', $command->getArguments()['1arg']->getDefault());
         $this->assertSame('two', $command->getOptions()['1opt']->getDefault());
+    }
+
+    public function testGroupWithNoCommandsAndChildlessGroupsAllowed()
+    {
+        $registry = new CommandRegistry();
+        $registry->allowChildlessGroups();
+
+        $registry->group('group', 'description', function () {
+        });
+
+        $this->assertCount(1, $registry->getRegisteredCommands());
+    }
+
+    public function testGroupWithNoCommandsAndChildlessGroupsForbidden()
+    {
+        $registry = new CommandRegistry();
+
+        $registry->group('group', 'description', function () {
+        });
+
+        $this->assertCount(0, $registry->getRegisteredCommands());
     }
 
     public function testInitialize()
@@ -160,14 +181,14 @@ class CommandRegistryTest extends TestCase
             ->method('addCommand')
             ->withConsecutive(
                 [
-                    'namespace',
+                    'group',
                     NamespaceIdentifier::class,
                     [
-                        'shortdesc' => 'Namespace description',
+                        'shortdesc' => 'Group description',
                     ]
                 ],
                 [
-                    'namespace command',
+                    'group command',
                     $this->isInstanceOf(Closure::class),
                     $this->callback(function ($subject) {
                         return is_array($subject)
@@ -208,9 +229,9 @@ class CommandRegistryTest extends TestCase
 
         $registry = new CommandRegistry(null, null, $wpCliAdapterMock);
 
-        $registry->namespace(
-            'namespace',
-            'Namespace description',
+        $registry->group(
+            'group',
+            'Group description',
             function (CommandRegistry $registry) {
                 $registry->add(
                     (new Command())
@@ -234,25 +255,15 @@ class CommandRegistryTest extends TestCase
         $registry->initializeImmediately();
     }
 
-    public function testNamespaceWithNoCommandsAndChildlessNamespacesAllowed()
+    public function testNamespace()
     {
         $registry = new CommandRegistry();
-        $registry->allowChildlessNamespaces();
 
-        $registry->namespace('namespace', 'description', function () {
-        });
+        $command = $registry->namespace('namespace', 'description');
 
         $this->assertCount(1, $registry->getRegisteredCommands());
-    }
-
-    public function testNamespaceWithNoCommandsAndChildlessNamespacesForbidden()
-    {
-        $registry = new CommandRegistry();
-
-        $registry->namespace('namespace', 'description', function () {
-        });
-
-        $this->assertCount(0, $registry->getRegisteredCommands());
+        $this->assertSame('namespace', $command->getName());
+        $this->assertSame('description', $command->getDescription());
     }
 
     public function testRemove()
