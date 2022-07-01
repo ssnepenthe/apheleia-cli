@@ -41,14 +41,14 @@ class Command
     protected $name;
 
     /**
-     * @var string|null
-     */
-    protected $namespace;
-
-    /**
      * @var array<string, Flag|Option>
      */
     protected $options = [];
+
+    /**
+     * @var ?Command
+     */
+    protected $parent;
 
     /**
      * @var string|null
@@ -186,7 +186,13 @@ class Command
             throw new InvalidArgumentException('Command name must be non-empty string');
         }
 
-        return $this->namespace ? "{$this->namespace} {$this->name}" : $this->name;
+        $name = $this->name;
+
+        if ($this->parent instanceof Command) {
+            $name = "{$this->parent->getName()} {$name}";
+        }
+
+        return $name;
     }
 
     /**
@@ -280,9 +286,9 @@ class Command
         return $this;
     }
 
-    public function setNamespace(string $namespace): self
+    public function setParent(?Command $parent): self
     {
-        $this->namespace = $namespace;
+        $this->parent = $parent;
 
         return $this;
     }

@@ -24,9 +24,9 @@ class CommandRegistry
     protected $commandParser;
 
     /**
-     * @var list<string>
+     * @var ?Command
      */
-    protected $groups = [];
+    protected $currentGroupParent;
 
     /**
      * @var InvocationStrategyInterface
@@ -60,8 +60,8 @@ class CommandRegistry
 
     public function add(Command $command): Command
     {
-        if (! empty($this->groups)) {
-            $command->setNamespace(implode(' ', $this->groups));
+        if ($this->currentGroupParent instanceof Command) {
+            $command->setParent($this->currentGroupParent);
         }
 
         $name = $command->getName();
@@ -122,11 +122,12 @@ class CommandRegistry
 
         $preCallbackCommandCount = count($this->registeredCommands);
 
-        $this->groups[] = $group;
+        $previousGroupParent = $this->currentGroupParent;
+        $this->currentGroupParent = $command;
 
         $callback($this);
 
-        array_pop($this->groups);
+        $this->currentGroupParent = $previousGroupParent;
 
         if (
             ! $this->allowChildlessGroups

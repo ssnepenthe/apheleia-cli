@@ -33,27 +33,33 @@ class CommandRegistryTest extends TestCase
     {
         $one = (new Command())->setName('one');
         $two = (new Command())->setName('two');
+        $three = (new Command())->setName('three');
+        $four = (new Command())->setName('four');
 
         $registry = new CommandRegistry();
 
+        $registry->add($one);
+
         $registry->group(
-            'group-one',
+            'first',
             'description',
-            function (CommandRegistry $registry) use ($one, $two) {
-                $registry->add($one);
+            function (CommandRegistry $registry) use ($two, $three) {
+                $registry->add($two);
 
                 $registry->group(
-                    'group-two',
+                    'second',
                     'description',
-                    function (CommandRegistry $registry) use ($two) {
-                        $registry->add($two);
+                    function (CommandRegistry $registry) use ($three) {
+                        $registry->add($three);
                     }
                 );
             }
         );
 
-        $this->assertSame('group-one one', $one->getName());
-        $this->assertSame('group-one group-two two', $two->getName());
+        $this->assertSame('one', $one->getName());
+        $this->assertSame('first two', $two->getName());
+        $this->assertSame('first second three', $three->getName());
+        $this->assertSame('four', $four->getName());
     }
 
     public function testCommand()
