@@ -7,6 +7,7 @@
         "php": "^7.4 || ^8.0"
     },
     "require-dev": {
+        "humanmade/psalm-plugin-wordpress": "dev-master",
         "php-di/invoker": "^2.3",
         "phpunit/phpunit": "^9.5",
         "vimeo/psalm": "^4.22",
