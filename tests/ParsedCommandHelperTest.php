@@ -6,9 +6,9 @@ namespace ApheleiaCli\Tests;
 
 use ApheleiaCli\Argument;
 use ApheleiaCli\Command;
-use ApheleiaCli\ParsedCommandHelper;
 use ApheleiaCli\Flag;
 use ApheleiaCli\Option;
+use ApheleiaCli\ParsedCommandHelper;
 use Closure;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;

@@ -153,6 +153,7 @@ class CommandParserTest extends TestCase
 
         $this->assertSame($output, $parser->parse($input)->getSynopsis());
     }
+
     public function testParseNames()
     {
         $parser = new CommandParser();

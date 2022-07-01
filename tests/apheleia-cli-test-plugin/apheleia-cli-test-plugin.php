@@ -72,7 +72,7 @@ $registry->namespace('apheleia', 'Apheleia CLI Test Plugin', function (CommandRe
             {
                 WP_CLI::log('Before class');
             }
-            
+
             public function configure(): void
             {
                 $this
