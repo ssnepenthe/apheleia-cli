@@ -48,7 +48,7 @@ class HelloCommand extends ApheleiaCli\Command
 
 $registry = new ApheleiaCli\CommandRegistry();
 
-$registry->namespace('example', 'Implements example command.', function($scopedRegistry) {
+$registry->group('example', 'Implements example command.', function($scopedRegistry) {
     $scopedRegistry->add(new HelloCommand());
 });
 
@@ -60,7 +60,7 @@ Alternatively, you might want to define a command on the fly:
 ```php
 $registry = new ApheleiaCli\CommandRegistry();
 
-$registry->namespace('example', 'Implements example command.', function($scopedRegistry) {
+$registry->group('example', 'Implements example command.', function($scopedRegistry) {
     $command = (new ApheleiaCli\Command())
         ->setName('hello')
         ->setDescription('Prints a greeting.')
@@ -122,7 +122,7 @@ class HelloCommand extends ApheleiaCli\Command
 // InvokerBackedInvocationStrategy calls command handlers using the php-di/invoker package.
 $registry = new ApheleiaCli\CommandRegistry(new ApheleiaCli\InvokerBackedInvocationStrategy());
 
-$registry->namespace('example', 'Implements example command.', function($scopedRegistry) {
+$registry->group('example', 'Implements example command.', function($scopedRegistry) {
     $scopedRegistry->add(new HelloCommand());
 });
 
@@ -134,7 +134,7 @@ There is also an alternate syntax:
 ```php
 $registry = new ApheleiaCli\CommandRegistry();
 
-$registry->namespace('example', 'Implements example command.', function($scopedRegistry) {
+$registry->group('example', 'Implements example command.', function($scopedRegistry) {
     $scopedRegistry->command('hello <name> [--type=<type>]', function($args, $assoc_args) {
         list($name) = $args;
 
