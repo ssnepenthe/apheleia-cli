@@ -14,8 +14,7 @@ class SupportTest extends TestCase
 {
     public function provideTestCallableReflector()
     {
-        yield [ReflectionFunction::class, function () {
-        }];
+        yield [ReflectionFunction::class, fn () => ''];
         yield [ReflectionMethod::class, 'DateTime::createFromFormat'];
         yield [ReflectionFunction::class, 'array_map'];
         yield [ReflectionMethod::class, new class () {

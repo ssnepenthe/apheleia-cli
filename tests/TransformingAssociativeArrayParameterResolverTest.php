@@ -15,8 +15,7 @@ class TransformingAssociativeArrayParameterResolverTest extends TestCase
         $resolver = new TransformingAssociativeArrayParameterResolver();
 
         $reflection = new ReflectionFunction(
-            function ($param_one, $paramTwo, $ParamThree, $param_four) {
-            }
+            fn ($param_one, $paramTwo, $ParamThree, $param_four) => ''
         );
 
         $parameters = $resolver->getParameters(
@@ -42,8 +41,7 @@ class TransformingAssociativeArrayParameterResolverTest extends TestCase
         $resolver = new TransformingAssociativeArrayParameterResolver();
 
         $reflection = new ReflectionFunction(
-            function ($param_one, $paramTwo, $ParamThree, $param_four, $paramFive) {
-            }
+            fn ($param_one, $paramTwo, $ParamThree, $param_four, $paramFive) => ''
         );
 
         $parameters = $resolver->getParameters(
@@ -73,8 +71,7 @@ class TransformingAssociativeArrayParameterResolverTest extends TestCase
     {
         $resolver = new TransformingAssociativeArrayParameterResolver();
 
-        $reflection = new ReflectionFunction(function ($paramOne, $ParamTwo) {
-        });
+        $reflection = new ReflectionFunction(fn ($paramOne, $ParamTwo) => '');
 
         $parameters = $resolver->getParameters(
             $reflection,
@@ -95,8 +92,7 @@ class TransformingAssociativeArrayParameterResolverTest extends TestCase
             fn ($name) => str_ireplace(['one', 'two', 'three'], ['1', '2', '3'], $name),
         ]);
 
-        $reflection = new ReflectionFunction(function ($paramOne, $paramTwo, $paramThree) {
-        });
+        $reflection = new ReflectionFunction(fn ($paramOne, $paramTwo, $paramThree) => '');
 
         $parameters = $resolver->getParameters(
             $reflection,

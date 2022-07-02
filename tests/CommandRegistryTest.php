@@ -61,8 +61,7 @@ class CommandRegistryTest extends TestCase
     public function testCommand()
     {
         $registry = new CommandRegistry();
-        $handler = function () {
-        };
+        $handler = fn () => '';
 
         $command = $registry->command('command', $handler)->getCommand();
 
@@ -76,8 +75,7 @@ class CommandRegistryTest extends TestCase
 
         $addition = $registry->command(
             'command [<arg>] [--opt=<opt>]',
-            function ($arg = 'one', $opt = 'two') {
-            }
+            fn ($arg = 'one', $opt = 'two') => ''
         );
         $command = $addition->getCommand();
 
@@ -92,8 +90,7 @@ class CommandRegistryTest extends TestCase
 
         $addition = $registry->command(
             'command [<1arg>] [--1opt=<1opt>]',
-            function ($onearg = 'one', $oneopt = 'two') {
-            }
+            fn ($onearg = 'one', $oneopt = 'two') => ''
         );
         $command = $addition->getCommand();
 
@@ -106,8 +103,7 @@ class CommandRegistryTest extends TestCase
         $registry = new CommandRegistry();
         $registry->allowChildlessGroups();
 
-        $registry->group('group', 'description', function () {
-        });
+        $registry->group('group', 'description', fn () => '');
 
         $this->assertCount(1, $registry->getRegisteredCommands());
     }
@@ -116,8 +112,7 @@ class CommandRegistryTest extends TestCase
     {
         $registry = new CommandRegistry();
 
-        $registry->group('group', 'description', function () {
-        });
+        $registry->group('group', 'description', fn () => '');
 
         $this->assertCount(0, $registry->getRegisteredCommands());
     }
@@ -165,8 +160,7 @@ class CommandRegistryTest extends TestCase
 
         $registry = new CommandRegistry(null, null, $wpCliAdapterMock);
 
-        $registry->command('command <arg> [--option=<option>]', function () {
-        });
+        $registry->command('command <arg> [--option=<option>]', fn () => '');
 
         $registry->initializeImmediately();
     }

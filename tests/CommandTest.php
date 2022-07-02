@@ -157,8 +157,7 @@ class CommandTest extends TestCase
     {
         $command = new Command();
 
-        $command->setHandler(function () {
-        });
+        $command->setHandler(fn () => '');
 
         $this->assertInstanceOf(Closure::class, $command->getHandler());
     }

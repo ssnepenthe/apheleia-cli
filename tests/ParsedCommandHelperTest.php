@@ -21,8 +21,7 @@ class ParsedCommandHelperTest extends TestCase
         $command = $this->createCommand();
         $helper = new ParsedCommandHelper($command);
 
-        $helper->after(function () {
-        });
+        $helper->after(fn () => '');
 
         $this->assertInstanceOf(Closure::class, $command->getAfterInvokeCallback());
     }
@@ -32,8 +31,7 @@ class ParsedCommandHelperTest extends TestCase
         $command = $this->createCommand();
         $helper = new ParsedCommandHelper($command);
 
-        $helper->before(function () {
-        });
+        $helper->before(fn () => '');
 
         $this->assertInstanceOf(Closure::class, $command->getBeforeInvokeCallback());
     }
@@ -208,8 +206,7 @@ class ParsedCommandHelperTest extends TestCase
 
         $addition = new ParsedCommandHelper($command);
 
-        $handler = function ($ArgOne = '1', $argTwo = '2', $arg_three = '3', $arg_four = '4') {
-        };
+        $handler = fn ($ArgOne = '1', $argTwo = '2', $arg_three = '3', $arg_four = '4') => '';
 
         $addition->handler($handler);
 
@@ -228,8 +225,7 @@ class ParsedCommandHelperTest extends TestCase
             fn ($name) => str_replace('one', '1', $name),
         ]);
 
-        $addition->handler(function ($argone = '1') {
-        });
+        $addition->handler(fn ($argone = '1') => '');
 
         $this->assertSame('1', $command->getArguments()['arg1']->getDefault());
     }
