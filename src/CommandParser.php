@@ -31,11 +31,7 @@ class CommandParser implements CommandParserInterface
         }
 
         $command = new Command();
-        $command->setName(array_pop($name));
-
-        if (! empty($name)) {
-            $command->setNamespace(implode(' ', $name));
-        }
+        $command->setName(implode(' ', $name));
 
         while (is_string($token)) {
             if ($this->isArgument($token)) {

@@ -215,11 +215,26 @@ class CommandTest extends TestCase
         $command->getName();
     }
 
-    public function testGetNameWithNamespace()
+    public function testGetNameWithMultipleAncestors()
     {
-        $command = (new Command())->setName('irrelevant')->setNamespace('also-irrelevant');
+        $command = (new Command())->setName('command');
+        $parent = (new Command())->setName('parent');
+        $grandparent = (new Command())->setName('grandparent');
 
-        $this->assertSame('also-irrelevant irrelevant', $command->getName());
+        $command->setParent($parent);
+        $parent->setParent($grandparent);
+
+        $this->assertSame('grandparent parent command', $command->getName());
+    }
+
+    public function testGetNameWithParent()
+    {
+        $command = (new Command())->setName('command');
+        $parent = (new Command())->setName('parent');
+
+        $command->setParent($parent);
+
+        $this->assertSame('parent command', $command->getName());
     }
 
     public function testGetSynopsis()
@@ -272,5 +287,19 @@ class CommandTest extends TestCase
                 'repeating' => false,
             ],
         ], $command->getSynopsis());
+    }
+
+    public function testParentCanBeUnset()
+    {
+        $command = (new Command())->setName('command');
+        $parent = (new Command())->setName('parent');
+
+        $command->setParent($parent);
+
+        $this->assertSame('parent command', $command->getName());
+
+        $command->setParent(null);
+
+        $this->assertSame('command', $command->getName());
     }
 }
