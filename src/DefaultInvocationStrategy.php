@@ -9,7 +9,7 @@ class DefaultInvocationStrategy extends AbstractInvocationStrategy
     /**
      * @return mixed
      */
-    public function call($callback)
+    public function call(callable $callback)
     {
         return $callback($this->context);
     }

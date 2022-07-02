@@ -8,7 +8,7 @@ abstract class AbstractInvocationStrategy implements InvocationStrategyInterface
 {
     protected $context = [];
 
-    abstract public function call($callback);
+    abstract public function call(callable $callback);
 
     abstract public function callCommandHandler(Command $command);
 

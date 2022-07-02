@@ -138,6 +138,20 @@ class CommandTest extends TestCase
         $this->assertSame([$command, 'afterInvoke'], $command->getAfterInvokeCallback());
     }
 
+    public function testGetAfterInvokeCallbackDefaultWithInvalidVisibility()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('method \'afterInvoke\' must have public visibility');
+
+        $command = new class () extends Command {
+            protected function afterInvoke()
+            {
+            }
+        };
+
+        $command->getAfterInvokeCallback();
+    }
+
     public function testGetBeforeInvokeCallbackDefault()
     {
         $command = new Command();
@@ -151,6 +165,20 @@ class CommandTest extends TestCase
         };
 
         $this->assertSame([$command, 'beforeInvoke'], $command->getBeforeInvokeCallback());
+    }
+
+    public function testGetBeforeInvokeCallbackDefaultWithInvalidVisibility()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('method \'beforeInvoke\' must have public visibility');
+
+        $command = new class () extends Command {
+            protected function beforeInvoke()
+            {
+            }
+        };
+
+        $command->getBeforeInvokeCallback();
     }
 
     public function testGetHandler()

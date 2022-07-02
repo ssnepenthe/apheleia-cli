@@ -23,14 +23,14 @@ class ParsedCommandHelper
         ]));
     }
 
-    public function after($callback): self
+    public function after(callable $callback): self
     {
         $this->command->setAfterInvokeCallback($callback);
 
         return $this;
     }
 
-    public function before($callback): self
+    public function before(callable $callback): self
     {
         $this->command->setBeforeInvokeCallback($callback);
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ApheleiaCli;
 
 use InvalidArgumentException;
+use ReflectionMethod;
 use RuntimeException;
 
 class Command
@@ -18,6 +19,9 @@ class Command
      */
     protected $acceptArbitraryOptions = false;
 
+    /**
+     * @var ?callable
+     */
     protected $afterInvokeCallback;
 
     /**
@@ -25,6 +29,9 @@ class Command
      */
     protected $arguments = [];
 
+    /**
+     * @var ?callable
+     */
     protected $beforeInvokeCallback;
 
     /**
@@ -132,9 +139,12 @@ class Command
         return $this->acceptArbitraryOptions;
     }
 
-    public function getAfterInvokeCallback()
+    public function getAfterInvokeCallback(): ?callable
     {
         if (null === $this->afterInvokeCallback && method_exists($this, 'afterInvoke')) {
+            $this->assertThisMethodIsPublic('afterInvoke');
+
+            /** @var callable */
             return [$this, 'afterInvoke'];
         }
 
@@ -149,9 +159,12 @@ class Command
         return $this->arguments;
     }
 
-    public function getBeforeInvokeCallback()
+    public function getBeforeInvokeCallback(): ?callable
     {
         if (null === $this->beforeInvokeCallback && method_exists($this, 'beforeInvoke')) {
+            $this->assertThisMethodIsPublic('beforeInvoke');
+
+            /** @var callable */
             return [$this, 'beforeInvoke'];
         }
 
@@ -248,14 +261,14 @@ class Command
         return $this;
     }
 
-    public function setAfterInvokeCallback($afterInvokeCallback): self
+    public function setAfterInvokeCallback(callable $afterInvokeCallback): self
     {
         $this->afterInvokeCallback = $afterInvokeCallback;
 
         return $this;
     }
 
-    public function setBeforeInvokeCallback($beforeInvokeCallback): self
+    public function setBeforeInvokeCallback(callable $beforeInvokeCallback): self
     {
         $this->beforeInvokeCallback = $beforeInvokeCallback;
 
@@ -305,6 +318,13 @@ class Command
         $this->when = $when;
 
         return $this;
+    }
+
+    protected function assertThisMethodIsPublic(string $method)
+    {
+        if (! (new ReflectionMethod($this, $method))->isPublic()) {
+            throw new RuntimeException("Command method '{$method}' must have public visibility");
+        }
     }
 
     protected function configure(): void

@@ -6,7 +6,7 @@ namespace ApheleiaCli;
 
 interface InvocationStrategyInterface
 {
-    public function call($callback);
+    public function call(callable $callback);
     public function callCommandHandler(Command $command);
     public function withContext(array $context);
 }
