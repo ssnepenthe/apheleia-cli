@@ -13,7 +13,8 @@
         </ignoreFiles>
     </projectFiles>
 
-    <plugins>
-        <pluginClass class="PsalmWordPress\Plugin" />
-    </plugins>
+    <stubs>
+        <file name="vendor/php-stubs/wp-cli-stubs/wp-cli-stubs.php" />
+        <file name="psalm-overrides.php" />
+    </stubs>
 </psalm>

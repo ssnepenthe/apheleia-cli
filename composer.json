@@ -7,8 +7,8 @@
         "php": "^7.4 || ^8.0"
     },
     "require-dev": {
-        "humanmade/psalm-plugin-wordpress": "dev-master",
         "php-di/invoker": "^2.3",
+        "php-stubs/wp-cli-stubs": "^2.6",
         "phpunit/phpunit": "^9.5",
         "vimeo/psalm": "^4.22",
         "wp-cli/wp-cli": "^2.6"
