@@ -136,10 +136,6 @@ class CommandRegistryTest extends TestCase
         $wpCliAdapterMock = $this->createMock(WpCliAdapterInterface::class);
         $wpCliAdapterMock
             ->expects($this->once())
-            ->method('isWpCli')
-            ->willReturn(true);
-        $wpCliAdapterMock
-            ->expects($this->once())
             ->method('addCommand')
             ->with('command', $this->isInstanceOf(Closure::class), [
                 'synopsis' => [

@@ -21,5 +21,4 @@ interface WpCliAdapterInterface
      * @return never
      */
     public function halt(int $code);
-    public function isWpCli(): bool;
 }

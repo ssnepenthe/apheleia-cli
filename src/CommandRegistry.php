@@ -55,7 +55,14 @@ class CommandRegistry
     ) {
         $this->invocationStrategy = $invocationStrategy ?: new DefaultInvocationStrategy();
         $this->commandParser = $commandParser ?: new CommandParser();
-        $this->wpCliAdapter = $wpCliAdapter ?: new WpCliAdapter();
+
+        if (! $wpCliAdapter instanceof WpCliAdapterInterface) {
+            $wpCliAdapter = defined('WP_CLI') && WP_CLI
+                ? new WpCliAdapter()
+                : new NullWpCliAdapter();
+        }
+
+        $this->wpCliAdapter = $wpCliAdapter;
     }
 
     public function add(Command $command): Command
@@ -146,10 +153,6 @@ class CommandRegistry
 
     public function initializeImmediately(): void
     {
-        if (! $this->wpCliAdapter->isWpCli()) {
-            return;
-        }
-
         foreach ($this->registeredCommands as $addition) {
             $this->wpCliAdapter->addCommand(
                 $addition->getName(),
