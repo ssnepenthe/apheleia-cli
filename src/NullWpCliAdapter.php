@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ApheleiaCli;
 
 use LogicException;
-use WP_CLI;
 
 class NullWpCliAdapter implements WpCliAdapterInterface
 {
