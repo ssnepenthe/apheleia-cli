@@ -7,7 +7,7 @@ class WP_CLI
     /**
      * @param string $command
      * @param callable|class-string<\WP_CLI\Dispatcher\CommandNamespace> $class
-     * @param array{before_invoke?: callable, after_invoke?: callable, shortdesc?: string, longdesc?: string, synopsis?: string, when?: string, is_deferred?: bool} $args
+     * @param array{before_invoke?: callable, after_invoke?: callable, shortdesc?: string, longdesc?: string, synopsis?: array|string, when?: string, is_deferred?: bool} $args
      * @return bool
      */
     public static function add_command(string $command, $class, array $args = [])
