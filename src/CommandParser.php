@@ -5,12 +5,19 @@ declare(strict_types=1);
 namespace ApheleiaCli;
 
 use InvalidArgumentException;
+use RuntimeException;
 use WP_CLI\SynopsisParser;
 
 class CommandParser implements CommandParserInterface
 {
     public function parse(string $command): Command
     {
+        if (! class_exists(SynopsisParser::class)) {
+            throw new RuntimeException(
+                'Cannot use CommandParser because WP-CLI dependency is not available'
+            );
+        }
+
         $tokens = array_filter(preg_split('/\s+/', $command));
 
         if (empty($tokens)) {
