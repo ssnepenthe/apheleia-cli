@@ -188,12 +188,13 @@ class ParsedCommandHelperTest extends TestCase
     public function testHandler()
     {
         $command = $this->createCommand();
+        $handler = fn () => '';
 
         $helper = new ParsedCommandHelper($command);
 
-        $helper->handler('somehandler');
+        $helper->handler($handler);
 
-        $this->assertSame('somehandler', $command->getHandler());
+        $this->assertSame($handler, $command->getHandler());
     }
 
     public function testHandlerWithDefaultValues()

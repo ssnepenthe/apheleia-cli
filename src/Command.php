@@ -7,6 +7,7 @@ namespace ApheleiaCli;
 use InvalidArgumentException;
 use ReflectionMethod;
 use RuntimeException;
+use WP_CLI\Dispatcher\CommandNamespace;
 
 class Command
 {
@@ -39,6 +40,9 @@ class Command
      */
     protected $description;
 
+    /**
+     * @var callable|class-string<CommandNamespace>
+     */
     protected $handler;
 
     /**
@@ -176,6 +180,10 @@ class Command
         return $this->description;
     }
 
+    /**
+     *
+     * @return callable|class-string<CommandNamespace>
+     */
     public function getHandler()
     {
         if (null !== $this->handler) {
@@ -183,6 +191,9 @@ class Command
         }
 
         if (method_exists($this, 'handle')) {
+            $this->assertThisMethodIsPublic('handle');
+
+            /** @var callable */
             return [$this, 'handle'];
         }
 
@@ -193,6 +204,9 @@ class Command
         );
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getName(): string
     {
         if (! is_string($this->name) || '' === $this->name) {
@@ -282,7 +296,7 @@ class Command
         return $this;
     }
 
-    public function setHandler($handler): self
+    public function setHandler(callable $handler): self
     {
         $this->handler = $handler;
 

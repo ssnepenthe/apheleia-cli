@@ -100,7 +100,7 @@ class ParsedCommandHelper
         return $this->command;
     }
 
-    public function handler($handler): self
+    public function handler(callable $handler): self
     {
         $this->command->setHandler($handler);
 

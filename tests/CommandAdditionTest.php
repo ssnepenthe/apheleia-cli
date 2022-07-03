@@ -8,6 +8,7 @@ use ApheleiaCli\Argument;
 use ApheleiaCli\Command;
 use ApheleiaCli\CommandAddition;
 use ApheleiaCli\InvocationStrategyInterface;
+use ApheleiaCli\NamespaceCommand;
 use ApheleiaCli\NamespaceIdentifier;
 use ApheleiaCli\Option;
 use ApheleiaCli\WpCliAdapterInterface;
@@ -87,7 +88,7 @@ class CommandAdditionTest extends TestCase
 
     public function testGetHandler()
     {
-        $command = (new Command())->setHandler(NamespaceIdentifier::class);
+        $command = new NamespaceCommand('name', 'description');
         $addition = $this->makeCommandAddition($command);
 
         $this->assertSame(NamespaceIdentifier::class, $addition->getHandler());

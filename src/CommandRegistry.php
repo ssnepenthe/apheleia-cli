@@ -164,10 +164,7 @@ class CommandRegistry
      */
     public function namespace(string $namespace, string $description): Command
     {
-        $command = new Command();
-        $command->setName($namespace);
-        $command->setHandler(NamespaceIdentifier::class);
-        $command->setDescription($description);
+        $command = new NamespaceCommand($namespace, $description);
 
         $this->add($command);
 
