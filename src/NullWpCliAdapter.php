@@ -8,6 +8,10 @@ use LogicException;
 
 class NullWpCliAdapter implements WpCliAdapterInterface
 {
+    /**
+     * @param callable|class-string<\WP_CLI\Dispatcher\CommandNamespace> $callable
+     * @param array{before_invoke?: callable, after_invoke?: callable, shortdesc?: string, longdesc?: string, synopsis?: array|string, when?: string, is_deferred?: bool} $args
+     */
     public function addCommand(string $name, $callable, array $args = []): bool
     {
         return true;

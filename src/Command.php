@@ -36,17 +36,17 @@ class Command
     protected $beforeInvokeCallback;
 
     /**
-     * @var string|null
+     * @var ?string
      */
     protected $description;
 
     /**
-     * @var callable|class-string<CommandNamespace>
+     * @var ?callable|class-string<CommandNamespace>
      */
     protected $handler;
 
     /**
-     * @var non-empty-string
+     * @var string
      * @psalm-suppress PropertyNotSetInConstructor
      */
     protected $name;
@@ -62,12 +62,12 @@ class Command
     protected $parent;
 
     /**
-     * @var string|null
+     * @var ?string
      */
     protected $usage;
 
     /**
-     * @var string|null
+     * @var ?string
      */
     protected $when;
 
@@ -181,7 +181,6 @@ class Command
     }
 
     /**
-     *
      * @return callable|class-string<CommandNamespace>
      */
     public function getHandler()
@@ -230,6 +229,9 @@ class Command
         return $this->options;
     }
 
+    /**
+     * @return array<int, array{type: 'assoc'|'flag'|'generic'|'positional', name?: string, optional: bool, repeating: bool, description?: string, default?: string, options?: string[], value?: array{optional: true, name: string}}>
+     */
     public function getSynopsis(): array
     {
         $arguments = array_map(
@@ -303,9 +305,6 @@ class Command
         return $this;
     }
 
-    /**
-     * @param non-empty-string $name
-     */
     public function setName(string $name): self
     {
         $this->name = $name;
@@ -334,7 +333,7 @@ class Command
         return $this;
     }
 
-    protected function assertThisMethodIsPublic(string $method)
+    protected function assertThisMethodIsPublic(string $method): void
     {
         if (! (new ReflectionMethod($this, $method))->isPublic()) {
             throw new RuntimeException("Command method '{$method}' must have public visibility");

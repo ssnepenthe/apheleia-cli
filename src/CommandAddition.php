@@ -6,9 +6,24 @@ namespace ApheleiaCli;
 
 class CommandAddition
 {
+    /**
+     * @var bool
+     */
     protected $autoExit = true;
+
+    /**
+     * @var Command
+     */
     protected $command;
+
+    /**
+     * @var InvocationStrategyInterface
+     */
     protected $invocationStrategy;
+
+    /**
+     * @var WpCliAdapterInterface
+     */
     protected $wpCliAdapter;
 
     public function __construct(
@@ -21,6 +36,9 @@ class CommandAddition
         $this->wpCliAdapter = $wpCliAdapter;
     }
 
+    /**
+     * @return array{shortdesc?: non-falsy-string, synopsis?: non-empty-array<int, array{type: 'assoc'|'flag'|'generic'|'positional', name?: string, optional: bool, repeating: bool, description?: string, default?: string, options?: string[], value?: array{optional: true, name: string}}>, longdesc?: non-falsy-string, before_invoke?: \Closure, after_invoke?: \Closure, when?: non-falsy-string}
+     */
     public function getArgs(): array
     {
         $args = [];
@@ -57,17 +75,23 @@ class CommandAddition
         return $this->command;
     }
 
+    /**
+     * @return \Closure|class-string<\WP_CLI\Dispatcher\CommandNamespace>
+     */
     public function getHandler()
     {
         $handler = $this->command->getHandler();
 
-        if (NamespaceIdentifier::class !== $handler) {
+        if (is_callable($handler)) {
             $handler = fn (array $args, array $assocArgs) => $this->handle($args, $assocArgs);
         }
 
         return $handler;
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getName(): string
     {
         return $this->command->getName();
@@ -80,6 +104,9 @@ class CommandAddition
         return $this;
     }
 
+    /**
+     * @return int
+     */
     protected function handle(array $args, array $assocArgs)
     {
         $status = $this->invocationStrategy

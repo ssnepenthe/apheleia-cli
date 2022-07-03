@@ -10,9 +10,6 @@ class NamespaceCommand extends Command
 {
     protected $handler = NamespaceIdentifier::class;
 
-    /**
-     * @param non-empty-string $name
-     */
     public function __construct(string $name, string $description)
     {
         $this->name = $name;

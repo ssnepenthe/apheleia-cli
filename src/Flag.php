@@ -11,7 +11,7 @@ class Flag
     public const NAME_PATTERN = 'a-z\-_0-9';
 
     /**
-     * @var string|null
+     * @var ?string
      */
     protected $description;
 

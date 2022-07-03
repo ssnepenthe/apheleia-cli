@@ -8,7 +8,14 @@ use InvalidArgumentException;
 
 class ParsedCommandHelper
 {
+    /**
+     * @var Command
+     */
     protected $command;
+
+    /**
+     * @var array<int, callable(string):string>
+     */
     protected $parameterNameMappers;
 
     public function __construct(Command $command, array $parameterNameMappers = [])
@@ -37,6 +44,9 @@ class ParsedCommandHelper
         return $this;
     }
 
+    /**
+     * @param array<string, string> $defaults
+     */
     public function defaults(array $defaults): self
     {
         $registeredParameters = array_merge(
@@ -69,6 +79,9 @@ class ParsedCommandHelper
         return $this;
     }
 
+    /**
+     * @param array<string, string> $paramDescriptions
+     */
     public function descriptions(string $commandDescription, array $paramDescriptions = []): self
     {
         $this->command->setDescription($commandDescription);
@@ -109,6 +122,9 @@ class ParsedCommandHelper
         return $this;
     }
 
+    /**
+     * @param array<string, string[]> $options
+     */
     public function options(array $options): self
     {
         $registeredParameters = array_merge(
@@ -201,8 +217,11 @@ class ParsedCommandHelper
         }
     }
 
+    /**
+     * @param callable(string):string ...$parameterNameMappers
+     */
     protected function setParameterNameMappers(callable ...$parameterNameMappers): void
     {
-        $this->parameterNameMappers = $parameterNameMappers;
+        $this->parameterNameMappers = array_values($parameterNameMappers);
     }
 }

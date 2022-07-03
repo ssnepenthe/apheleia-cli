@@ -58,6 +58,6 @@ class TransformingAssociativeArrayParameterResolver implements ParameterResolver
      */
     public function setParameterNameTransformers(callable ...$parameterNameTransformers): void
     {
-        $this->parameterNameTransformers = $parameterNameTransformers;
+        $this->parameterNameTransformers = array_values($parameterNameTransformers);
     }
 }

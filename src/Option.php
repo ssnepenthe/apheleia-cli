@@ -13,12 +13,12 @@ class Option
     public const VALUE_PATTERN = 'a-zA-Z\-_0-9';
 
     /**
-     * @var string|null
+     * @var ?string
      */
     protected $default;
 
     /**
-     * @var string|null
+     * @var ?string
      */
     protected $description;
 
@@ -33,7 +33,7 @@ class Option
     protected $optional = true;
 
     /**
-     * @var list<string>
+     * @var string[]
      */
     protected $options = [];
 
@@ -74,7 +74,7 @@ class Option
     }
 
     /**
-     * @return list<string>
+     * @return string[]
      */
     public function getOptions(): array
     {
@@ -82,7 +82,7 @@ class Option
     }
 
     /**
-     * @return array{type: 'assoc', name: string, optional: bool, repeating: bool, description?: string, default?: string, options?: list<string>, value?: array{optional: true, name: string}}
+     * @return array{type: 'assoc', name: string, optional: bool, repeating: bool, description?: string, default?: string, options?: string[], value?: array{optional: true, name: string}}
      */
     public function getSynopsis(): array
     {
@@ -107,8 +107,6 @@ class Option
             $synopsis['options'] = $this->options;
         }
 
-        // @todo This doesn't currently work.
-        // Revisit if/when https://github.com/wp-cli/wp-cli/pull/5618 is merged.
         if ($this->valueIsOptional) {
             $synopsis['value'] = [
                 'optional' => true,
@@ -154,7 +152,7 @@ class Option
 
     public function setOptions(string ...$options): self
     {
-        $this->options = $options;
+        $this->options = array_values($options);
 
         return $this;
     }

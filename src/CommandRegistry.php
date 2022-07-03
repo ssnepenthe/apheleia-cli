@@ -97,7 +97,7 @@ class CommandRegistry
         return $this;
     }
 
-    public function command(string $command, $handler): ParsedCommandHelper
+    public function command(string $command, callable $handler): ParsedCommandHelper
     {
         $command = $this->commandParser->parse($command);
 
@@ -120,9 +120,6 @@ class CommandRegistry
         );
     }
 
-    /**
-     * @param non-empty-string $group
-     */
     public function group(string $group, string $description, callable $callback): Command
     {
         $command = $this->namespace($group, $description);
@@ -162,9 +159,6 @@ class CommandRegistry
         }
     }
 
-    /**
-     * @param non-empty-string $namespace
-     */
     public function namespace(string $namespace, string $description): Command
     {
         $command = new NamespaceCommand($namespace, $description);
@@ -194,9 +188,12 @@ class CommandRegistry
         return $this;
     }
 
+    /**
+     * @param callable(string):string ...$parameterNameMappers
+     */
     public function setParameterNameMappers(callable ...$parameterNameMappers): self
     {
-        $this->parameterNameMappers = $parameterNameMappers;
+        $this->parameterNameMappers = array_values($parameterNameMappers);
 
         return $this;
     }

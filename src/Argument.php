@@ -12,12 +12,12 @@ class Argument
     public const NAME_PATTERN = 'a-zA-Z\-_0-9';
 
     /**
-     * @var string|null
+     * @var ?string
      */
     protected $default;
 
     /**
-     * @var string|null
+     * @var ?string
      */
     protected $description;
 
@@ -32,7 +32,7 @@ class Argument
     protected $optional = false;
 
     /**
-     * @var list<string>
+     * @var string[]
      */
     protected $options = [];
 
@@ -73,7 +73,7 @@ class Argument
     }
 
     /**
-     * @return list<string>
+     * @return string[]
      */
     public function getOptions(): array
     {
@@ -86,7 +86,7 @@ class Argument
     }
 
     /**
-     * @return array{type: 'positional', name: string, optional: bool, repeating: bool, description?: string, default?: string, options?: list<string>}
+     * @return array{type: 'positional', name: string, optional: bool, repeating: bool, description?: string, default?: string, options?: string[]}
      */
     public function getSynopsis(): array
     {
@@ -144,7 +144,7 @@ class Argument
 
     public function setOptions(string ...$options): self
     {
-        $this->options = $options;
+        $this->options = array_values($options);
 
         return $this;
     }
