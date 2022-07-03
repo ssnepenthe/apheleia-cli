@@ -4,7 +4,7 @@ class WP_CLI
 {
     /**
 	 * @param string $command
-	 * @param callable|class-string $class
+	 * @param callable|class-string<\WP_CLI\Dispatcher\CommandNamespace> $class
 	 * @param array{before_invoke?: callable, after_invoke?: callable, shortdesc?: string, longdesc?: string, synopsis?: string, when?: string, is_deferred?: bool} $args
 	 * @return bool
 	 */
