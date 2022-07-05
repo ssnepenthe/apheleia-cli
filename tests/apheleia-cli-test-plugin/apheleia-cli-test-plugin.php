@@ -25,7 +25,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 $registry = new CommandRegistry();
 
-$registry->namespace('apheleia', 'Apheleia CLI Test Plugin', function (CommandRegistry $registry) {
+$registry->group('apheleia', 'Apheleia CLI Test Plugin', function (CommandRegistry $registry) {
     $registry->add(
         (new Command())
             ->setName('inline')
@@ -34,7 +34,6 @@ $registry->namespace('apheleia', 'Apheleia CLI Test Plugin', function (CommandRe
             ->setWhen('after_wp_load')
             ->addArgument(
                 (new Argument('arg'))
-                    ->setDefault('arg-default')
                     ->setDescription('Description for argument "arg"')
                     ->setOptions('arg-default', 'arg-override')
             )
