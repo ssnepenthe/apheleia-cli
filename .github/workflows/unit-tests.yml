@@ -53,7 +53,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Install Composer dependencies
-        run: composer install --ansi --no-interaction --no-progress --prefer-dist ${{ matrix.dependencies }}
+        run: composer update --ansi --no-interaction --no-progress --prefer-dist ${{ matrix.dependencies }}
 
       - name: Run tests
         run: vendor/bin/phpunit
