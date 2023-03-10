@@ -86,7 +86,6 @@ class CommandRegistry
         );
         $this->registeredCommands[$name]->setAutoExit($this->autoExit);
 
-
         return $command;
     }
 
