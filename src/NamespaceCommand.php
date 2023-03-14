@@ -56,6 +56,11 @@ class NamespaceCommand extends Command
         throw new RuntimeException('Cannot change name after instantiation on namespace commands');
     }
 
+    public function setRequiredInvocationStrategy(string $requiredInvocationStrategy): Command
+    {
+        throw new RuntimeException('Cannot set invocation strategy on namespace commands');
+    }
+
     public function setWhen(string $when): Command
     {
         throw new RuntimeException('Cannot set when on namespace commands');

@@ -17,9 +17,9 @@ class CommandAddition
     protected $command;
 
     /**
-     * @var InvocationStrategyInterface
+     * @var InvocationStrategyFactoryInterface
      */
-    protected $invocationStrategy;
+    protected $invocationStrategyFactory;
 
     /**
      * @var WpCliAdapterInterface
@@ -28,11 +28,11 @@ class CommandAddition
 
     public function __construct(
         Command $command,
-        InvocationStrategyInterface $invocationStrategy,
+        InvocationStrategyFactoryInterface $invocationStrategyFactory,
         WpCliAdapterInterface $wpCliAdapter
     ) {
         $this->command = $command;
-        $this->invocationStrategy = $invocationStrategy;
+        $this->invocationStrategyFactory = $invocationStrategyFactory;
         $this->wpCliAdapter = $wpCliAdapter;
     }
 
@@ -56,11 +56,11 @@ class CommandAddition
         }
 
         if ($beforeInvoke = $this->command->getBeforeInvokeCallback()) {
-            $args['before_invoke'] = fn () => $this->invocationStrategy->call($beforeInvoke);
+            $args['before_invoke'] = fn () => $this->invocationStrategyFactory->createForCommand($this->command)->call($beforeInvoke);
         }
 
         if ($afterInvoke = $this->command->getAfterInvokeCallback()) {
-            $args['after_invoke'] = fn () => $this->invocationStrategy->call($afterInvoke);
+            $args['after_invoke'] = fn () => $this->invocationStrategyFactory->createForCommand($this->command)->call($afterInvoke);
         }
 
         if ($when = $this->command->getWhen()) {
@@ -109,7 +109,8 @@ class CommandAddition
      */
     protected function handle(array $args, array $assocArgs)
     {
-        $status = $this->invocationStrategy
+        $status = $this->invocationStrategyFactory
+            ->createForCommand($this->command)
             ->withContext(compact('args', 'assocArgs'))
             ->callCommandHandler($this->command);
 

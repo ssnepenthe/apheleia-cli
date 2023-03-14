@@ -29,9 +29,9 @@ class CommandRegistry
     protected $currentGroupParent;
 
     /**
-     * @var InvocationStrategyInterface
+     * @var InvocationStrategyFactoryInterface
      */
-    protected $invocationStrategy;
+    protected $invocationStrategyFactory;
 
     /**
      * @var array<int, callable(string):string>
@@ -49,11 +49,11 @@ class CommandRegistry
     protected $wpCliAdapter;
 
     public function __construct(
-        ?InvocationStrategyInterface $invocationStrategy = null,
+        ?InvocationStrategyFactoryInterface $invocationStrategyFactory = null,
         ?CommandParserInterface $commandParser = null,
         ?WpCliAdapterInterface $wpCliAdapter = null
     ) {
-        $this->invocationStrategy = $invocationStrategy ?: new DefaultInvocationStrategy();
+        $this->invocationStrategyFactory = $invocationStrategyFactory ?: new InvocationStrategyFactory();
         $this->commandParser = $commandParser ?: new CommandParser();
 
         if (! $wpCliAdapter instanceof WpCliAdapterInterface) {
@@ -81,7 +81,7 @@ class CommandRegistry
 
         $this->registeredCommands[$name] = new CommandAddition(
             $command,
-            $this->invocationStrategy,
+            $this->invocationStrategyFactory,
             $this->wpCliAdapter
         );
         $this->registeredCommands[$name]->setAutoExit($this->autoExit);
