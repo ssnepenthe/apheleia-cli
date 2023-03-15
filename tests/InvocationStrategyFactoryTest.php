@@ -11,6 +11,7 @@ use ApheleiaCli\InvocationStrategyInterface;
 use ApheleiaCli\InvokerBackedInvocationStrategy;
 use Invoker\Invoker;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class InvocationStrategyFactoryTest extends TestCase
 {
@@ -55,10 +56,19 @@ class InvocationStrategyFactoryTest extends TestCase
         $this->assertSame($invoker, $strategy->getInvoker());
     }
 
+    public function testCreateFailsForNonExistentStrategies()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('non-existent class');
+
+        $factory = new InvocationStrategyFactory();
+        $factory->create(NonExistentInvocationStrategy::class);
+    }
+
     public function testCreateFailsForUnknownStrategiesWithConstructorArguments()
     {
-        $this->expectError();
-        $this->expectErrorMessage('Too few arguments');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('no custom creator has been registered');
 
         $factory = new InvocationStrategyFactory();
         $factory->create(InvocationStrategyForTestsWithConstructor::class);

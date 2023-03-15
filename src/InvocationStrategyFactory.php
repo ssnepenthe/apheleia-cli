@@ -6,6 +6,9 @@ namespace ApheleiaCli;
 
 use Invoker\InvokerInterface;
 use LogicException;
+use ReflectionClass;
+use ReflectionMethod;
+use RuntimeException;
 
 class InvocationStrategyFactory implements InvocationStrategyFactoryInterface
 {
@@ -34,9 +37,20 @@ class InvocationStrategyFactory implements InvocationStrategyFactoryInterface
                 return new DefaultInvocationStrategy();
             case InvokerBackedInvocationStrategy::class:
                 return new InvokerBackedInvocationStrategy($this->invoker);
-            default:
-                return new $strategy();
         }
+
+        if (! class_exists($strategy)) {
+            throw new RuntimeException("Cannot create instance of non-existent class {$strategy}");
+        }
+
+        $reflection = new ReflectionClass($strategy);
+        $constructor = $reflection->getConstructor();
+
+        if ($constructor instanceof ReflectionMethod && $constructor->getNumberOfRequiredParameters() > 0) {
+            throw new RuntimeException("Cannot create instance of class {$strategy} because no custom creator has been registered");
+        }
+
+        return $reflection->newInstance();
     }
 
     public function createForCommand(Command $command): InvocationStrategyInterface
