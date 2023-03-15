@@ -234,7 +234,3 @@ $registry->command('example hello <name> [--type=<type>]', function ($name, $typ
     WP_CLI::$type("Hello, $name!");
 })->strategy(InvokerBackedInvocationStrategy::class);
 ```
-
-### NOTE
-
-It is important to remember that since the invocation strategy is responsible for the command handler signature, commands are not portable between strategies.
