@@ -163,19 +163,19 @@ class ParsedCommandHelper
         return $this;
     }
 
-    public function usage(string $usage): self
-    {
-        $this->command->setUsage($usage);
-
-        return $this;
-    }
-
     /**
      * @param class-string<InvocationStrategyInterface> $invocationStrategy
      */
     public function strategy(string $invocationStrategy): self
     {
         $this->command->setRequiredInvocationStrategy($invocationStrategy);
+
+        return $this;
+    }
+
+    public function usage(string $usage): self
+    {
+        $this->command->setUsage($usage);
 
         return $this;
     }

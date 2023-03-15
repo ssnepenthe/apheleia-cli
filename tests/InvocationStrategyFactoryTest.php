@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ApheleiaCli\Tests;
 
 use ApheleiaCli\Command;
@@ -17,7 +19,7 @@ class InvocationStrategyFactoryTest extends TestCase
         $factory = new InvocationStrategyFactory();
         $factory->registerCustomCreator(
             InvocationStrategyForTestsWithConstructor::class,
-            fn() => new InvocationStrategyForTestsWithConstructor('irrelevant')
+            fn () => new InvocationStrategyForTestsWithConstructor('irrelevant')
         );
 
         // Supported via custom creator.
@@ -65,15 +67,29 @@ class InvocationStrategyFactoryTest extends TestCase
 
 class InvocationStrategyForTests implements InvocationStrategyInterface
 {
-    public function call(callable $callback) {}
-    public function callCommandHandler(Command $command) {}
-    public function withContext(array $context) {}
+    public function call(callable $callback)
+    {
+    }
+    public function callCommandHandler(Command $command)
+    {
+    }
+    public function withContext(array $context)
+    {
+    }
 }
 
 class InvocationStrategyForTestsWithConstructor implements InvocationStrategyInterface
 {
-    public function __construct($irrelevant) {}
-    public function call(callable $callback) {}
-    public function callCommandHandler(Command $command) {}
-    public function withContext(array $context) {}
+    public function __construct($irrelevant)
+    {
+    }
+    public function call(callable $callback)
+    {
+    }
+    public function callCommandHandler(Command $command)
+    {
+    }
+    public function withContext(array $context)
+    {
+    }
 }

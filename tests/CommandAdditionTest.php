@@ -7,7 +7,6 @@ namespace ApheleiaCli\Tests;
 use ApheleiaCli\Argument;
 use ApheleiaCli\Command;
 use ApheleiaCli\CommandAddition;
-use ApheleiaCli\InvocationStrategyFactory;
 use ApheleiaCli\InvocationStrategyFactoryInterface;
 use ApheleiaCli\InvocationStrategyInterface;
 use ApheleiaCli\NamespaceCommand;
