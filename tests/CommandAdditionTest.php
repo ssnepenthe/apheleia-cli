@@ -29,7 +29,7 @@ class CommandAdditionTest extends TestCase
         $this->invocationStrategy->method('withContext')->willReturn($this->invocationStrategy);
 
         $this->invocationStrategyFactory = $this->createStub(InvocationStrategyFactoryInterface::class);
-        $this->invocationStrategyFactory->method('createForCommand')->willReturn($this->invocationStrategy);
+        $this->invocationStrategyFactory->method('create')->willReturn($this->invocationStrategy);
 
         $this->wpCliAdapter = $this->createStub(WpCliAdapterInterface::class);
     }
@@ -135,8 +135,8 @@ class CommandAdditionTest extends TestCase
 
         $invocationStrategyFactory = $this->createMock(InvocationStrategyFactoryInterface::class);
         $invocationStrategyFactory->expects($this->once())
-            ->method('createForCommand')
-            ->with($this->identicalTo($command))
+            ->method('create')
+            ->with($this->identicalTo($command->getRequiredInvocationStrategy()))
             ->willReturn($invocationStrategy);
 
         $wpCliAdapter = $this->createMock(WpCliAdapterInterface::class);

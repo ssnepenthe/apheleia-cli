@@ -53,11 +53,6 @@ class InvocationStrategyFactory implements InvocationStrategyFactoryInterface
         return $reflection->newInstance();
     }
 
-    public function createForCommand(Command $command): InvocationStrategyInterface
-    {
-        return $this->create($command->getRequiredInvocationStrategy());
-    }
-
     /**
      * @param class-string<InvocationStrategyInterface> $strategy
      * @param callable():InvocationStrategyInterface $creator

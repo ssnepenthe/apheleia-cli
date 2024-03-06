@@ -56,11 +56,11 @@ class CommandAddition
         }
 
         if ($beforeInvoke = $this->command->getBeforeInvokeCallback()) {
-            $args['before_invoke'] = fn () => $this->invocationStrategyFactory->createForCommand($this->command)->call($beforeInvoke);
+            $args['before_invoke'] = fn () => $this->createInvocationStrategy()->call($beforeInvoke);
         }
 
         if ($afterInvoke = $this->command->getAfterInvokeCallback()) {
-            $args['after_invoke'] = fn () => $this->invocationStrategyFactory->createForCommand($this->command)->call($afterInvoke);
+            $args['after_invoke'] = fn () => $this->createInvocationStrategy()->call($afterInvoke);
         }
 
         if ($when = $this->command->getWhen()) {
@@ -104,13 +104,17 @@ class CommandAddition
         return $this;
     }
 
+    protected function createInvocationStrategy(): InvocationStrategyInterface
+    {
+        return $this->invocationStrategyFactory->create($this->command->getRequiredInvocationStrategy());
+    }
+
     /**
      * @return int
      */
     protected function handle(array $args, array $assocArgs)
     {
-        $status = $this->invocationStrategyFactory
-            ->createForCommand($this->command)
+        $status = $this->createInvocationStrategy()
             ->withContext(compact('args', 'assocArgs'))
             ->callCommandHandler($this->command);
 
