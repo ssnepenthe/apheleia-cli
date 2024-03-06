@@ -68,7 +68,7 @@ class InvocationStrategyFactory implements InvocationStrategyFactoryInterface
     {
         if (! array_key_exists($strategy, $this->customCreators)) {
             throw new LogicException(
-                'Attempting to call unregistered custom creator for {$strategy} - make sure to check $this->hasCustomCreator() before using $this->callCustomCreator()'
+                "Attempting to call unregistered custom creator for {$strategy} - make sure to check \$this->hasCustomCreator() before using \$this->callCustomCreator()"
             );
         }
 
