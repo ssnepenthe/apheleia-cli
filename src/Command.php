@@ -62,6 +62,11 @@ class Command
     protected $parent;
 
     /**
+     * @var class-string<InvocationStrategyInterface>
+     */
+    protected $requiredInvocationStrategy = DefaultInvocationStrategy::class;
+
+    /**
      * @var ?string
      */
     protected $usage;
@@ -230,6 +235,14 @@ class Command
     }
 
     /**
+     * @return class-string<InvocationStrategyInterface>
+     */
+    public function getRequiredInvocationStrategy(): string
+    {
+        return $this->requiredInvocationStrategy;
+    }
+
+    /**
      * @return array<int, array{type: 'assoc'|'flag'|'generic'|'positional', name?: string, optional: bool, repeating: bool, description?: string, default?: string, options?: string[], value?: array{optional: true, name: string}}>
      */
     public function getSynopsis(): array
@@ -315,6 +328,16 @@ class Command
     public function setParent(?Command $parent): self
     {
         $this->parent = $parent;
+
+        return $this;
+    }
+
+    /**
+     * @param class-string<InvocationStrategyInterface> $requiredInvocationStrategy
+     */
+    public function setRequiredInvocationStrategy(string $requiredInvocationStrategy): self
+    {
+        $this->requiredInvocationStrategy = $requiredInvocationStrategy;
 
         return $this;
     }

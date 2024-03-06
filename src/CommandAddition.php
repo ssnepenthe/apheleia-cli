@@ -17,9 +17,9 @@ class CommandAddition
     protected $command;
 
     /**
-     * @var InvocationStrategyInterface
+     * @var InvocationStrategyFactoryInterface
      */
-    protected $invocationStrategy;
+    protected $invocationStrategyFactory;
 
     /**
      * @var WpCliAdapterInterface
@@ -28,11 +28,11 @@ class CommandAddition
 
     public function __construct(
         Command $command,
-        InvocationStrategyInterface $invocationStrategy,
+        InvocationStrategyFactoryInterface $invocationStrategyFactory,
         WpCliAdapterInterface $wpCliAdapter
     ) {
         $this->command = $command;
-        $this->invocationStrategy = $invocationStrategy;
+        $this->invocationStrategyFactory = $invocationStrategyFactory;
         $this->wpCliAdapter = $wpCliAdapter;
     }
 
@@ -56,11 +56,11 @@ class CommandAddition
         }
 
         if ($beforeInvoke = $this->command->getBeforeInvokeCallback()) {
-            $args['before_invoke'] = fn () => $this->invocationStrategy->call($beforeInvoke);
+            $args['before_invoke'] = fn () => $this->createInvocationStrategy()->call($beforeInvoke);
         }
 
         if ($afterInvoke = $this->command->getAfterInvokeCallback()) {
-            $args['after_invoke'] = fn () => $this->invocationStrategy->call($afterInvoke);
+            $args['after_invoke'] = fn () => $this->createInvocationStrategy()->call($afterInvoke);
         }
 
         if ($when = $this->command->getWhen()) {
@@ -104,12 +104,17 @@ class CommandAddition
         return $this;
     }
 
+    protected function createInvocationStrategy(): InvocationStrategyInterface
+    {
+        return $this->invocationStrategyFactory->create($this->command->getRequiredInvocationStrategy());
+    }
+
     /**
      * @return int
      */
     protected function handle(array $args, array $assocArgs)
     {
-        $status = $this->invocationStrategy
+        $status = $this->createInvocationStrategy()
             ->withContext(compact('args', 'assocArgs'))
             ->callCommandHandler($this->command);
 

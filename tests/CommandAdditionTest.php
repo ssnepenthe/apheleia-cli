@@ -7,6 +7,7 @@ namespace ApheleiaCli\Tests;
 use ApheleiaCli\Argument;
 use ApheleiaCli\Command;
 use ApheleiaCli\CommandAddition;
+use ApheleiaCli\InvocationStrategyFactoryInterface;
 use ApheleiaCli\InvocationStrategyInterface;
 use ApheleiaCli\NamespaceCommand;
 use ApheleiaCli\NamespaceIdentifier;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\TestCase;
 class CommandAdditionTest extends TestCase
 {
     protected $invocationStrategy;
+    protected $invocationStrategyFactory;
     protected $wpCliAdapter;
 
     protected function setUp(): void
@@ -26,12 +28,16 @@ class CommandAdditionTest extends TestCase
         $this->invocationStrategy = $this->createStub(InvocationStrategyInterface::class);
         $this->invocationStrategy->method('withContext')->willReturn($this->invocationStrategy);
 
+        $this->invocationStrategyFactory = $this->createStub(InvocationStrategyFactoryInterface::class);
+        $this->invocationStrategyFactory->method('create')->willReturn($this->invocationStrategy);
+
         $this->wpCliAdapter = $this->createStub(WpCliAdapterInterface::class);
     }
 
     protected function tearDown(): void
     {
         $this->invocationStrategy = null;
+        $this->invocationStrategyFactory = null;
         $this->wpCliAdapter = null;
     }
 
@@ -127,12 +133,18 @@ class CommandAdditionTest extends TestCase
             ->with($this->identicalTo(compact('args', 'assocArgs')))
             ->willReturn($invocationStrategyClone);
 
+        $invocationStrategyFactory = $this->createMock(InvocationStrategyFactoryInterface::class);
+        $invocationStrategyFactory->expects($this->once())
+            ->method('create')
+            ->with($this->identicalTo($command->getRequiredInvocationStrategy()))
+            ->willReturn($invocationStrategy);
+
         $wpCliAdapter = $this->createMock(WpCliAdapterInterface::class);
         $wpCliAdapter->expects($this->once())
             ->method('halt')
             ->with($this->isType(IsType::TYPE_INT));
 
-        $addition = new CommandAddition($command, $invocationStrategy, $wpCliAdapter);
+        $addition = new CommandAddition($command, $invocationStrategyFactory, $wpCliAdapter);
 
         ($addition->getHandler())($args, $assocArgs);
     }
@@ -146,7 +158,7 @@ class CommandAdditionTest extends TestCase
             ->method('halt');
 
         $command = (new Command())->setHandler(fn () => 'irrelevant');
-        $addition = new CommandAddition($command, $this->invocationStrategy, $wpCliAdapter);
+        $addition = new CommandAddition($command, $this->invocationStrategyFactory, $wpCliAdapter);
         $addition->setAutoExit(false);
 
         $return = ($addition->getHandler())([], []);
@@ -195,6 +207,6 @@ class CommandAdditionTest extends TestCase
 
     protected function makeCommandAddition(Command $command): CommandAddition
     {
-        return new CommandAddition($command, $this->invocationStrategy, $this->wpCliAdapter);
+        return new CommandAddition($command, $this->invocationStrategyFactory, $this->wpCliAdapter);
     }
 }

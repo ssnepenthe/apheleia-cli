@@ -186,9 +186,9 @@ $command->setHandler(function (array $args, array $assocArgs) {
 });
 ```
 
-However, command handler signatures can be modified via invocation strategies.
+However, commands can modify handler signatures by overriding their requiredInvocationStrategy property.
 
-This package only ships with one non-default invocation strategy: the `InvokerBackedInvocationStrategy`. It uses the [`php-di/invoker`](https://github.com/php-di/invoker) package to call command handlers.
+This package only ships with one alternative invocation strategy: the `InvokerBackedInvocationStrategy`. It uses the [`php-di/invoker`](https://github.com/php-di/invoker) package to call command handlers.
 
 Before it can be used, you must install `php-di/invoker`:
 
@@ -196,14 +196,17 @@ Before it can be used, you must install `php-di/invoker`:
 composer require php-di/invoker
 ```
 
-Then set the invocation strategy on the command registry:
+Then set the invocation strategy on your command (or a base command from which all of your commands extend):
 
 ```php
 use ApheleiaCli\InvokerBackedInvocationStrategy;
 
-$registry = new CommandRegistry(
-    new InvokerBackedInvocationStrategy()
-);
+class HelloCommand extends Command
+{
+    protected $requiredInvocationStrategy = InvokerBackedInvocationStrategy::class;
+
+    // ...
+}
 ```
 
 With this in place, command handlers can now ask for command parameters by name:
@@ -229,9 +232,5 @@ $registry->command('example hello <name> [--type=<type>]', function ($name, $typ
     }
 
     WP_CLI::$type("Hello, $name!");
-});
+})->strategy(InvokerBackedInvocationStrategy::class);
 ```
-
-### NOTE
-
-It is important to remember that since the invocation strategy is responsible for the command handler signature, commands are not portable between strategies.

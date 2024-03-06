@@ -91,4 +91,9 @@ class InvokerBackedInvocationStrategy extends AbstractInvocationStrategy
 
         return $this->invoker->call($command->getHandler(), $parameters);
     }
+
+    public function getInvoker(): InvokerInterface
+    {
+        return $this->invoker;
+    }
 }
