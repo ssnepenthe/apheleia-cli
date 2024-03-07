@@ -43,7 +43,7 @@ class InvokerBackedInvocationStrategyTest extends TestCase
     public function testCallCommandHandlerWithContext()
     {
         $count = 0;
-        $receivedArgs = [];
+        $receivedArgs = null;
 
         $callback = function (
             $args,
@@ -95,11 +95,10 @@ class InvokerBackedInvocationStrategyTest extends TestCase
         ];
 
         (new InvokerBackedInvocationStrategy())
-            ->withContext($context = [
+            ->callCommandHandler($command, $context = [
                 'args' => $args,
                 'assocArgs' => array_merge($assocArgs, $arbitraryOptions),
-            ])
-            ->callCommandHandler($command);
+            ]);
 
         $this->assertSame(1, $count);
 
@@ -127,8 +126,7 @@ class InvokerBackedInvocationStrategyTest extends TestCase
     public function testCallWithContext()
     {
         $count = 0;
-        $receivedKey = '';
-        $receivedContext = [];
+        $receivedKey = $receivedContext = null;
 
         $callback = function ($key, $context) use (&$count, &$receivedKey, &$receivedContext) {
             $count++;
@@ -139,8 +137,7 @@ class InvokerBackedInvocationStrategyTest extends TestCase
         $context = ['key' => 'value'];
 
         (new InvokerBackedInvocationStrategy())
-            ->withContext($context)
-            ->call($callback);
+            ->call($callback, $context);
 
         $this->assertSame(1, $count);
         $this->assertSame('value', $receivedKey);

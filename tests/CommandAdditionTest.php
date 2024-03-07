@@ -26,7 +26,6 @@ class CommandAdditionTest extends TestCase
     protected function setUp(): void
     {
         $this->invocationStrategy = $this->createStub(InvocationStrategyInterface::class);
-        $this->invocationStrategy->method('withContext')->willReturn($this->invocationStrategy);
 
         $this->invocationStrategyFactory = $this->createStub(InvocationStrategyFactoryInterface::class);
         $this->invocationStrategyFactory->method('create')->willReturn($this->invocationStrategy);
@@ -121,17 +120,11 @@ class CommandAdditionTest extends TestCase
         $args = ['one'];
         $assocArgs = ['two' => 'three'];
 
-        $invocationStrategyClone = $this->createMock(InvocationStrategyInterface::class);
-        $invocationStrategyClone->expects($this->once())
+        $invocationStrategy = $this->createMock(InvocationStrategyInterface::class);
+        $invocationStrategy->expects($this->once())
             ->method('callCommandHandler')
             ->with($this->identicalTo($command))
             ->willReturn(0);
-
-        $invocationStrategy = $this->createMock(InvocationStrategyInterface::class);
-        $invocationStrategy->expects($this->once())
-            ->method('withContext')
-            ->with($this->identicalTo(compact('args', 'assocArgs')))
-            ->willReturn($invocationStrategyClone);
 
         $invocationStrategyFactory = $this->createMock(InvocationStrategyFactoryInterface::class);
         $invocationStrategyFactory->expects($this->once())

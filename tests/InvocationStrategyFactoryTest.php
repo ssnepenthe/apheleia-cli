@@ -77,13 +77,10 @@ class InvocationStrategyFactoryTest extends TestCase
 
 class InvocationStrategyForTests implements InvocationStrategyInterface
 {
-    public function call(callable $callback)
+    public function call(callable $callback, array $arguments = [])
     {
     }
-    public function callCommandHandler(Command $command)
-    {
-    }
-    public function withContext(array $context)
+    public function callCommandHandler(Command $command, array $arguments = [])
     {
     }
 }
@@ -93,13 +90,10 @@ class InvocationStrategyForTestsWithConstructor implements InvocationStrategyInt
     public function __construct($irrelevant)
     {
     }
-    public function call(callable $callback)
+    public function call(callable $callback, array $arguments = [])
     {
     }
-    public function callCommandHandler(Command $command)
-    {
-    }
-    public function withContext(array $context)
+    public function callCommandHandler(Command $command, array $arguments = [])
     {
     }
 }

@@ -4,31 +4,31 @@ declare(strict_types=1);
 
 namespace ApheleiaCli;
 
-class DefaultInvocationStrategy extends AbstractInvocationStrategy
+class DefaultInvocationStrategy implements InvocationStrategyInterface
 {
     /**
      * @return mixed
      */
-    public function call(callable $callback)
+    public function call(callable $callback, array $arguments = [])
     {
-        return $callback($this->context);
+        return $callback($arguments);
     }
 
     /**
      * @return mixed
      */
-    public function callCommandHandler(Command $command)
+    public function callCommandHandler(Command $command, array $arguments = [])
     {
         $args = $assocArgs = [];
 
-        if (isset($this->context['args']) && is_array($this->context['args'])) {
-            $args = $this->context['args'];
+        if (isset($arguments['args']) && is_array($arguments['args'])) {
+            $args = $arguments['args'];
         }
 
-        if (isset($this->context['assocArgs']) && is_array($this->context['assocArgs'])) {
-            $assocArgs = $this->context['assocArgs'];
+        if (isset($arguments['assocArgs']) && is_array($arguments['assocArgs'])) {
+            $assocArgs = $arguments['assocArgs'];
         }
 
-        return ($command->getHandler())($args, $assocArgs, $this->context);
+        return ($command->getHandler())($args, $assocArgs, $arguments);
     }
 }

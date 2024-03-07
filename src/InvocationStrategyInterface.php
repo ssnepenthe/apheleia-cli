@@ -9,15 +9,10 @@ interface InvocationStrategyInterface
     /**
      * @return mixed
      */
-    public function call(callable $callback);
+    public function call(callable $callback, array $arguments = []);
 
     /**
      * @return mixed
      */
-    public function callCommandHandler(Command $command);
-
-    /**
-     * @return static
-     */
-    public function withContext(array $context);
+    public function callCommandHandler(Command $command, array $arguments = []);
 }

@@ -11,7 +11,7 @@ use Invoker\ParameterResolver\DefaultValueResolver;
 use Invoker\ParameterResolver\NumericArrayResolver;
 use Invoker\ParameterResolver\ResolverChain;
 
-class InvokerBackedInvocationStrategy extends AbstractInvocationStrategy
+class InvokerBackedInvocationStrategy implements InvocationStrategyInterface
 {
     /**
      * @var InvokerInterface
@@ -33,28 +33,28 @@ class InvokerBackedInvocationStrategy extends AbstractInvocationStrategy
     /**
      * @return mixed
      */
-    public function call(callable $callback)
+    public function call(callable $callback, array $arguments = [])
     {
         return $this->invoker->call(
             $callback,
-            array_merge(['context' => $this->context], $this->context)
+            array_merge(['context' => $arguments], $arguments)
         );
     }
 
     /**
      * @return mixed
      */
-    public function callCommandHandler(Command $command)
+    public function callCommandHandler(Command $command, array $arguments = [])
     {
-        $args = $argsCopy = $this->context['args'] ?? [];
-        $assocArgs = $assocArgsCopy = $this->context['assocArgs'] ?? [];
+        $args = $argsCopy = $arguments['args'] ?? [];
+        $assocArgs = $assocArgsCopy = $arguments['assocArgs'] ?? [];
 
         $parameters = [
             'args' => $args,
             'assocArgs' => $assocArgs,
             'arguments' => $args,
             'options' => $assocArgs,
-            'context' => $this->context,
+            'context' => $arguments,
         ];
 
         $registeredArgs = $command->getArguments();

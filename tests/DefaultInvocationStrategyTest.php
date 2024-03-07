@@ -25,7 +25,7 @@ class DefaultInvocationStrategyTest extends TestCase
     public function testCallCommandHandler()
     {
         $count = 0;
-        $receivedArgs = $receivedAssocArgs = $receivedContext = [];
+        $receivedArgs = $receivedAssocArgs = $receivedContext = null;
 
         $callback = function ($args, $assocArgs, $context) use (&$count, &$receivedArgs, &$receivedAssocArgs, &$receivedContext) {
             $count++;
@@ -49,7 +49,7 @@ class DefaultInvocationStrategyTest extends TestCase
     public function testCallCommandHandlerWithContext()
     {
         $count = 0;
-        $receivedArgs = $receivedAssocArgs = $receivedContext = [];
+        $receivedArgs = $receivedAssocArgs = $receivedContext = null;
 
         $callback = function ($args, $assocArgs, $context) use (&$count, &$receivedArgs, &$receivedAssocArgs, &$receivedContext) {
             $count++;
@@ -67,8 +67,7 @@ class DefaultInvocationStrategyTest extends TestCase
         $context = compact('args', 'assocArgs');
 
         (new DefaultInvocationStrategy())
-            ->withContext($context)
-            ->callCommandHandler($command);
+            ->callCommandHandler($command, $context);
 
         $this->assertSame(1, $count);
         $this->assertSame($args, $receivedArgs);
@@ -86,8 +85,7 @@ class DefaultInvocationStrategyTest extends TestCase
         };
 
         (new DefaultInvocationStrategy())
-            ->withContext($context = ['some' => 'context'])
-            ->call($callback);
+            ->call($callback, $context = ['some' => 'context']);
 
         $this->assertSame(1, $count);
         $this->assertSame($context, $receivedContext);

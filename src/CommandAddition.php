@@ -115,8 +115,7 @@ class CommandAddition
     protected function handle(array $args, array $assocArgs)
     {
         $status = $this->createInvocationStrategy()
-            ->withContext(compact('args', 'assocArgs'))
-            ->callCommandHandler($this->command);
+            ->callCommandHandler($this->command, compact('args', 'assocArgs'));
 
         if (! is_int($status) || $status < 0) {
             $status = 0;
