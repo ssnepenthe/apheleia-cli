@@ -97,23 +97,6 @@ $registry->group('apheleia', 'Apheleia CLI Test Plugin', function (CommandRegist
             }
         }
     );
-
-    $registry->command('string <arg> [--option=<option>]', function ($args, $assocArgs) {
-        WP_CLI::log('Hi from the string handler');
-        var_dump('ARGS', $args, 'ASSOC ARGS', $assocArgs);
-    })->descriptions('Description for string command', [
-        'arg' => 'Description for argument "arg"',
-        '--option' => 'Description for option "option"',
-    ])->before(function () {
-        WP_CLI::log('Before string');
-    })->after(function () {
-        WP_CLI::log('After string');
-    });
-
-    $registry->command('arbitrary [--<field>=<value>]', function ($args, $assocArgs) {
-        WP_CLI::log('Hi from the arbitrary handler');
-        var_dump('ARGS', $args, 'ASSOC ARGS', $assocArgs);
-    });
 });
 
 $registry->initialize();

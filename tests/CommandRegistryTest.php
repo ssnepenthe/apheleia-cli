@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace ApheleiaCli\Tests;
 
+use ApheleiaCli\Argument;
 use ApheleiaCli\Command;
 use ApheleiaCli\CommandRegistry;
+use ApheleiaCli\Option;
 use ApheleiaCli\WpCliAdapterInterface;
 use Closure;
 use PHPUnit\Framework\Constraint\IsType;
@@ -58,46 +60,6 @@ class CommandRegistryTest extends TestCase
         $this->assertSame('four', $four->getName());
     }
 
-    public function testCommand()
-    {
-        $registry = new CommandRegistry();
-        $handler = fn () => '';
-
-        $command = $registry->command('command', $handler)->getCommand();
-
-        $this->assertSame('command', $command->getName());
-        $this->assertSame($handler, $command->getHandler());
-    }
-
-    public function testCommandWithHandlerWithDefaults()
-    {
-        $registry = new CommandRegistry();
-
-        $addition = $registry->command(
-            'command [<arg>] [--opt=<opt>]',
-            fn ($arg = 'one', $opt = 'two') => ''
-        );
-        $command = $addition->getCommand();
-
-        $this->assertSame('one', $command->getArguments()['arg']->getDefault());
-        $this->assertSame('two', $command->getOptions()['opt']->getDefault());
-    }
-
-    public function testCommandWithHandlerWithDefaultsAndCustomParameterNameMappers()
-    {
-        $registry = new CommandRegistry();
-        $registry->setParameterNameMappers(fn ($name) => str_replace('one', '1', $name));
-
-        $addition = $registry->command(
-            'command [<1arg>] [--1opt=<1opt>]',
-            fn ($onearg = 'one', $oneopt = 'two') => ''
-        );
-        $command = $addition->getCommand();
-
-        $this->assertSame('one', $command->getArguments()['1arg']->getDefault());
-        $this->assertSame('two', $command->getOptions()['1opt']->getDefault());
-    }
-
     public function testGroupWithNoCommandsAndChildlessGroupsAllowed()
     {
         $registry = new CommandRegistry();
@@ -126,7 +88,7 @@ class CommandRegistryTest extends TestCase
             ->method('addWpHook')
             ->with('plugins_loaded', $this->isType(IsType::TYPE_CALLABLE));
 
-        $registry = new CommandRegistry(null, null, $wpCliAdapterMock);
+        $registry = new CommandRegistry(null, $wpCliAdapterMock);
 
         $registry->initialize();
     }
@@ -154,9 +116,15 @@ class CommandRegistryTest extends TestCase
                 ],
             ]);
 
-        $registry = new CommandRegistry(null, null, $wpCliAdapterMock);
+        $registry = new CommandRegistry(null, $wpCliAdapterMock);
 
-        $registry->command('command <arg> [--option=<option>]', fn () => '');
+        $registry->add(
+            (new Command())
+                ->setName('command')
+                ->addArgument(new Argument('arg'))
+                ->addOption(new Option('option'))
+                ->setHandler(fn () => '')
+        );
 
         $registry->initializeImmediately();
     }

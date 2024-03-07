@@ -2,7 +2,7 @@
 
 Apheleia CLI provides an alternate approach to writing WP-CLI commands. It eliminates the need for docblock command definitions and should allow you to take full advantage of the autocomplete features in your favorite editor.
 
-The syntax for Apheleia commands is loosely modeled after both [symfony/console](https://github.com/symfony/console) and [mnapoli/silly](https://github.com/mnapoli/silly/).
+The syntax for Apheleia commands is loosely modeled after the [symfony/console](https://github.com/symfony/console) package.
 
 ## Warning
 
@@ -139,43 +139,6 @@ $registry->add(
 );
 ```
 
-Alternatively, commands can be defined using plain strings:
-
-```php
-$registry->command('example hello <name> [--type=<type>]', function ($args, $assocArgs) {
-    [$name] = $args;
-    $type = $assocArgs['type'] ?? 'success';
-
-    if (! in_array($type, ['success', 'error'], true)) {
-        $type = 'success';
-    }
-
-    WP_CLI::$type("Hello, $name!");
-});
-```
-
-The above is a quick-and-dirty command definition. It is missing some important info such as descriptions, defaults, etc. A more thorough example might look like this:
-
-```php
-$registry->group('example', 'Implements example command.', function (CommandRegistry $registry) {
-    $registry->command('hello <name> [--type=<type>]', function ($args, $assocArgs) {
-        [$name] = $args;
-        $type = $assocArgs['type'];
-
-        WP_CLI::$type("Hello, $name!");
-    })->descriptions('Prints a greeting.', [
-        'name' => 'The name of the person to greet.',
-        '--type' => 'Whether or not to greet the person with success or error.',
-    ])->defaults([
-        '--type' => 'success',
-    ])->options([
-        '--type' => ['success', 'error'],
-    ])->usage(
-        "## EXAMPLES\n\n\twp example hello newman"
-    )->when('after_wp_load');
-});
-```
-
 ## Advanced Usage
 
 By default, command handlers should be written more-or-less the same as they would if you were working directly with WP-CLI. That is to say they should always expect to receive a list of command arguments as the first parameter and an associative array of command options as the second:
@@ -221,16 +184,4 @@ class HelloCommand extends Command
         WP_CLI::$type("Hello, $name!");
     }
 }
-```
-
-You can take advantage of this to streamline your command definitions:
-
-```php
-$registry->command('example hello <name> [--type=<type>]', function ($name, $type = 'success') {
-    if (! in_array($type, ['success', 'error'], true)) {
-        $type = 'success';
-    }
-
-    WP_CLI::$type("Hello, $name!");
-})->strategy(InvokerBackedInvocationStrategy::class);
 ```

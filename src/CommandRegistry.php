@@ -19,11 +19,6 @@ class CommandRegistry
     protected $autoExit = true;
 
     /**
-     * @var CommandParserInterface
-     */
-    protected $commandParser;
-
-    /**
      * @var ?Command
      */
     protected $currentGroupParent;
@@ -32,11 +27,6 @@ class CommandRegistry
      * @var InvocationStrategyFactoryInterface
      */
     protected $invocationStrategyFactory;
-
-    /**
-     * @var array<int, callable(string):string>
-     */
-    protected $parameterNameMappers = [];
 
     /**
      * @var array<string, CommandAddition>
@@ -50,11 +40,9 @@ class CommandRegistry
 
     public function __construct(
         ?InvocationStrategyFactoryInterface $invocationStrategyFactory = null,
-        ?CommandParserInterface $commandParser = null,
         ?WpCliAdapterInterface $wpCliAdapter = null
     ) {
         $this->invocationStrategyFactory = $invocationStrategyFactory ?: new InvocationStrategyFactory();
-        $this->commandParser = $commandParser ?: new CommandParser();
 
         if (! $wpCliAdapter instanceof WpCliAdapterInterface) {
             $wpCliAdapter = defined('WP_CLI') && WP_CLI
@@ -94,18 +82,6 @@ class CommandRegistry
         $this->allowChildlessGroups = $allowChildlessGroups;
 
         return $this;
-    }
-
-    public function command(string $command, callable $handler): ParsedCommandHelper
-    {
-        $command = $this->commandParser->parse($command);
-
-        $addition = new ParsedCommandHelper($command, $this->parameterNameMappers);
-        $addition->handler($handler);
-
-        $this->add($command);
-
-        return $addition;
     }
 
     /**
@@ -183,16 +159,6 @@ class CommandRegistry
     public function setAutoExit(bool $autoExit): self
     {
         $this->autoExit = $autoExit;
-
-        return $this;
-    }
-
-    /**
-     * @param callable(string):string ...$parameterNameMappers
-     */
-    public function setParameterNameMappers(callable ...$parameterNameMappers): self
-    {
-        $this->parameterNameMappers = array_values($parameterNameMappers);
 
         return $this;
     }

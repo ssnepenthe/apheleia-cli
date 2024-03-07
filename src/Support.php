@@ -4,35 +4,8 @@ declare(strict_types=1);
 
 namespace ApheleiaCli;
 
-use Closure;
-use ReflectionFunction;
-use ReflectionFunctionAbstract;
-use ReflectionMethod;
-
 class Support
 {
-    public static function callableReflector(callable $callable): ReflectionFunctionAbstract
-    {
-        if ($callable instanceof Closure) {
-            return new ReflectionFunction($callable);
-        }
-
-        if (is_string($callable)) {
-            if (false !== strpos($callable, '::')) {
-                return new ReflectionMethod($callable);
-            }
-
-            return new ReflectionFunction($callable);
-        }
-
-        if (is_object($callable)) {
-            return new ReflectionMethod($callable, '__invoke');
-        }
-
-        // @see https://github.com/vimeo/psalm/issues/7778
-        return new ReflectionMethod($callable[0], $callable[1]);
-    }
-
     public static function camelCase(string $string): string
     {
         return lcfirst(

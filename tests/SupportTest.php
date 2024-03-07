@@ -12,20 +12,6 @@ use ReflectionMethod;
 
 class SupportTest extends TestCase
 {
-    public function provideTestCallableReflector()
-    {
-        yield [ReflectionFunction::class, fn () => ''];
-        yield [ReflectionMethod::class, 'DateTime::createFromFormat'];
-        yield [ReflectionFunction::class, 'array_map'];
-        yield [ReflectionMethod::class, new class () {
-            public function __invoke()
-            {
-            }
-        }];
-        yield [ReflectionMethod::class, [DateTime::class, 'createFromFormat']];
-        yield [ReflectionMethod::class, [new DateTime(), 'add']];
-    }
-
     public function provideTestCamelCase()
     {
         yield ['', ''];
@@ -144,14 +130,6 @@ class SupportTest extends TestCase
         yield ['2snake_case', '2snake-case'];
         yield ['snake2_case', 'snake2Case'];
         yield ['snake2case', 'snake2case'];
-    }
-
-    /**
-     * @dataProvider provideTestCallableReflector
-     */
-    public function testCallableReflector($class, $callable)
-    {
-        $this->assertInstanceOf($class, Support::callableReflector($callable));
     }
 
     /**
