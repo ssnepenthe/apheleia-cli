@@ -15,6 +15,7 @@ use ApheleiaCli\Argument;
 use ApheleiaCli\Command;
 use ApheleiaCli\CommandRegistry;
 use ApheleiaCli\Flag;
+use ApheleiaCli\Invoker\PhpDiHandlerInvoker;
 use ApheleiaCli\Option;
 
 if (! (defined('WP_CLI') && \WP_CLI)) {
@@ -94,6 +95,18 @@ $registry->group('apheleia', 'Apheleia CLI Test Plugin', function (CommandRegist
                 var_dump('ARGS', $args, 'ASSOC ARGS', $assocArgs);
             }
         }
+    );
+
+    $registry->add(
+        (new Command())
+            ->setName('invoker')
+            ->addArgument(new Argument('one'))
+            ->addArgument(new Argument('two'))
+            ->setHandlerInvokerClass(PhpDiHandlerInvoker::class)
+            ->setHandler(function ($one, $two) {
+                WP_CLI::log("ONE: {$one}");
+                WP_CLI::log("TWO: {$two}");
+            })
     );
 });
 
