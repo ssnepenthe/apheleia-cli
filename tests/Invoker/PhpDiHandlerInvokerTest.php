@@ -2,30 +2,21 @@
 
 declare(strict_types=1);
 
-namespace ApheleiaCli\Tests;
+namespace ApheleiaCli\Tests\Invoker;
 
 use ApheleiaCli\Argument;
 use ApheleiaCli\Command;
 use ApheleiaCli\Flag;
-use ApheleiaCli\InvokerBackedInvocationStrategy;
+use ApheleiaCli\Invoker\PhpDiHandlerInvoker;
 use ApheleiaCli\Option;
 use PHPUnit\Framework\TestCase;
 
-class InvokerBackedInvocationStrategyTest extends TestCase
+// @todo InvokerInterface mocks?
+class PhpDiHandlerInvokerTest extends TestCase
 {
-    public function testCall()
-    {
-        $count = 0;
-        $callback = function () use (&$count) {
-            $count++;
-        };
+    use CreatesPhpDiInvoker;
 
-        (new InvokerBackedInvocationStrategy())->call($callback);
-
-        $this->assertSame(1, $count);
-    }
-
-    public function testCallCommandHandler()
+    public function testInvoke()
     {
         $count = 0;
         $callback = function () use (&$count) {
@@ -35,12 +26,16 @@ class InvokerBackedInvocationStrategyTest extends TestCase
             ->setName('irrelevant')
             ->setHandler($callback);
 
-        (new InvokerBackedInvocationStrategy())->callCommandHandler($command);
+        (new PhpDiHandlerInvoker($this->createPhpDiInvoker()))->invoke($command->getHandler(), [
+            'args' => [],
+            'assocArgs' => [],
+            'command' => $command,
+        ]);
 
         $this->assertSame(1, $count);
     }
 
-    public function testCallCommandHandlerWithContext()
+    public function testInvokeWithArguments()
     {
         $count = 0;
         $receivedArgs = null;
@@ -55,7 +50,7 @@ class InvokerBackedInvocationStrategyTest extends TestCase
             $flagOne,
             $optOne,
             $arbitraryOptions,
-            $context
+            $command
         ) use (&$count, &$receivedArgs) {
             $count++;
             $receivedArgs = compact(
@@ -68,7 +63,7 @@ class InvokerBackedInvocationStrategyTest extends TestCase
                 'flagOne',
                 'optOne',
                 'arbitraryOptions',
-                'context',
+                'command'
             );
         };
 
@@ -94,10 +89,11 @@ class InvokerBackedInvocationStrategyTest extends TestCase
             'to' => 'arbitrary-options',
         ];
 
-        (new InvokerBackedInvocationStrategy())
-            ->callCommandHandler($command, $context = [
+        (new PhpDiHandlerInvoker($this->createPhpDiInvoker()))
+            ->invoke($command->getHandler(), $context = [
                 'args' => $args,
                 'assocArgs' => array_merge($assocArgs, $arbitraryOptions),
+                'command' => $command,
             ]);
 
         $this->assertSame(1, $count);
@@ -118,29 +114,8 @@ class InvokerBackedInvocationStrategyTest extends TestCase
             // If command accepts arbitrary options, remaining options are bundled together
             'arbitraryOptions' => $arbitraryOptions,
 
-            // Full context array is also available
-            'context' => $context,
+            // Command instance is also available.
+            'command' => $command,
         ], $receivedArgs);
-    }
-
-    public function testCallWithContext()
-    {
-        $count = 0;
-        $receivedKey = $receivedContext = null;
-
-        $callback = function ($key, $context) use (&$count, &$receivedKey, &$receivedContext) {
-            $count++;
-            $receivedKey = $key;
-            $receivedContext = $context;
-        };
-
-        $context = ['key' => 'value'];
-
-        (new InvokerBackedInvocationStrategy())
-            ->call($callback, $context);
-
-        $this->assertSame(1, $count);
-        $this->assertSame('value', $receivedKey);
-        $this->assertSame($context, $receivedContext);
     }
 }

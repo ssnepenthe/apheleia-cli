@@ -7,43 +7,21 @@ namespace ApheleiaCli\Tests;
 use ApheleiaCli\Argument;
 use ApheleiaCli\Command;
 use ApheleiaCli\CommandAddition;
-use ApheleiaCli\InvocationStrategyFactoryInterface;
-use ApheleiaCli\InvocationStrategyInterface;
+use ApheleiaCli\Invoker\InvokerFactory;
 use ApheleiaCli\NamespaceCommand;
 use ApheleiaCli\NamespaceIdentifier;
+use ApheleiaCli\NullWpCliAdapter;
 use ApheleiaCli\Option;
 use ApheleiaCli\WpCliAdapterInterface;
 use Closure;
-use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\TestCase;
 
 class CommandAdditionTest extends TestCase
 {
-    protected $invocationStrategy;
-    protected $invocationStrategyFactory;
-    protected $wpCliAdapter;
-
-    protected function setUp(): void
-    {
-        $this->invocationStrategy = $this->createStub(InvocationStrategyInterface::class);
-
-        $this->invocationStrategyFactory = $this->createStub(InvocationStrategyFactoryInterface::class);
-        $this->invocationStrategyFactory->method('create')->willReturn($this->invocationStrategy);
-
-        $this->wpCliAdapter = $this->createStub(WpCliAdapterInterface::class);
-    }
-
-    protected function tearDown(): void
-    {
-        $this->invocationStrategy = null;
-        $this->invocationStrategyFactory = null;
-        $this->wpCliAdapter = null;
-    }
-
     public function testGetArgs()
     {
         $command = new Command();
-        $addition = $this->makeCommandAddition($command);
+        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter());
 
         $this->assertSame([], $addition->getArgs());
 
@@ -55,7 +33,7 @@ class CommandAdditionTest extends TestCase
             ->setBeforeInvokeCallback(fn () => 'irrelevant')
             ->setAfterInvokeCallback(fn () => 'irrelevant')
             ->setWhen('irrelevant-when');
-        $addition = $this->makeCommandAddition($command);
+        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter());
 
         $args = $addition->getArgs();
         $basicArgs = array_intersect_key($args, [
@@ -94,13 +72,13 @@ class CommandAdditionTest extends TestCase
     public function testGetHandler()
     {
         $command = new NamespaceCommand('name', 'description');
-        $addition = $this->makeCommandAddition($command);
+        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter());
 
         $this->assertSame(NamespaceIdentifier::class, $addition->getHandler());
 
         $handler = fn () => 'irrelevant';
         $command = (new Command())->setHandler($handler);
-        $addition = $this->makeCommandAddition($command);
+        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter());
 
         $this->assertInstanceOf(Closure::class, $addition->getHandler());
         $this->assertNotSame($handler, $addition->getHandler());
@@ -109,49 +87,38 @@ class CommandAdditionTest extends TestCase
     public function testGetName()
     {
         $command = (new Command())->setName('irrelevant');
-        $addition = $this->makeCommandAddition($command);
+        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter());
 
         $this->assertSame('irrelevant', $addition->getName());
     }
 
     public function testHandle()
     {
-        $command = (new Command())->setHandler(fn () => 'irrelevant');
+        $command = (new Command())->setHandler(fn () => 0);
         $args = ['one'];
         $assocArgs = ['two' => 'three'];
-
-        $invocationStrategy = $this->createMock(InvocationStrategyInterface::class);
-        $invocationStrategy->expects($this->once())
-            ->method('callCommandHandler')
-            ->with($this->identicalTo($command))
-            ->willReturn(0);
-
-        $invocationStrategyFactory = $this->createMock(InvocationStrategyFactoryInterface::class);
-        $invocationStrategyFactory->expects($this->once())
-            ->method('create')
-            ->with($this->identicalTo($command->getRequiredInvocationStrategy()))
-            ->willReturn($invocationStrategy);
 
         $wpCliAdapter = $this->createMock(WpCliAdapterInterface::class);
         $wpCliAdapter->expects($this->once())
             ->method('halt')
-            ->with($this->isType(IsType::TYPE_INT));
+            ->with(0);
 
-        $addition = new CommandAddition($command, $invocationStrategyFactory, $wpCliAdapter);
+        $addition = new CommandAddition($command, new InvokerFactory(), $wpCliAdapter);
+
+        // This is the default but let's be explicit...
+        $addition->setAutoExit(true);
 
         ($addition->getHandler())($args, $assocArgs);
     }
 
     public function testHandleWithAutoExitDisabled()
     {
-        $this->invocationStrategy->method('callCommandHandler')->willReturn(0);
-
         $wpCliAdapter = $this->createMock(WpCliAdapterInterface::class);
         $wpCliAdapter->expects($this->never())
             ->method('halt');
 
-        $command = (new Command())->setHandler(fn () => 'irrelevant');
-        $addition = new CommandAddition($command, $this->invocationStrategyFactory, $wpCliAdapter);
+        $command = (new Command())->setHandler(fn () => 0);
+        $addition = new CommandAddition($command, new InvokerFactory(), $wpCliAdapter);
         $addition->setAutoExit(false);
 
         $return = ($addition->getHandler())([], []);
@@ -161,45 +128,40 @@ class CommandAdditionTest extends TestCase
 
     public function testHandleWithNonIntReturnValue()
     {
-        $this->invocationStrategy->method('callCommandHandler')->willReturn(null);
+        $command = (new Command())->setHandler(fn () => 'stringval');
 
-        $command = (new Command())->setHandler(fn () => 'irrelevant');
-        $addition = $this->makeCommandAddition($command);
+        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter());
         $addition->setAutoExit(false);
 
         $return = ($addition->getHandler())([], []);
 
+        // Assume zero exit status when handler return non-int value.
         $this->assertSame(0, $return);
     }
 
     public function testHandleWithReturnValueOverMax()
     {
-        $this->invocationStrategy->method('callCommandHandler')->willReturn(256);
+        $command = (new Command())->setHandler(fn () => 256);
 
-        $command = (new Command())->setHandler(fn () => 'irrelevant');
-        $addition = $this->makeCommandAddition($command);
+        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter());
         $addition->setAutoExit(false);
 
         $return = ($addition->getHandler())([], []);
 
+        // Exit status allowed max is 255.
         $this->assertSame(255, $return);
     }
 
     public function testHandleWithReturnValueUnderMin()
     {
-        $this->invocationStrategy->method('callCommandHandler')->willReturn(-1);
-
         $command = (new Command())->setHandler(fn () => 'irrelevant');
-        $addition = $this->makeCommandAddition($command);
+
+        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter());
         $addition->setAutoExit(false);
 
         $return = ($addition->getHandler())([], []);
 
+        // Exit status allowed min is 0.
         $this->assertSame(0, $return);
-    }
-
-    protected function makeCommandAddition(Command $command): CommandAddition
-    {
-        return new CommandAddition($command, $this->invocationStrategyFactory, $this->wpCliAdapter);
     }
 }

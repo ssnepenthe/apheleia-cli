@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ApheleiaCli\Tests;
+namespace ApheleiaCli\Tests\Invoker;
 
-use ApheleiaCli\TransformingAssociativeArrayParameterResolver;
+use ApheleiaCli\Invoker\TransformingAssociativeArrayParameterResolver;
 use PHPUnit\Framework\TestCase;
 use ReflectionFunction;
 

@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace ApheleiaCli;
 
+use ApheleiaCli\Invoker\DefaultGenericInvoker;
+use ApheleiaCli\Invoker\DefaultHandlerInvoker;
+use ApheleiaCli\Invoker\GenericInvokerInterface;
+use ApheleiaCli\Invoker\HandlerInvokerInterface;
 use InvalidArgumentException;
 use ReflectionMethod;
 use RuntimeException;
@@ -37,9 +41,19 @@ class Command
     protected $description;
 
     /**
+     * @var class-string<GenericInvokerInterface>
+     */
+    protected $genericInvokerClass = DefaultGenericInvoker::class;
+
+    /**
      * @var ?callable|class-string<CommandNamespace>
      */
     protected $handler;
+
+    /**
+     * @var class-string<HandlerInvokerInterface>
+     */
+    protected $handlerInvokerClass = DefaultHandlerInvoker::class;
 
     /**
      * @var string
@@ -56,11 +70,6 @@ class Command
      * @var ?Command
      */
     protected $parent;
-
-    /**
-     * @var class-string<InvocationStrategyInterface>
-     */
-    protected $requiredInvocationStrategy = DefaultInvocationStrategy::class;
 
     /**
      * @var ?string
@@ -182,6 +191,14 @@ class Command
     }
 
     /**
+     * @return class-string<GenericInvokerInterface>
+     */
+    public function getGenericInvokerClass(): string
+    {
+        return $this->genericInvokerClass;
+    }
+
+    /**
      * @return callable|class-string<CommandNamespace>
      */
     public function getHandler()
@@ -202,6 +219,14 @@ class Command
             . ' - set explicitly using the \$command->setHandler() method'
             . ' or implicitly by implementing the \'handle\' method on your command class'
         );
+    }
+
+    /**
+     * @return class-string<HandlerInvokerInterface>
+     */
+    public function getHandlerInvokerClass(): string
+    {
+        return $this->handlerInvokerClass;
     }
 
     /**
@@ -228,14 +253,6 @@ class Command
     public function getOptions(): array
     {
         return $this->options;
-    }
-
-    /**
-     * @return class-string<InvocationStrategyInterface>
-     */
-    public function getRequiredInvocationStrategy(): string
-    {
-        return $this->requiredInvocationStrategy;
     }
 
     /**
@@ -307,9 +324,29 @@ class Command
         return $this;
     }
 
+    /**
+     * @param class-string<GenericInvokerInterface> $genericInvokerClass
+     */
+    public function setGenericInvokerClass(string $genericInvokerClass): self
+    {
+        $this->genericInvokerClass = $genericInvokerClass;
+
+        return $this;
+    }
+
     public function setHandler(callable $handler): self
     {
         $this->handler = $handler;
+
+        return $this;
+    }
+
+    /**
+     * @param class-string<HandlerInvokerInterface> $handlerInvokerClass
+     */
+    public function setHandlerInvokerClass(string $handlerInvokerClass): self
+    {
+        $this->handlerInvokerClass = $handlerInvokerClass;
 
         return $this;
     }
@@ -324,16 +361,6 @@ class Command
     public function setParent(?Command $parent): self
     {
         $this->parent = $parent;
-
-        return $this;
-    }
-
-    /**
-     * @param class-string<InvocationStrategyInterface> $requiredInvocationStrategy
-     */
-    public function setRequiredInvocationStrategy(string $requiredInvocationStrategy): self
-    {
-        $this->requiredInvocationStrategy = $requiredInvocationStrategy;
 
         return $this;
     }

@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace ApheleiaCli;
 
+use ApheleiaCli\Invoker\GenericInvokerInterface;
+use ApheleiaCli\Invoker\HandlerInvokerInterface;
+use ApheleiaCli\Invoker\InvokerFactoryInterface;
+
 class CommandAddition
 {
     /**
@@ -17,9 +21,9 @@ class CommandAddition
     protected $command;
 
     /**
-     * @var InvocationStrategyFactoryInterface
+     * @var InvokerFactoryInterface
      */
-    protected $invocationStrategyFactory;
+    protected $invokerFactory;
 
     /**
      * @var WpCliAdapterInterface
@@ -28,11 +32,11 @@ class CommandAddition
 
     public function __construct(
         Command $command,
-        InvocationStrategyFactoryInterface $invocationStrategyFactory,
+        InvokerFactoryInterface $invokerFactory,
         WpCliAdapterInterface $wpCliAdapter
     ) {
         $this->command = $command;
-        $this->invocationStrategyFactory = $invocationStrategyFactory;
+        $this->invokerFactory = $invokerFactory;
         $this->wpCliAdapter = $wpCliAdapter;
     }
 
@@ -56,11 +60,11 @@ class CommandAddition
         }
 
         if ($beforeInvoke = $this->command->getBeforeInvokeCallback()) {
-            $args['before_invoke'] = fn () => $this->createInvocationStrategy()->call($beforeInvoke);
+            $args['before_invoke'] = fn () => $this->createGenericInvoker()->invoke($beforeInvoke);
         }
 
         if ($afterInvoke = $this->command->getAfterInvokeCallback()) {
-            $args['after_invoke'] = fn () => $this->createInvocationStrategy()->call($afterInvoke);
+            $args['after_invoke'] = fn () => $this->createGenericInvoker()->invoke($afterInvoke);
         }
 
         if ($when = $this->command->getWhen()) {
@@ -104,9 +108,14 @@ class CommandAddition
         return $this;
     }
 
-    protected function createInvocationStrategy(): InvocationStrategyInterface
+    protected function createGenericInvoker(): GenericInvokerInterface
     {
-        return $this->invocationStrategyFactory->create($this->command->getRequiredInvocationStrategy());
+        return $this->invokerFactory->createGenericInvoker($this->command->getGenericInvokerClass());
+    }
+
+    protected function createHandlerInvoker(): HandlerInvokerInterface
+    {
+        return $this->invokerFactory->createHandlerInvoker($this->command->getHandlerInvokerClass());
     }
 
     /**
@@ -114,8 +123,12 @@ class CommandAddition
      */
     protected function handle(array $args, array $assocArgs)
     {
-        $status = $this->createInvocationStrategy()
-            ->callCommandHandler($this->command, compact('args', 'assocArgs'));
+        $status = $this->createHandlerInvoker()
+            ->invoke($this->command->getHandler(), [
+                'args' => $args,
+                'assocArgs' => $assocArgs,
+                'command' => $this->command,
+            ]);
 
         if (! is_int($status) || $status < 0) {
             $status = 0;
