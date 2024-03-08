@@ -21,8 +21,6 @@ if (! (defined('WP_CLI') && \WP_CLI)) {
     return;
 }
 
-require_once __DIR__ . '/../../vendor/autoload.php';
-
 $registry = new CommandRegistry();
 
 $registry->group('apheleia', 'Apheleia CLI Test Plugin', function (CommandRegistry $registry) {
