@@ -11,6 +11,7 @@
         "php-stubs/wp-cli-stubs": "^2.6",
         "phpunit/phpunit": "^9.5",
         "vimeo/psalm": "^4.22",
+        "wp-cli/php-cli-tools": "^0.11.6",
         "wp-cli/wp-cli": "^2.6"
     },
     "autoload": {
