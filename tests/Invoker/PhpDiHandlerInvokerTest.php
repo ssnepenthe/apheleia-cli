@@ -7,8 +7,13 @@ namespace ApheleiaCli\Tests\Invoker;
 use ApheleiaCli\Argument;
 use ApheleiaCli\Command;
 use ApheleiaCli\Flag;
+use ApheleiaCli\Input\ArrayInput;
+use ApheleiaCli\Input\InputInterface;
 use ApheleiaCli\Invoker\PhpDiHandlerInvoker;
 use ApheleiaCli\Option;
+use ApheleiaCli\Output\ConsoleOutput;
+use ApheleiaCli\Output\ConsoleOutputInterface;
+use ApheleiaCli\Output\OutputInterface;
 use PHPUnit\Framework\TestCase;
 
 // @todo InvokerInterface mocks?
@@ -26,11 +31,8 @@ class PhpDiHandlerInvokerTest extends TestCase
             ->setName('irrelevant')
             ->setHandler($callback);
 
-        (new PhpDiHandlerInvoker($this->createPhpDiInvoker()))->invoke($command->getHandler(), [
-            'args' => [],
-            'assocArgs' => [],
-            'command' => $command,
-        ]);
+        (new PhpDiHandlerInvoker($this->createPhpDiInvoker()))
+            ->invoke($command->getHandler(), new ArrayInput([], [], []), new ConsoleOutput(), $command);
 
         $this->assertSame(1, $count);
     }
@@ -45,12 +47,19 @@ class PhpDiHandlerInvokerTest extends TestCase
             $assocArgs,
             $arguments,
             $options,
+            $flags,
+            $command,
+            Command $typedCommand,
+            $input,
+            InputInterface $typedInput,
+            $output,
+            ConsoleOutputInterface $typedConsoleOutput,
+            OutputInterface $typedOutput,
             $argOne,
             $argTwo,
             $flagOne,
             $optOne,
             $arbitraryOptions,
-            $command
         ) use (&$count, &$receivedArgs) {
             $count++;
             $receivedArgs = compact(
@@ -58,12 +67,19 @@ class PhpDiHandlerInvokerTest extends TestCase
                 'assocArgs',
                 'arguments',
                 'options',
+                'flags',
+                'command',
+                'typedCommand',
+                'input',
+                'typedInput',
+                'output',
+                'typedConsoleOutput',
+                'typedOutput',
                 'argOne',
                 'argTwo',
                 'flagOne',
                 'optOne',
                 'arbitraryOptions',
-                'command'
             );
         };
 
@@ -79,43 +95,52 @@ class PhpDiHandlerInvokerTest extends TestCase
             ->setAcceptArbitraryOptions(true)
             ->setHandler($callback);
 
-        $args = ['apple', 'banana', 'cherry'];
-        $assocArgs = [
-            'flag-one' => true,
-            'opt-one' => 'zebra',
-        ];
+        $arguments = ['apple', 'banana', 'cherry'];
+        $options = ['opt-one' => 'zebra'];
+        $flags = ['flag-one' => true];
         $arbitraryOptions = [
             'this' => 'goes',
             'to' => 'arbitrary-options',
         ];
 
-        (new PhpDiHandlerInvoker($this->createPhpDiInvoker()))
-            ->invoke($command->getHandler(), $context = [
-                'args' => $args,
-                'assocArgs' => array_merge($assocArgs, $arbitraryOptions),
-                'command' => $command,
-            ]);
+        (new PhpDiHandlerInvoker($this->createPhpDiInvoker()))->invoke(
+            $command->getHandler(),
+            $input = new ArrayInput($arguments, array_merge($options, $arbitraryOptions), $flags),
+            $output = new ConsoleOutput(),
+            $command
+        );
 
         $this->assertSame(1, $count);
 
         $this->assertSame([
-            'args' => $args,
-            'assocArgs' => array_merge($assocArgs, $arbitraryOptions),
-            'arguments' => $args,
-            'options' => array_merge($assocArgs, $arbitraryOptions),
-            'argOne' => $args[0],
+            'args' => $arguments,
+            'assocArgs' => array_merge($options, $arbitraryOptions, $flags),
+
+            'arguments' => $arguments,
+            'options' => array_merge($options, $arbitraryOptions),
+            'flags' => $flags,
+
+            'command' => $command,
+            'typedCommand' => $command,
+
+            'input' => $input,
+            'typedInput' => $input,
+
+            'output' => $output,
+            'typedConsoleOutput' => $output,
+            'typedOutput' => $output,
+
+            'argOne' => $arguments[0],
 
             // If the last argument is repeating, all remaining arguments are bundled together
-            'argTwo' => [$args[1], $args[2]],
+            'argTwo' => [$arguments[1], $arguments[2]],
+
             'flagOne' => true,
 
-            'optOne' => $assocArgs['opt-one'],
+            'optOne' => $options['opt-one'],
 
             // If command accepts arbitrary options, remaining options are bundled together
             'arbitraryOptions' => $arbitraryOptions,
-
-            // Command instance is also available.
-            'command' => $command,
         ], $receivedArgs);
     }
 }

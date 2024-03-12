@@ -33,4 +33,9 @@ class WpCliAdapter implements WpCliAdapterInterface
     {
         WP_CLI::halt($code);
     }
+
+    public function isQuiet(): bool
+    {
+        return WP_CLI::get_runner()->config['quiet'];
+    }
 }

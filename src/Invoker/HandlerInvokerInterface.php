@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace ApheleiaCli\Invoker;
 
+use ApheleiaCli\Command;
+use ApheleiaCli\Input\InputInterface;
+use ApheleiaCli\Output\ConsoleOutputInterface;
+
 interface HandlerInvokerInterface
 {
-    /**
-     * @todo verify typing on $assocArgs is correct
-     * @param array{args: string[], assocArgs: array<string, bool|string>, command: Command, ...} $arguments
-     */
-    public function invoke(callable $handler, array $arguments = []);
+    public function invoke(callable $handler, InputInterface $input, ConsoleOutputInterface $output, Command $command);
 }

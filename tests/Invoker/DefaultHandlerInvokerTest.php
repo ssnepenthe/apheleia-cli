@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace ApheleiaCli\Tests\Invoker;
 
 use ApheleiaCli\Command;
+use ApheleiaCli\Input\ArrayInput;
 use ApheleiaCli\Invoker\DefaultHandlerInvoker;
+use ApheleiaCli\Output\ConsoleOutput;
 use PHPUnit\Framework\TestCase;
 
 class DefaultHandlerInvokerTest extends TestCase
@@ -25,7 +27,8 @@ class DefaultHandlerInvokerTest extends TestCase
             ->setName('irrelevant')
             ->setHandler($callback);
 
-        (new DefaultHandlerInvoker())->invoke($command->getHandler());
+        (new DefaultHandlerInvoker())
+            ->invoke($command->getHandler(), new ArrayInput([], [], []), new ConsoleOutput(), $command);
 
         $this->assertSame(1, $count);
         $this->assertSame([], $receivedArgs);
@@ -47,15 +50,19 @@ class DefaultHandlerInvokerTest extends TestCase
             ->setName('irrelevant')
             ->setHandler($callback);
 
-        $args = ['args'];
-        $assocArgs = ['assoc' => 'args'];
-        $arguments = compact('args', 'assocArgs');
+        $arguments = ['args'];
+        $options = ['options' => 'values'];
+        $flags = ['flags' => true];
 
-        (new DefaultHandlerInvoker())
-            ->invoke($command->getHandler(), $arguments);
+        (new DefaultHandlerInvoker())->invoke(
+            $command->getHandler(),
+            new ArrayInput($arguments, $options, $flags),
+            new ConsoleOutput(),
+            $command
+        );
 
         $this->assertSame(1, $count);
-        $this->assertSame($args, $receivedArgs);
-        $this->assertSame($assocArgs, $receivedAssocArgs);
+        $this->assertSame($arguments, $receivedArgs);
+        $this->assertSame(array_merge($options, $flags), $receivedAssocArgs);
     }
 }

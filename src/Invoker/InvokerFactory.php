@@ -10,6 +10,7 @@ use Invoker\ParameterResolver\AssociativeArrayResolver;
 use Invoker\ParameterResolver\DefaultValueResolver;
 use Invoker\ParameterResolver\NumericArrayResolver;
 use Invoker\ParameterResolver\ResolverChain;
+use Invoker\ParameterResolver\TypeHintResolver;
 use ReflectionClass;
 use ReflectionMethod;
 use RuntimeException;
@@ -113,6 +114,7 @@ class InvokerFactory implements InvokerFactoryInterface
     {
         return new Invoker(
             new ResolverChain([
+                new TypeHintResolver(),
                 new NumericArrayResolver(),
                 new AssociativeArrayResolver(),
                 new TransformingAssociativeArrayParameterResolver(),

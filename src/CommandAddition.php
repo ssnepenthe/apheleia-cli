@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace ApheleiaCli;
 
+use ApheleiaCli\Input\ArrayInput;
 use ApheleiaCli\Invoker\GenericInvokerInterface;
 use ApheleiaCli\Invoker\HandlerInvokerInterface;
 use ApheleiaCli\Invoker\InvokerFactoryInterface;
+use ApheleiaCli\Output\ConsoleOutput;
 
 class CommandAddition
 {
@@ -123,12 +125,22 @@ class CommandAddition
      */
     protected function handle(array $args, array $assocArgs)
     {
-        $status = $this->createHandlerInvoker()
-            ->invoke($this->command->getHandler(), [
-                'args' => $args,
-                'assocArgs' => $assocArgs,
-                'command' => $this->command,
-            ]);
+        $options = $flags = [];
+
+        foreach ($assocArgs as $key => $val) {
+            if (is_bool($val)) {
+                $flags[$key] = $val;
+            } else {
+                $options[$key] = $val;
+            }
+        }
+
+        $status = $this->createHandlerInvoker()->invoke(
+            $this->command->getHandler(),
+            new ArrayInput($args, $options, $flags),
+            new ConsoleOutput($this->wpCliAdapter->isQuiet()),
+            $this->command,
+        );
 
         if (! is_int($status) || $status < 0) {
             $status = 0;

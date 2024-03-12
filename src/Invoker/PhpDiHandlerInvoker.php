@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace ApheleiaCli\Invoker;
 
+use ApheleiaCli\Command;
+use ApheleiaCli\Input\InputInterface;
+use ApheleiaCli\Output\ConsoleOutputInterface;
+use ApheleiaCli\Output\OutputInterface;
 use Invoker\InvokerInterface;
 
 class PhpDiHandlerInvoker implements HandlerInvokerInterface
@@ -15,32 +19,43 @@ class PhpDiHandlerInvoker implements HandlerInvokerInterface
         $this->invoker = $invoker;
     }
 
-    public function invoke(callable $handler, array $arguments = [])
-    {
+    public function invoke(callable $handler, InputInterface $input, ConsoleOutputInterface $output, Command $command) {
+        $arguments = $input->getArguments();
+        $assocArgs = array_merge($input->getOptions(), $input->getFlags());
+
+        // @todo Should we mark these as reserved variable names somehow so user can't overwrite them?
         $parameters = [
-            'args' => $arguments['args'],
-            'arguments' => $arguments['args'],
+            'args' => $arguments,
+            'assocArgs' => $assocArgs,
 
-            'assocArgs' => $arguments['assocArgs'],
-            'options' => $arguments['assocArgs'],
+            'arguments' => $arguments,
+            'options' => $input->getOptions(),
+            'flags' => $input->getFlags(),
 
-            'command' => $arguments['command'],
+            'command' => $command,
+            Command::class => $command,
+
+            'input' => $input,
+            InputInterface::class => $input,
+
+            'output' => $output,
+            ConsoleOutputInterface::class => $output,
+            OutputInterface::class => $output,
         ];
 
-        $command = $arguments['command'];
         $registeredArgs = $command->getArguments();
 
-        while (count($arguments['args'])) {
+        while (count($arguments)) {
             $current = array_shift($registeredArgs);
 
             $name = $current->getName();
 
             if ($current->getRepeating()) {
-                $parameters[$name] = $arguments['args'];
+                $parameters[$name] = $arguments;
 
-                $arguments['args'] = [];
+                $arguments = [];
             } else {
-                $arg = array_shift($arguments['args']);
+                $arg = array_shift($arguments);
 
                 $parameters[$name] = $arg;
             }
@@ -49,15 +64,15 @@ class PhpDiHandlerInvoker implements HandlerInvokerInterface
         foreach ($command->getOptions() as $option) {
             $name = $option->getName();
 
-            if (array_key_exists($name, $arguments['assocArgs'])) {
-                $parameters[$name] = $arguments['assocArgs'][$name];
+            if (array_key_exists($name, $assocArgs)) {
+                $parameters[$name] = $assocArgs[$name];
 
-                unset($arguments['assocArgs'][$name]);
+                unset($assocArgs[$name]);
             }
         }
 
-        if ($command->getAcceptArbitraryOptions() && ! empty($arguments['assocArgs'])) {
-            $parameters['arbitraryOptions'] = $arguments['assocArgs'];
+        if ($command->getAcceptArbitraryOptions() && ! empty($assocArgs)) {
+            $parameters['arbitraryOptions'] = $assocArgs;
         }
 
         return $this->invoker->call($handler, $parameters);
