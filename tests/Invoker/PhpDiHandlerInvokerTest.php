@@ -59,7 +59,7 @@ class PhpDiHandlerInvokerTest extends TestCase
             $argTwo,
             $flagOne,
             $optOne,
-            $arbitraryOptions,
+            $arbitraryOptions
         ) use (&$count, &$receivedArgs) {
             $count++;
             $receivedArgs = compact(
@@ -79,7 +79,7 @@ class PhpDiHandlerInvokerTest extends TestCase
                 'argTwo',
                 'flagOne',
                 'optOne',
-                'arbitraryOptions',
+                'arbitraryOptions'
             );
         };
 
