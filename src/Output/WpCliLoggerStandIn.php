@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ApheleiaCli\Output;
 
+use ApheleiaCli\WpCli\WpCliConfig;
+use ApheleiaCli\WpCli\WpCliConfigInterface;
 use cli\Colors;
 use InvalidArgumentException;
 use Throwable;
@@ -12,24 +14,14 @@ use WP_Error;
 // @todo LoggerInterface?
 class WpCliLoggerStandIn
 {
-    protected $debug;
-
-    protected $debugGroup;
-
-    protected $inColor;
+    protected $config;
 
     protected $output;
 
-    public function __construct(
-        ConsoleOutputInterface $output,
-        bool $inColor = true,
-        bool $debug = false,
-        ?string $debugGroup = null
-    ) {
+    public function __construct(ConsoleOutputInterface $output, ?WpCliConfigInterface $config = null) {
         $this->output = $output;
-        $this->inColor = $inColor;
-        $this->debug = $debug;
-        $this->debugGroup = $debugGroup;
+
+        $this->config = $config instanceof WpCliConfigInterface ? $config : new WpCliConfig();
     }
 
     /**
@@ -43,17 +35,17 @@ class WpCliLoggerStandIn
             $startTime = defined('WP_CLI_START_MICROTIME') ? WP_CLI_START_MICROTIME : microtime(true);
         }
 
-        if (! $this->debug) {
+        if (! $this->config->isDebug()) {
             return;
         }
 
-        if (is_string($this->debugGroup) && $group !== $this->debugGroup) {
+        if (is_string($this->config->debugGroup()) && $group !== $this->config->debugGroup()) {
             return;
         }
 
         $label = 'Debug';
 
-        if (is_string($group) && ! is_string($this->debugGroup)) {
+        if (is_string($group) && ! is_string($this->config->debugGroup())) {
             $label .= " ({$group})";
         }
 
@@ -117,7 +109,7 @@ class WpCliLoggerStandIn
             return $string;
         }
 
-        return Colors::colorize("{$color}{$string}%n", $this->inColor);
+        return Colors::colorize("{$color}{$string}%n", $this->config->inColor());
     }
 
     private function stringifyErrorMessage($message): string

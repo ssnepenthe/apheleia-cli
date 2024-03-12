@@ -6,6 +6,7 @@ namespace ApheleiaCli\Tests\Output;
 
 use ApheleiaCli\Output\TestConsoleOutput;
 use ApheleiaCli\Output\WpCliLoggerStandIn;
+use ApheleiaCli\WpCli\TestConfig;
 use cli\Colors;
 use PHPUnit\Framework\TestCase;
 
@@ -24,7 +25,7 @@ class WpCliLoggerStandInTest extends TestCase
     public function testColors()
     {
         $output = new TestConsoleOutput();
-        $logger = new WpCliLoggerStandIn($output, true, true);
+        $logger = new WpCliLoggerStandIn($output, new TestConfig(false, true, true, null));
 
         $logger->debug('apples');
         $logger->error('bananas');
@@ -61,7 +62,7 @@ class WpCliLoggerStandInTest extends TestCase
     public function testDebugDefault()
     {
         $output = new TestConsoleOutput();
-        $logger = new WpCliLoggerStandIn($output, false);
+        $logger = new WpCliLoggerStandIn($output, new TestConfig());
 
         $logger->debug('apples');
 
@@ -78,7 +79,7 @@ class WpCliLoggerStandInTest extends TestCase
     public function testDebugWithDebugEnabled()
     {
         $output = new TestConsoleOutput();
-        $logger = new WpCliLoggerStandIn($output, false, true);
+        $logger = new WpCliLoggerStandIn($output, new TestConfig(false, false, true, null));
 
         $logger->debug('apples');
         $logger->debug('bananas', 'groupname');
@@ -98,7 +99,7 @@ class WpCliLoggerStandInTest extends TestCase
     public function testDebugWithDebugSetToSpecificGroup()
     {
         $output = new TestConsoleOutput();
-        $logger = new WpCliLoggerStandIn($output, false, true, 'groupname');
+        $logger = new WpCliLoggerStandIn($output, new TestConfig(false, false, true, 'groupname'));
 
         $logger->debug('apples');
         $logger->debug('bananas', 'groupname');
@@ -125,7 +126,7 @@ class WpCliLoggerStandInTest extends TestCase
     public function testError()
     {
         $output = new TestConsoleOutput();
-        $logger = new WpCliLoggerStandIn($output, false);
+        $logger = new WpCliLoggerStandIn($output, new TestConfig());
 
         $logger->error('apples');
 
@@ -143,7 +144,7 @@ class WpCliLoggerStandInTest extends TestCase
     public function testErrorMultiLine()
     {
         $output = new TestConsoleOutput();
-        $logger = new WpCliLoggerStandIn($output, false);
+        $logger = new WpCliLoggerStandIn($output, new TestConfig());
 
         $logger->errorMultiLine([
             'apples',
@@ -175,7 +176,7 @@ class WpCliLoggerStandInTest extends TestCase
     public function testInfo()
     {
         $output = new TestConsoleOutput();
-        $logger = new WpCliLoggerStandIn($output, false);
+        $logger = new WpCliLoggerStandIn($output, new TestConfig());
 
         $logger->info('apples');
 
@@ -198,7 +199,7 @@ class WpCliLoggerStandInTest extends TestCase
     public function testSuccess()
     {
         $output = new TestConsoleOutput();
-        $logger = new WpCliLoggerStandIn($output, false);
+        $logger = new WpCliLoggerStandIn($output, new TestConfig());
 
         $logger->success('apples');
 
@@ -216,7 +217,7 @@ class WpCliLoggerStandInTest extends TestCase
     public function testWarning()
     {
         $output = new TestConsoleOutput();
-        $logger = new WpCliLoggerStandIn($output, false);
+        $logger = new WpCliLoggerStandIn($output, new TestConfig());
 
         $logger->warning('apples');
 

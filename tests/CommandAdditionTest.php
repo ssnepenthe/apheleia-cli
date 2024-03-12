@@ -12,6 +12,7 @@ use ApheleiaCli\NamespaceCommand;
 use ApheleiaCli\NamespaceIdentifier;
 use ApheleiaCli\NullWpCliAdapter;
 use ApheleiaCli\Option;
+use ApheleiaCli\WpCli\TestConfig;
 use ApheleiaCli\WpCliAdapterInterface;
 use Closure;
 use PHPUnit\Framework\TestCase;
@@ -21,7 +22,7 @@ class CommandAdditionTest extends TestCase
     public function testGetArgs()
     {
         $command = new Command();
-        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter());
+        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter(), new TestConfig());
 
         $this->assertSame([], $addition->getArgs());
 
@@ -33,7 +34,7 @@ class CommandAdditionTest extends TestCase
             ->setBeforeInvokeCallback(fn () => 'irrelevant')
             ->setAfterInvokeCallback(fn () => 'irrelevant')
             ->setWhen('irrelevant-when');
-        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter());
+        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter(),  new TestConfig());
 
         $args = $addition->getArgs();
         $basicArgs = array_intersect_key($args, [
@@ -72,13 +73,13 @@ class CommandAdditionTest extends TestCase
     public function testGetHandler()
     {
         $command = new NamespaceCommand('name', 'description');
-        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter());
+        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter(), new TestConfig());
 
         $this->assertSame(NamespaceIdentifier::class, $addition->getHandler());
 
         $handler = fn () => 'irrelevant';
         $command = (new Command())->setHandler($handler);
-        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter());
+        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter(), new TestConfig());
 
         $this->assertInstanceOf(Closure::class, $addition->getHandler());
         $this->assertNotSame($handler, $addition->getHandler());
@@ -87,7 +88,7 @@ class CommandAdditionTest extends TestCase
     public function testGetName()
     {
         $command = (new Command())->setName('irrelevant');
-        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter());
+        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter(), new TestConfig());
 
         $this->assertSame('irrelevant', $addition->getName());
     }
@@ -103,7 +104,7 @@ class CommandAdditionTest extends TestCase
             ->method('halt')
             ->with(0);
 
-        $addition = new CommandAddition($command, new InvokerFactory(), $wpCliAdapter);
+        $addition = new CommandAddition($command, new InvokerFactory(), $wpCliAdapter, new TestConfig());
 
         // This is the default but let's be explicit...
         $addition->setAutoExit(true);
@@ -118,7 +119,7 @@ class CommandAdditionTest extends TestCase
             ->method('halt');
 
         $command = (new Command())->setHandler(fn () => 0);
-        $addition = new CommandAddition($command, new InvokerFactory(), $wpCliAdapter);
+        $addition = new CommandAddition($command, new InvokerFactory(), $wpCliAdapter, new TestConfig());
         $addition->setAutoExit(false);
 
         $return = ($addition->getHandler())([], []);
@@ -130,7 +131,7 @@ class CommandAdditionTest extends TestCase
     {
         $command = (new Command())->setHandler(fn () => 'stringval');
 
-        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter());
+        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter(), new TestConfig());
         $addition->setAutoExit(false);
 
         $return = ($addition->getHandler())([], []);
@@ -143,7 +144,7 @@ class CommandAdditionTest extends TestCase
     {
         $command = (new Command())->setHandler(fn () => 256);
 
-        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter());
+        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter(), new TestConfig());
         $addition->setAutoExit(false);
 
         $return = ($addition->getHandler())([], []);
@@ -156,7 +157,7 @@ class CommandAdditionTest extends TestCase
     {
         $command = (new Command())->setHandler(fn () => 'irrelevant');
 
-        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter());
+        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter(), new TestConfig());
         $addition->setAutoExit(false);
 
         $return = ($addition->getHandler())([], []);

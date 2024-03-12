@@ -33,9 +33,4 @@ class NullWpCliAdapter implements WpCliAdapterInterface
     {
         throw new LogicException('The \'halt\' method should not be called on NullWpCliAdapter');
     }
-
-    public function isQuiet(): bool
-    {
-        return false;
-    }
 }

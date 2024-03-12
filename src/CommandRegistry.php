@@ -6,6 +6,8 @@ namespace ApheleiaCli;
 
 use ApheleiaCli\Invoker\InvokerFactory;
 use ApheleiaCli\Invoker\InvokerFactoryInterface;
+use ApheleiaCli\WpCli\WpCliConfig;
+use ApheleiaCli\WpCli\WpCliConfigInterface;
 use RuntimeException;
 
 class CommandRegistry
@@ -19,6 +21,11 @@ class CommandRegistry
      * @var bool
      */
     protected $autoExit = true;
+
+    /**
+     * @var WpCliConfigInterface
+     */
+    protected $config;
 
     /**
      * @var ?Command
@@ -42,7 +49,8 @@ class CommandRegistry
 
     public function __construct(
         ?InvokerFactoryInterface $invokerFactory = null,
-        ?WpCliAdapterInterface $wpCliAdapter = null
+        ?WpCliAdapterInterface $wpCliAdapter = null,
+        ?WpCliConfigInterface $config = null
     ) {
         $this->invokerFactory = $invokerFactory ?: new InvokerFactory();
 
@@ -53,6 +61,8 @@ class CommandRegistry
         }
 
         $this->wpCliAdapter = $wpCliAdapter;
+
+        $this->config = $config instanceof WpCliConfigInterface ? $config : new WpCliConfig();
     }
 
     public function add(Command $command): Command
@@ -69,7 +79,12 @@ class CommandRegistry
             );
         }
 
-        $this->registeredCommands[$name] = new CommandAddition($command, $this->invokerFactory, $this->wpCliAdapter);
+        $this->registeredCommands[$name] = new CommandAddition(
+            $command,
+            $this->invokerFactory,
+            $this->wpCliAdapter,
+            $this->config
+        );
         $this->registeredCommands[$name]->setAutoExit($this->autoExit);
 
         return $command;

@@ -9,6 +9,8 @@ use ApheleiaCli\Invoker\GenericInvokerInterface;
 use ApheleiaCli\Invoker\HandlerInvokerInterface;
 use ApheleiaCli\Invoker\InvokerFactoryInterface;
 use ApheleiaCli\Output\ConsoleOutput;
+use ApheleiaCli\WpCli\WpCliConfig;
+use ApheleiaCli\WpCli\WpCliConfigInterface;
 
 class CommandAddition
 {
@@ -23,6 +25,12 @@ class CommandAddition
     protected $command;
 
     /**
+     *
+     * @var WpCliConfigInterface
+     */
+    protected $config;
+
+    /**
      * @var InvokerFactoryInterface
      */
     protected $invokerFactory;
@@ -35,11 +43,13 @@ class CommandAddition
     public function __construct(
         Command $command,
         InvokerFactoryInterface $invokerFactory,
-        WpCliAdapterInterface $wpCliAdapter
+        WpCliAdapterInterface $wpCliAdapter,
+        WpCliConfigInterface $config
     ) {
         $this->command = $command;
         $this->invokerFactory = $invokerFactory;
         $this->wpCliAdapter = $wpCliAdapter;
+        $this->config = $config;
     }
 
     /**
@@ -138,7 +148,7 @@ class CommandAddition
         $status = $this->createHandlerInvoker()->invoke(
             $this->command->getHandler(),
             new ArrayInput($args, $options, $flags),
-            new ConsoleOutput($this->wpCliAdapter->isQuiet()),
+            new ConsoleOutput($this->config->isQuiet()),
             $this->command,
         );
 

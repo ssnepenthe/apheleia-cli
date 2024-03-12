@@ -23,6 +23,4 @@ interface WpCliAdapterInterface
      * @return never
      */
     public function halt(int $code);
-
-    public function isQuiet(): bool;
 }
