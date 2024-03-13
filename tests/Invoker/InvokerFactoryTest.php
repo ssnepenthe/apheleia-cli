@@ -14,7 +14,6 @@ use ApheleiaCli\Invoker\InvokerFactory;
 use ApheleiaCli\Invoker\PhpDiGenericInvoker;
 use ApheleiaCli\Invoker\PhpDiHandlerInvoker;
 use ApheleiaCli\Output\ConsoleOutputInterface;
-use ApheleiaCli\Output\WpCliLoggerStandIn;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 

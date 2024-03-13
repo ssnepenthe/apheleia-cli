@@ -34,7 +34,7 @@ class CommandAdditionTest extends TestCase
             ->setBeforeInvokeCallback(fn () => 'irrelevant')
             ->setAfterInvokeCallback(fn () => 'irrelevant')
             ->setWhen('irrelevant-when');
-        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter(),  new TestConfig());
+        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter(), new TestConfig());
 
         $args = $addition->getArgs();
         $basicArgs = array_intersect_key($args, [

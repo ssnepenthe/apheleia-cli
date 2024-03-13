@@ -10,7 +10,8 @@ use ApheleiaCli\Output\ConsoleOutputInterface;
 
 class DefaultHandlerInvoker implements HandlerInvokerInterface
 {
-    public function invoke(callable $handler, InputInterface $input, ConsoleOutputInterface $output, Command $command) {
+    public function invoke(callable $handler, InputInterface $input, ConsoleOutputInterface $output, Command $command)
+    {
         return $handler($input, $output);
     }
 }

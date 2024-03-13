@@ -20,7 +20,8 @@ class PhpDiHandlerInvoker implements HandlerInvokerInterface
         $this->invoker = $invoker;
     }
 
-    public function invoke(callable $handler, InputInterface $input, ConsoleOutputInterface $output, Command $command) {
+    public function invoke(callable $handler, InputInterface $input, ConsoleOutputInterface $output, Command $command)
+    {
         // @todo Should we mark these as reserved variable names somehow so user can't overwrite them?
         $parameters = [
             'arguments' => $input->getArguments(),

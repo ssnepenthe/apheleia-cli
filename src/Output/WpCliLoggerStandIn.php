@@ -18,7 +18,8 @@ class WpCliLoggerStandIn
 
     protected $output;
 
-    public function __construct(ConsoleOutputInterface $output, ?WpCliConfigInterface $config = null) {
+    public function __construct(ConsoleOutputInterface $output, ?WpCliConfigInterface $config = null)
+    {
         $this->output = $output;
 
         $this->config = $config instanceof WpCliConfigInterface ? $config : new WpCliConfig();
