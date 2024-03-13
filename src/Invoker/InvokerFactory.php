@@ -61,6 +61,8 @@ class InvokerFactory implements InvokerFactoryInterface
         switch ($className) {
             case DefaultHandlerInvoker::class:
                 return new DefaultHandlerInvoker();
+            case LegacyHandlerInvoker::class:
+                return new LegacyHandlerInvoker();
             case PhpDiHandlerInvoker::class:
                 return new PhpDiHandlerInvoker($this->invoker ?: $this->createPhpDiInvoker());
         }

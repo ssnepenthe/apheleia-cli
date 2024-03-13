@@ -6,11 +6,11 @@ namespace ApheleiaCli\Tests\Invoker;
 
 use ApheleiaCli\Command;
 use ApheleiaCli\Input\ArrayInput;
-use ApheleiaCli\Invoker\DefaultHandlerInvoker;
+use ApheleiaCli\Invoker\LegacyHandlerInvoker;
 use ApheleiaCli\Output\ConsoleOutput;
 use PHPUnit\Framework\TestCase;
 
-class DefaultHandlerInvokerTest extends TestCase
+class LegacyHandlerInvokerTest extends TestCase
 {
     public function testInvoke()
     {
@@ -27,7 +27,7 @@ class DefaultHandlerInvokerTest extends TestCase
             ->setName('irrelevant')
             ->setHandler($callback);
 
-        (new DefaultHandlerInvoker())
+        (new LegacyHandlerInvoker())
             ->invoke($command->getHandler(), new ArrayInput([], [], []), new ConsoleOutput(), $command);
 
         $this->assertSame(1, $count);
@@ -54,7 +54,7 @@ class DefaultHandlerInvokerTest extends TestCase
         $options = ['options' => 'values'];
         $flags = ['flags' => true];
 
-        (new DefaultHandlerInvoker())->invoke(
+        (new LegacyHandlerInvoker())->invoke(
             $command->getHandler(),
             new ArrayInput($arguments, $options, $flags),
             new ConsoleOutput(),

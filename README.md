@@ -29,8 +29,10 @@ Extend the `Command` class using the `configure` method to define the command si
 ```php
 use ApheleiaCli\Argument;
 use ApheleiaCli\Command;
+use ApheleiaCli\Input\InputInterface;
 use ApheleiaCli\Option;
-use WP_CLI;
+use ApheleiaCli\Output\ConsoleOutputInterface;
+use ApheleiaCli\Output\WpCliLoggerStandIn;
 
 class HelloCommand extends Command
 {
@@ -52,12 +54,14 @@ class HelloCommand extends Command
             ->setWhen('after_wp_load');
     }
 
-    public function handle($args, $assocArgs)
+    public function handle(InputInterface $input, ConsoleOutputInterface $output)
     {
-        [$name] = $args;
+        $logger = new WpCliLoggerStandIn($output);
 
-        $type = $assocArgs['type'];
-        WP_CLI::$type("Hello, $name!");
+        $name = $input->getArgument('name');
+        $type = $input->getOption('type');
+
+        $logger->{$type}("Hello, {$name}");
     }
 }
 ```
@@ -130,36 +134,49 @@ $registry->add(
         )
         ->setUsage("## EXAMPLES\n\n\twp example hello newman")
         ->setWhen('after_wp_load')
-        ->setHandler(function ($args, $assocArgs) {
-            [$name] = $args;
+        ->setHandler(function (InputInterface $input, ConsoleOutputInterface $output) {
+            $logger = new WpCliLoggerStandIn($output);
 
-            $type = $assocArgs['type'];
-            WP_CLI::$type("Hello, $name!");
+            $name = $input->getArgument('name');
+            $type = $input->getOption('type');
+
+            $logger->{$type}("Hello, {$name}");
         })
 );
 ```
 
-## Advanced Usage
+## Advanced Usage - Handler Invoker
 
-By default, command handlers should be written more-or-less the same as they would if you were working directly with WP-CLI. That is to say they should always expect to receive a list of command arguments as the first parameter and an associative array of command options as the second:
+should be written more-or-less the same as they would if you were working directly with WP-CLI. That is to say they should always expect to receive a list of command arguments as the first parameter and an associative array of command options as the second:
+
+By default, command handlers receive an `InputInterface` object and a `ConsoleOutputInterface` object. Handler signatures can be modified, however, by overriding the command `handlerInvokerClass` property.
+
+This package ships with two alternative handler invokers: the `LegacyHandlerInvoker` and the `PhpDiHandlerInvoker`.
+
+The `LegacyHandlerInvoker` class can be used to mimic standard WP-CLI commands - handlers receive an `$args` array of arguments and an `$assocArgs` array of options.
 
 ```php
-$command->setHandler(function (array $args, array $assocArgs) {
-    // ...
-});
+use ApheleiaCli\Invoker\LegacyHandlerInvoker;
+
+class HelloCommand extends Command
+{
+    protected $handlerInvokerClass = LegacyHandlerInvoker::class;
+
+    public function handle(array $args, array $assocArgs) {
+        // ...
+    }
+}
 ```
 
-However, commands can modify handler signatures by overriding their `handlerInvokerClass` property.
+The `PhpDiHandlerInvoker` class can be used to call command handlers with the php-di/invoker package.
 
-This package only ships with one alternative handler invoker: the `PhpDiHandlerInvoker`. It uses the [`php-di/invoker`](https://github.com/php-di/invoker) package to call command handlers.
-
-Before it can be used, you must install `php-di/invoker`:
+Before it can be used, you must separately install the `php-di/invoker` package:
 
 ```sh
 composer require php-di/invoker
 ```
 
-Then set the handler invoker on your command (or a base command from which all of your commands extend):
+Once configured, handlers can now ask for parameters by name or type:
 
 ```php
 use ApheleiaCli\Invoker\PhpDiHandlerInvoker;
@@ -168,20 +185,9 @@ class HelloCommand extends Command
 {
     protected $handlerInvokerClass = PhpDiHandlerInvoker::class;
 
-    // ...
-}
-```
-
-With this in place, command handlers can now ask for command parameters by name:
-
-```php
-class HelloCommand extends Command
-{
-    // ...
-
-    public function handle($name, $type)
+    public function handle($name, $type, WpCliLoggerStandIn $logger)
     {
-        WP_CLI::$type("Hello, $name!");
+        $logger->{$type}("Hello, {$name}!");
     }
 }
 ```
