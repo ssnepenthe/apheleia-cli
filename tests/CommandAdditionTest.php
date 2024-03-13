@@ -96,8 +96,6 @@ class CommandAdditionTest extends TestCase
     public function testHandle()
     {
         $command = (new Command())->setHandler(fn () => 0);
-        $args = ['one'];
-        $assocArgs = ['two' => 'three'];
 
         $wpCliAdapter = $this->createMock(WpCliAdapterInterface::class);
         $wpCliAdapter->expects($this->once())
@@ -109,7 +107,7 @@ class CommandAdditionTest extends TestCase
         // This is the default but let's be explicit...
         $addition->setAutoExit(true);
 
-        ($addition->getHandler())($args, $assocArgs);
+        ($addition->getHandler())([], []);
     }
 
     public function testHandleWithAutoExitDisabled()

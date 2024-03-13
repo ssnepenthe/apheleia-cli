@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace ApheleiaCli;
 
-use ApheleiaCli\Input\ArrayInput;
+use ApheleiaCli\Input\WpCliInput;
 use ApheleiaCli\Invoker\GenericInvokerInterface;
 use ApheleiaCli\Invoker\HandlerInvokerInterface;
 use ApheleiaCli\Invoker\InvokerFactoryInterface;
 use ApheleiaCli\Output\ConsoleOutput;
-use ApheleiaCli\WpCli\WpCliConfig;
 use ApheleiaCli\WpCli\WpCliConfigInterface;
 
 class CommandAddition
@@ -135,19 +134,9 @@ class CommandAddition
      */
     protected function handle(array $args, array $assocArgs)
     {
-        $options = $flags = [];
-
-        foreach ($assocArgs as $key => $val) {
-            if (is_bool($val)) {
-                $flags[$key] = $val;
-            } else {
-                $options[$key] = $val;
-            }
-        }
-
         $status = $this->createHandlerInvoker()->invoke(
             $this->command->getHandler(),
-            new ArrayInput($args, $options, $flags),
+            new WpCliInput($args, $assocArgs, $this->command),
             new ConsoleOutput($this->config->isQuiet()),
             $this->command,
         );
