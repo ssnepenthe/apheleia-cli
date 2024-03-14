@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace ApheleiaCli;
 
+use ApheleiaCli\Input\InputInterface;
 use ApheleiaCli\Input\WpCliInput;
 use ApheleiaCli\Invoker\GenericInvokerInterface;
 use ApheleiaCli\Invoker\HandlerInvokerInterface;
 use ApheleiaCli\Invoker\InvokerFactoryInterface;
 use ApheleiaCli\Output\ConsoleOutput;
+use ApheleiaCli\Output\ConsoleOutputInterface;
 use ApheleiaCli\WpCli\WpCliConfigInterface;
 
 class CommandAddition
@@ -30,9 +32,19 @@ class CommandAddition
     protected $config;
 
     /**
+     * @var callable(string[], array<string, string>, Command):InputInterface
+     */
+    protected $inputFactory;
+
+    /**
      * @var InvokerFactoryInterface
      */
     protected $invokerFactory;
+
+    /**
+     * @var callable(WpCliConfigInterface):ConsoleOutputInterface
+     */
+    protected $outputFactory;
 
     /**
      * @var ?int
@@ -54,6 +66,9 @@ class CommandAddition
         $this->invokerFactory = $invokerFactory;
         $this->wpCliAdapter = $wpCliAdapter;
         $this->config = $config;
+
+        $this->inputFactory = fn ($args, $assocArgs, $command) => new WpCliInput($args, $assocArgs, $command);
+        $this->outputFactory = fn ($config) => new ConsoleOutput($config->isQuiet());
     }
 
     /**
@@ -136,6 +151,26 @@ class CommandAddition
         return $this;
     }
 
+    /**
+     * @param callable(string[], array<string, string>, Command):InputInterface $inputFactory
+     */
+    public function setInputFactory(callable $inputFactory): self
+    {
+        $this->inputFactory = $inputFactory;
+
+        return $this;
+    }
+
+    /**
+     * @param callable(WpCliConfigInterface):ConsoleOutputInterface $outputFactory
+     */
+    public function setOutputFactory(callable $outputFactory): self
+    {
+        $this->outputFactory = $outputFactory;
+
+        return $this;
+    }
+
     protected function createGenericInvoker(): GenericInvokerInterface
     {
         return $this->invokerFactory->createGenericInvoker($this->command->getGenericInvokerClass());
@@ -153,8 +188,8 @@ class CommandAddition
     {
         $status = $this->createHandlerInvoker()->invoke(
             $this->command->getHandler(),
-            new WpCliInput($args, $assocArgs, $this->command),
-            new ConsoleOutput($this->config->isQuiet()),
+            ($this->inputFactory)($args, $assocArgs, $this->command),
+            ($this->outputFactory)($this->config),
             $this->command,
         );
 
