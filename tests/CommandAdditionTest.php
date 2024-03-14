@@ -19,12 +19,83 @@ use PHPUnit\Framework\TestCase;
 
 class CommandAdditionTest extends TestCase
 {
+    public function testAutoExit()
+    {
+        $command = new Command();
+
+        $wpCliAdapter = $this->createMock(WpCliAdapterInterface::class);
+        $wpCliAdapter->expects($this->once())
+            ->method('halt')
+            ->with(0);
+
+        $addition = new CommandAddition($command, new InvokerFactory(), $wpCliAdapter, new TestConfig());
+
+        // This is the default but let's be explicit...
+        $addition->setAutoExit(true);
+
+        ($addition->getArgs()['after_invoke'])();
+    }
+
+    public function testAutoExitDisabled()
+    {
+        $addition = new CommandAddition(new Command(), new InvokerFactory(), new NullWpCliAdapter(), new TestConfig());
+        $addition->setAutoExit(false);
+
+        $this->assertArrayNotHasKey('after_invoke', $addition->getArgs());
+    }
+
+    public function testAutoExitDisabledWithAfterInvokeCallback()
+    {
+        $count = 0;
+        $afterInvoke = function () use (&$count) {
+            $count++;
+        };
+        $command = (new Command())
+            ->setAfterInvokeCallback($afterInvoke);
+
+        $wpCliAdapter = $this->createMock(WpCliAdapterInterface::class);
+        $wpCliAdapter->expects($this->never())->method('halt');
+
+        $addition = new CommandAddition($command, new InvokerFactory(), $wpCliAdapter, new TestConfig());
+        $addition->setAutoExit(false);
+
+        ($addition->getArgs()['after_invoke'])();
+
+        $this->assertSame(1, $count);
+    }
+
+    public function testAutoExitWithAfterInvokeCallback()
+    {
+        $count = 0;
+        $afterInvoke = function () use (&$count) {
+            $count++;
+        };
+        $command = (new Command())
+            ->setAfterInvokeCallback($afterInvoke);
+
+        $wpCliAdapter = $this->createMock(WpCliAdapterInterface::class);
+        $wpCliAdapter->expects($this->once())
+            ->method('halt')
+            ->with(0);
+
+        $addition = new CommandAddition($command, new InvokerFactory(), $wpCliAdapter, new TestConfig());
+
+        // This is the default but let's be explicit...
+        $addition->setAutoExit(true);
+
+        ($addition->getArgs()['after_invoke'])();
+
+        $this->assertSame(1, $count);
+    }
     public function testGetArgs()
     {
         $command = new Command();
         $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter(), new TestConfig());
 
-        $this->assertSame([], $addition->getArgs());
+        $args = $addition->getArgs();
+        $this->assertCount(1, $args);
+        $this->assertArrayHasKey('after_invoke', $args);
+        $this->assertInstanceOf(Closure::class, $args['after_invoke']);
 
         $command = (new Command())
             ->setDescription('irrelevant description')
@@ -95,34 +166,14 @@ class CommandAdditionTest extends TestCase
 
     public function testHandle()
     {
-        $command = (new Command())->setHandler(fn () => 0);
+        $command = (new Command())->setHandler(fn () => 5);
 
-        $wpCliAdapter = $this->createMock(WpCliAdapterInterface::class);
-        $wpCliAdapter->expects($this->once())
-            ->method('halt')
-            ->with(0);
-
-        $addition = new CommandAddition($command, new InvokerFactory(), $wpCliAdapter, new TestConfig());
-
-        // This is the default but let's be explicit...
-        $addition->setAutoExit(true);
-
-        ($addition->getHandler())([], []);
-    }
-
-    public function testHandleWithAutoExitDisabled()
-    {
-        $wpCliAdapter = $this->createMock(WpCliAdapterInterface::class);
-        $wpCliAdapter->expects($this->never())
-            ->method('halt');
-
-        $command = (new Command())->setHandler(fn () => 0);
-        $addition = new CommandAddition($command, new InvokerFactory(), $wpCliAdapter, new TestConfig());
+        $addition = new CommandAddition($command, new InvokerFactory(), new NullWpCliAdapter(), new TestConfig());
         $addition->setAutoExit(false);
 
         $return = ($addition->getHandler())([], []);
 
-        $this->assertSame(0, $return);
+        $this->assertSame(5, $return);
     }
 
     public function testHandleWithNonIntReturnValue()

@@ -35,6 +35,11 @@ class CommandAddition
     protected $invokerFactory;
 
     /**
+     * @var ?int
+     */
+    protected $statusCode = null;
+
+    /**
      * @var WpCliAdapterInterface
      */
     protected $wpCliAdapter;
@@ -74,8 +79,20 @@ class CommandAddition
             $args['before_invoke'] = fn () => $this->createGenericInvoker()->invoke($beforeInvoke);
         }
 
-        if ($afterInvoke = $this->command->getAfterInvokeCallback()) {
-            $args['after_invoke'] = fn () => $this->createGenericInvoker()->invoke($afterInvoke);
+        if (null !== ($afterInvoke = $this->command->getAfterInvokeCallback())) {
+            $args['after_invoke'] = function () use ($afterInvoke) {
+                $this->createGenericInvoker()->invoke($afterInvoke);
+
+                if ($this->autoExit) {
+                    $this->wpCliAdapter->halt(is_int($this->statusCode) ? $this->statusCode : Status::SUCCESS);
+                }
+            };
+        } elseif (! $this->command instanceof NamespaceCommand && $this->autoExit) {
+            $args['after_invoke'] = function () {
+                if ($this->autoExit) {
+                    $this->wpCliAdapter->halt(is_int($this->statusCode) ? $this->statusCode : Status::SUCCESS);
+                }
+            };
         }
 
         if ($when = $this->command->getWhen()) {
@@ -149,10 +166,6 @@ class CommandAddition
             $status = 255;
         }
 
-        if ($this->autoExit) {
-            $this->wpCliAdapter->halt($status);
-        } else {
-            return $status;
-        }
+        return $this->statusCode = $status;
     }
 }

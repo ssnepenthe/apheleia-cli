@@ -99,22 +99,26 @@ class CommandRegistryTest extends TestCase
         $wpCliAdapterMock
             ->expects($this->once())
             ->method('addCommand')
-            ->with('command', $this->isInstanceOf(Closure::class), [
-                'synopsis' => [
-                    [
-                        'type' => 'positional',
-                        'name' => 'arg',
-                        'optional' => false,
-                        'repeating' => false,
-                    ],
-                    [
-                        'type' => 'assoc',
-                        'name' => 'option',
-                        'optional' => true,
-                        'repeating' => false,
-                    ],
-                ],
-            ]);
+            ->with('command', $this->isInstanceOf(Closure::class), $this->callback(function ($subject) {
+                return is_array($subject)
+                    && array_key_exists('synopsis', $subject)
+                    && [
+                        [
+                            'type' => 'positional',
+                            'name' => 'arg',
+                            'optional' => false,
+                            'repeating' => false,
+                        ],
+                        [
+                            'type' => 'assoc',
+                            'name' => 'option',
+                            'optional' => true,
+                            'repeating' => false,
+                        ],
+                    ] === $subject['synopsis']
+                    && array_key_exists('after_invoke', $subject)
+                    && $subject['after_invoke'] instanceof Closure;
+            }));
 
         $registry = new CommandRegistry(null, $wpCliAdapterMock);
 
