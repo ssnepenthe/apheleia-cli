@@ -33,6 +33,7 @@ use ApheleiaCli\Input\InputInterface;
 use ApheleiaCli\Option;
 use ApheleiaCli\Output\ConsoleOutputInterface;
 use ApheleiaCli\Output\WpCliLoggerStandIn;
+use ApheleiaCli\Status;
 
 class HelloCommand extends Command
 {
@@ -62,11 +63,25 @@ class HelloCommand extends Command
         $type = $input->getOption('type');
 
         $logger->{$type}("Hello, {$name}");
+
+        if ('error' === $type) {
+            return Status::FAILURE;
+        }
+
+        return Status::SUCCESS;
     }
 }
 ```
 
-Commands are registered using the `CommandRegistry`.
+There are a couple of things you should notice in the command handler:
+
+1. Instead of an `$args` array and `$assoc_args` array, handlers receive an input object and output object.
+2. Arguments are retrieved by name rather than position.
+3. We use the `WpCliLoggerStandIn` class to print output rather than the various output methods on the `WP_CLI` class. This makes it easier to properly unit test our command since we can customize the output streams that are written to by `$output`.
+4. The error method on our logger stand-in does not automatically halt execution like `WP_CLI::error()`.
+5. Handlers should (optionally) return an integer (e.g. `Status::FAILURE`, `Status::SUCCESS`) to set the exit status code.
+
+Next, we register our command using the `CommandRegistry`:
 
 ```php
 use ApheleiaCli\CommandRegistry;
@@ -141,13 +156,17 @@ $registry->add(
             $type = $input->getOption('type');
 
             $logger->{$type}("Hello, {$name}");
+
+            if ('error' === $type) {
+                return Status::FAILURE;
+            }
+
+            return Status::SUCCESS;
         })
 );
 ```
 
 ## Advanced Usage - Handler Invoker
-
-should be written more-or-less the same as they would if you were working directly with WP-CLI. That is to say they should always expect to receive a list of command arguments as the first parameter and an associative array of command options as the second:
 
 By default, command handlers receive an `InputInterface` object and a `ConsoleOutputInterface` object. Handler signatures can be modified, however, by overriding the command `handlerInvokerClass` property.
 
@@ -157,13 +176,18 @@ The `LegacyHandlerInvoker` class can be used to mimic standard WP-CLI commands -
 
 ```php
 use ApheleiaCli\Invoker\LegacyHandlerInvoker;
+use WP_CLI;
 
 class HelloCommand extends Command
 {
     protected $handlerInvokerClass = LegacyHandlerInvoker::class;
 
-    public function handle(array $args, array $assocArgs) {
-        // ...
+    public function handle(array $args, array $assocArgs)
+    {
+        [$name] = $args;
+        $type = $assocArgs['type'];
+
+        WP_CLI::{$type}("Hello, {$name}");
     }
 }
 ```
