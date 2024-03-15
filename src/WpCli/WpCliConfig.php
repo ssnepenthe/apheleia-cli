@@ -17,7 +17,7 @@ class WpCliConfig implements WpCliConfigInterface
 
     public function inColor(): bool
     {
-        return WP_CLI::get_runner()->in_color();
+        return (bool) WP_CLI::get_runner()->in_color();
     }
 
     public function isDebug(): bool
@@ -27,6 +27,6 @@ class WpCliConfig implements WpCliConfigInterface
 
     public function isQuiet(): bool
     {
-        return WP_CLI::get_runner()->config['quiet'];
+        return (bool) WP_CLI::get_runner()->config['quiet'];
     }
 }
