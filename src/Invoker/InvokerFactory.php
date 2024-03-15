@@ -34,6 +34,9 @@ class InvokerFactory implements InvokerFactoryInterface
         $this->invoker = $invoker;
     }
 
+    /**
+     * @param class-string<GenericInvokerInterface> $className
+     */
     public function createGenericInvoker(string $className): GenericInvokerInterface
     {
         if ($this->hasGenericInvokerFactory($className)) {
@@ -52,6 +55,9 @@ class InvokerFactory implements InvokerFactoryInterface
         return new $className();
     }
 
+    /**
+     * @param class-string<HandlerInvokerInterface> $className
+     */
     public function createHandlerInvoker(string $className): HandlerInvokerInterface
     {
         if ($this->hasHandlerInvokerFactory($className)) {
