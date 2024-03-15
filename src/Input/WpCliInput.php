@@ -10,10 +10,20 @@ use RuntimeException;
 
 class WpCliInput extends ArrayInput
 {
+    /**
+     * @var string[]
+     */
     protected $rawArgs;
 
+    /**
+     * @var array<string, bool|string>
+     */
     protected $rawAssocArgs;
 
+    /**
+     * @param string[] $args
+     * @param array<string, bool|string> $assocArgs
+     */
     public function __construct(array $args, array $assocArgs, Command $command)
     {
         $this->rawArgs = $args;
@@ -25,16 +35,26 @@ class WpCliInput extends ArrayInput
         parent::__construct($arguments, $options, $flags);
     }
 
+    /**
+     * @return string[]
+     */
     public function getRawArgs(): array
     {
         return $this->rawArgs;
     }
 
+    /**
+     * @return array<string, bool|string>
+     */
     public function getRawAssocArgs(): array
     {
         return $this->rawAssocArgs;
     }
 
+    /**
+     * @param string[] $args
+     * @return array<string, string|string[]>
+     */
     private function processArgs(array $args, Command $command): array
     {
         $arguments = [];
@@ -66,6 +86,10 @@ class WpCliInput extends ArrayInput
         return $arguments;
     }
 
+    /**
+     * @param array<string, bool|string> $assocArgs
+     * @return array{0: array<string, array<string, string>|string>, 1: array<string, bool>}
+     */
     private function processAssocArgs(array $assocArgs, Command $command): array
     {
         $options = $flags = [];
@@ -84,9 +108,13 @@ class WpCliInput extends ArrayInput
             }
 
             if ($option instanceof Option) {
-                $options[$name] = $assocArgs[$name];
+                /** @var string $value */
+                $value = $assocArgs[$name];
+                $options[$name] = $value;
             } else {
-                $flags[$name] = $assocArgs[$name];
+                /** @var bool $value */
+                $value = $assocArgs[$name];
+                $flags[$name] = $value;
             }
 
             unset($assocArgs[$name]);
@@ -94,8 +122,10 @@ class WpCliInput extends ArrayInput
 
         if (! empty($assocArgs)) {
             if ($command->getAcceptArbitraryOptions()) {
-                $options['arbitraryOptions'] = $assocArgs;
+                /** @var array<string, string> $value */
+                $value = $assocArgs;
                 $assocArgs = [];
+                $options['arbitraryOptions'] = $value;
             } else {
                 throw new RuntimeException("Too many options provided for command {$command->getName()}");
             }
