@@ -8,6 +8,7 @@
     },
     "require-dev": {
         "php-di/invoker": "^2.3",
+        "php-stubs/wordpress-stubs": "^6.4",
         "php-stubs/wp-cli-stubs": "^2.6",
         "phpunit/phpunit": "^9.5",
         "vimeo/psalm": "^4.22",
