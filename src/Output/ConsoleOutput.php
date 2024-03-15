@@ -6,6 +6,9 @@ namespace ApheleiaCli\Output;
 
 class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
 {
+    /**
+     * @var StreamOutput
+     */
     protected $stderr;
 
     public function __construct(bool $quiet = false)
@@ -20,11 +23,17 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
         return $this->stderr;
     }
 
+    /**
+     * @return resource
+     */
     protected function errorStream()
     {
         return defined('STDERR') ? STDERR : (@fopen('php://stderr', 'w') ?: fopen('php://output', 'w'));
     }
 
+    /**
+     * @return resource
+     */
     protected function outputStream()
     {
         return defined('STDOUT') ? STDOUT : (@fopen('php://stdout', 'w') ?: fopen('php://output', 'w'));

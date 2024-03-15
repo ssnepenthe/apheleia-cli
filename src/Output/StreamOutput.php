@@ -8,12 +8,19 @@ use InvalidArgumentException;
 
 class StreamOutput implements OutputInterface
 {
-    protected $debug;
-
+    /**
+     * @var bool
+     */
     protected $quiet;
 
+    /**
+     * @var resource
+     */
     protected $stream;
 
+    /**
+     * @param resource $stream
+     */
     public function __construct($stream, bool $quiet = false)
     {
         if (! is_resource($stream) || 'stream' !== get_resource_type($stream)) {
@@ -24,12 +31,15 @@ class StreamOutput implements OutputInterface
         $this->quiet = $quiet;
     }
 
+    /**
+     * @return resource
+     */
     public function getStream()
     {
         return $this->stream;
     }
 
-    public function write($message, bool $newline = false): void
+    public function write(string $message, bool $newline = false): void
     {
         if ($this->quiet) {
             return;
@@ -43,7 +53,7 @@ class StreamOutput implements OutputInterface
         fflush($this->stream);
     }
 
-    public function writeln($message): void
+    public function writeln(string $message): void
     {
         $this->write($message, true);
     }

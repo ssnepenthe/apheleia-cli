@@ -14,8 +14,14 @@ use WP_Error;
 // @todo LoggerInterface?
 class WpCliLoggerStandIn
 {
+    /**
+     * @var WpCliConfigInterface
+     */
     protected $config;
 
+    /**
+     * @var ConsoleOutputInterface
+     */
     protected $output;
 
     public function __construct(ConsoleOutputInterface $output, ?WpCliConfigInterface $config = null)
@@ -63,8 +69,15 @@ class WpCliLoggerStandIn
         $this->writeToErrorOutputWithLabel($this->stringifyErrorMessage($message), 'Error', '%R');
     }
 
+    /**
+     * @param array<int, string|WP_Error|Throwable> $messages
+     */
     public function errorMultiLine(array $messages): void
     {
+        if ([] === $messages) {
+            return;
+        }
+
         // None of the WP-CLI logger error_multi_line() methods handle WP_Error instances or Throwables...
         // But WP-CLI::error_multi_line() does so that is the behavior we will mimic here.
         $messages = array_map(
@@ -113,6 +126,9 @@ class WpCliLoggerStandIn
         return Colors::colorize("{$color}{$string}%n", $this->config->inColor());
     }
 
+    /**
+     * @param mixed $message
+     */
     private function stringifyErrorMessage($message): string
     {
         if (is_string($message)) {
@@ -144,14 +160,14 @@ class WpCliLoggerStandIn
         throw new InvalidArgumentException(sprintf("Cannot stringify error type: '%s'", gettype($message)));
     }
 
-    private function writeToErrorOutputWithLabel($message, $label, $color): void
+    private function writeToErrorOutputWithLabel(string $message, string $label, string $color): void
     {
         $label = $this->colorize("{$label}:", $color);
 
         $this->output->getErrorOutput()->writeln("{$label} {$message}");
     }
 
-    private function writeToOutputWithLabel($message, $label, $color): void
+    private function writeToOutputWithLabel(string $message, string $label, string $color): void
     {
         $label = $this->colorize("{$label}:", $color);
 
