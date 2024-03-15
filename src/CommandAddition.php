@@ -12,6 +12,7 @@ use ApheleiaCli\Invoker\InvokerFactoryInterface;
 use ApheleiaCli\Output\ConsoleOutput;
 use ApheleiaCli\Output\ConsoleOutputInterface;
 use ApheleiaCli\WpCli\WpCliConfigInterface;
+use LogicException;
 
 class CommandAddition
 {
@@ -181,13 +182,18 @@ class CommandAddition
         return $this->invokerFactory->createHandlerInvoker($this->command->getHandlerInvokerClass());
     }
 
-    /**
-     * @return int
-     */
-    protected function handle(array $args, array $assocArgs)
+    protected function handle(array $args, array $assocArgs): int
     {
+        $handler = $this->command->getHandler();
+
+        if (! is_callable($handler)) {
+            throw new LogicException(
+                'CommandAddition::handle() should never be called for a namespace command handler'
+            );
+        }
+
         $status = $this->createHandlerInvoker()->invoke(
-            $this->command->getHandler(),
+            $handler,
             ($this->inputFactory)($args, $assocArgs, $this->command),
             ($this->outputFactory)($this->config),
             $this->command,
