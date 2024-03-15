@@ -119,7 +119,7 @@ class WpCliLoggerStandIn
             return $message;
         }
 
-        $render = function ($data) {
+        $stringify = function ($data) {
             if (is_array($data) || is_object($data)) {
                 return json_encode($data);
             }
@@ -128,11 +128,13 @@ class WpCliLoggerStandIn
         };
 
         if ($message instanceof WP_Error) {
-            foreach ($message->get_error_messages() as $message) {
-                return $message . ' ' . $render($message->get_error_data());
-            }
+            foreach ($message->get_error_messages() as $errorMessage) {
+                if ($message->get_error_data()) {
+                    return $errorMessage . ' ' . $stringify($message->get_error_data());
+                }
 
-            return $message;
+                return $errorMessage;
+            }
         }
 
         if ($message instanceof Throwable) {
