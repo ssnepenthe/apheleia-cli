@@ -101,6 +101,48 @@ class ArrayInput implements InputInterface
         return $this->options;
     }
 
+        /**
+     * @return string[]
+     */
+    public function getWpCliArguments(): array
+    {
+        $args = [];
+
+        foreach ($this->arguments as $argument) {
+            if (! is_array($argument)) {
+                $argument = [$argument];
+            }
+
+            foreach ($argument as $subArgument) {
+                $args[] = $subArgument;
+            }
+        }
+
+        return $args;
+    }
+
+    /**
+     * @return array<string, bool|string>
+     */
+    public function getWpCliAssociativeArguments(): array
+    {
+        $assocArgs = [];
+
+        foreach ($this->options as $name => $option) {
+            if (is_array($option)) {
+                $assocArgs = array_merge($assocArgs, $option);
+            } else {
+                $assocArgs[$name] = $option;
+            }
+        }
+
+        foreach ($this->flags as $name => $flag) {
+            $assocArgs[$name] = $flag;
+        }
+
+        return $assocArgs;
+    }
+
     public function hasArgument(string $name): bool
     {
         return array_key_exists($name, $this->arguments);

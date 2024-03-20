@@ -38,7 +38,7 @@ class WpCliInput extends ArrayInput
     /**
      * @return string[]
      */
-    public function getRawArgs(): array
+    public function getWpCliArguments(): array
     {
         return $this->rawArgs;
     }
@@ -46,7 +46,7 @@ class WpCliInput extends ArrayInput
     /**
      * @return array<string, bool|string>
      */
-    public function getRawAssocArgs(): array
+    public function getWpCliAssociativeArguments(): array
     {
         return $this->rawAssocArgs;
     }

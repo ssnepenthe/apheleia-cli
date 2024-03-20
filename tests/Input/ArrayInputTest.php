@@ -56,6 +56,7 @@ class ArrayInputTest extends TestCase
         $this->assertFalse($input->hasFlag('flagthree'));
         $this->assertNull($input->getFlag('flagthree'));
     }
+
     public function testGet()
     {
         $arguments = [
@@ -102,5 +103,35 @@ class ArrayInputTest extends TestCase
 
         $this->assertFalse($input->hasOption('optthree'));
         $this->assertNull($input->getOption('optthree'));
+    }
+
+    public function testWpCliCompatibility()
+    {
+        $arguments = [
+            'argone' => 'argvalone',
+            'argtwo' => ['argvaltwoone', 'argvaltwotwo'],
+        ];
+        $options = [
+            'optone' => 'optvalone',
+            'arbitraryOptions' => [
+                'opttwo' => 'optvaltwo',
+                'optthree' => 'optvalthree',
+            ],
+        ];
+        $flags = [
+            'flagone' => true,
+            'flagtwo' => false,
+        ];
+
+        $input = new ArrayInput($arguments, $options, $flags);
+
+        $this->assertSame(['argvalone', 'argvaltwoone', 'argvaltwotwo'], $input->getWpCliArguments());
+        $this->assertSame([
+            'optone' => 'optvalone',
+            'opttwo' => 'optvaltwo',
+            'optthree' => 'optvalthree',
+            'flagone' => true,
+            'flagtwo' => false,
+        ], $input->getWpCliAssociativeArguments());
     }
 }

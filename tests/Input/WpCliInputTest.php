@@ -164,6 +164,7 @@ class WpCliInputTest extends TestCase
 
         new WpCliInput([], ['opt-one' => 'apple', 'opt-two' => 'banana'], $command);
     }
+
     public function testRawArgsAreUnmodified()
     {
         $command = (new Command())
@@ -188,8 +189,8 @@ class WpCliInputTest extends TestCase
 
         $input = new WpCliInput($args, $assocArgs, $command);
 
-        $this->assertSame($args, $input->getRawArgs());
-        $this->assertSame($assocArgs, $input->getRawAssocArgs());
+        $this->assertSame($args, $input->getWpCliArguments());
+        $this->assertSame($assocArgs, $input->getWpCliAssociativeArguments());
 
         // Sanity...
         $this->assertNotSame($args, $input->getArguments());

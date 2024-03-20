@@ -107,12 +107,11 @@ class PhpDiHandlerInvokerTest extends TestCase
 
     public function testInvokeInput()
     {
-        $receivedInput = $receivedTypedInput = $receivedTypedWpCliInput = null;
+        $receivedInput = $receivedTypedInput = null;
 
-        $handler = function ($input, InputInterface $typedInput, WpCliInput $typedWpCliInput) use (&$receivedInput, &$receivedTypedInput, &$receivedTypedWpCliInput) {
+        $handler = function ($input, InputInterface $typedInput) use (&$receivedInput, &$receivedTypedInput) {
             $receivedInput = $input;
             $receivedTypedInput = $typedInput;
-            $receivedTypedWpCliInput = $typedWpCliInput;
         };
         $command = (new Command())
             ->setName('irrelevant')
@@ -123,8 +122,7 @@ class PhpDiHandlerInvokerTest extends TestCase
             ->invoke($command->getHandler(), $input, new TestConsoleOutput(), $command);
 
         $this->assertSame($input, $receivedInput);
-        $this->assertSame($input, $receivedTypedInput);
-        $this->assertSame($input, $receivedTypedWpCliInput);
+        $this->assertSame($input, $receivedTypedInput);;
     }
 
     public function testInvokeOutput()

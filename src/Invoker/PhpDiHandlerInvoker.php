@@ -28,6 +28,9 @@ class PhpDiHandlerInvoker implements HandlerInvokerInterface
             'options' => $input->getOptions(),
             'flags' => $input->getFlags(),
 
+            'args' => $input->getWpCliArguments(),
+            'assocArgs' => $input->getWpCliAssociativeArguments(),
+
             'command' => $command,
             Command::class => $command,
 
@@ -38,12 +41,6 @@ class PhpDiHandlerInvoker implements HandlerInvokerInterface
             ConsoleOutputInterface::class => $output,
             OutputInterface::class => $output,
         ];
-
-        if ($input instanceof WpCliInput) {
-            $parameters[WpCliInput::class] = $input;
-            $parameters['args'] = $input->getRawArgs();
-            $parameters['assocArgs'] = $input->getRawAssocArgs();
-        }
 
         $parameters = array_merge($parameters, $input->getArguments(), $input->getOptions(), $input->getFlags());
 

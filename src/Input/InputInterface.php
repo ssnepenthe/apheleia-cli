@@ -41,6 +41,16 @@ interface InputInterface
      */
     public function getOptions(): array;
 
+    /**
+     * @return string[]
+     */
+    public function getWpCliArguments(): array;
+
+    /**
+     * @return array<string, bool|string>
+     */
+    public function getWpCliAssociativeArguments(): array;
+
     public function hasArgument(string $name): bool;
 
     public function hasFlag(string $name): bool;
