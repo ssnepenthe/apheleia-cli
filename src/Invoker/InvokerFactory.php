@@ -10,6 +10,7 @@ use Invoker\ParameterResolver\AssociativeArrayResolver;
 use Invoker\ParameterResolver\DefaultValueResolver;
 use Invoker\ParameterResolver\NumericArrayResolver;
 use Invoker\ParameterResolver\ResolverChain;
+use Invoker\ParameterResolver\TypeHintResolver;
 use ReflectionClass;
 use ReflectionMethod;
 use RuntimeException;
@@ -33,6 +34,9 @@ class InvokerFactory implements InvokerFactoryInterface
         $this->invoker = $invoker;
     }
 
+    /**
+     * @param class-string<GenericInvokerInterface> $className
+     */
     public function createGenericInvoker(string $className): GenericInvokerInterface
     {
         if ($this->hasGenericInvokerFactory($className)) {
@@ -51,6 +55,9 @@ class InvokerFactory implements InvokerFactoryInterface
         return new $className();
     }
 
+    /**
+     * @param class-string<HandlerInvokerInterface> $className
+     */
     public function createHandlerInvoker(string $className): HandlerInvokerInterface
     {
         if ($this->hasHandlerInvokerFactory($className)) {
@@ -60,6 +67,8 @@ class InvokerFactory implements InvokerFactoryInterface
         switch ($className) {
             case DefaultHandlerInvoker::class:
                 return new DefaultHandlerInvoker();
+            case LegacyHandlerInvoker::class:
+                return new LegacyHandlerInvoker();
             case PhpDiHandlerInvoker::class:
                 return new PhpDiHandlerInvoker($this->invoker ?: $this->createPhpDiInvoker());
         }
@@ -113,6 +122,7 @@ class InvokerFactory implements InvokerFactoryInterface
     {
         return new Invoker(
             new ResolverChain([
+                new TypeHintResolver(),
                 new NumericArrayResolver(),
                 new AssociativeArrayResolver(),
                 new TransformingAssociativeArrayParameterResolver(),

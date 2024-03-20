@@ -5,10 +5,7 @@ declare(strict_types=1);
 namespace ApheleiaCli\Tests;
 
 use ApheleiaCli\Support;
-use DateTime;
 use PHPUnit\Framework\TestCase;
-use ReflectionFunction;
-use ReflectionMethod;
 
 class SupportTest extends TestCase
 {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ApheleiaCli\Tests\Invoker;
 
+use ApheleiaCli\Command;
+use ApheleiaCli\Input\InputInterface;
 use ApheleiaCli\Invoker\DefaultGenericInvoker;
 use ApheleiaCli\Invoker\DefaultHandlerInvoker;
 use ApheleiaCli\Invoker\GenericInvokerInterface;
@@ -11,6 +13,7 @@ use ApheleiaCli\Invoker\HandlerInvokerInterface;
 use ApheleiaCli\Invoker\InvokerFactory;
 use ApheleiaCli\Invoker\PhpDiGenericInvoker;
 use ApheleiaCli\Invoker\PhpDiHandlerInvoker;
+use ApheleiaCli\Output\ConsoleOutputInterface;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -168,7 +171,7 @@ class GenericInvokerForTests implements GenericInvokerInterface
 
 class HandlerInvokerForTests implements HandlerInvokerInterface
 {
-    public function invoke(callable $handler, array $arguments = [])
+    public function invoke(callable $handler, InputInterface $input, ConsoleOutputInterface $output, Command $command)
     {
 
     }
@@ -194,7 +197,7 @@ class HandlerInvokerWithConstructorForTests implements HandlerInvokerInterface
 
     }
 
-    public function invoke(callable $handler, array $arguments = [])
+    public function invoke(callable $handler, InputInterface $input, ConsoleOutputInterface $output, Command $command)
     {
 
     }

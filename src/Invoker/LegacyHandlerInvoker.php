@@ -8,10 +8,10 @@ use ApheleiaCli\Command;
 use ApheleiaCli\Input\InputInterface;
 use ApheleiaCli\Output\ConsoleOutputInterface;
 
-class DefaultHandlerInvoker implements HandlerInvokerInterface
+class LegacyHandlerInvoker implements HandlerInvokerInterface
 {
     public function invoke(callable $handler, InputInterface $input, ConsoleOutputInterface $output, Command $command)
     {
-        return $handler($input, $output);
+        return $handler($input->getWpCliArguments(), $input->getWpCliAssociativeArguments());
     }
 }

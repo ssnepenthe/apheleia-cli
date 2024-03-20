@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace ApheleiaCli\Tests\Invoker;
 
+use ApheleiaCli\Argument;
 use ApheleiaCli\Command;
-use ApheleiaCli\Invoker\DefaultHandlerInvoker;
+use ApheleiaCli\Flag;
+use ApheleiaCli\Input\WpCliInput;
+use ApheleiaCli\Invoker\LegacyHandlerInvoker;
+use ApheleiaCli\Option;
+use ApheleiaCli\Output\ConsoleOutput;
 use PHPUnit\Framework\TestCase;
 
-class DefaultHandlerInvokerTest extends TestCase
+class LegacyHandlerInvokerTest extends TestCase
 {
     public function testInvoke()
     {
@@ -25,7 +30,8 @@ class DefaultHandlerInvokerTest extends TestCase
             ->setName('irrelevant')
             ->setHandler($callback);
 
-        (new DefaultHandlerInvoker())->invoke($command->getHandler());
+        (new LegacyHandlerInvoker())
+            ->invoke($command->getHandler(), new WpCliInput([], [], $command), new ConsoleOutput(), $command);
 
         $this->assertSame(1, $count);
         $this->assertSame([], $receivedArgs);
@@ -45,14 +51,20 @@ class DefaultHandlerInvokerTest extends TestCase
 
         $command = (new Command())
             ->setName('irrelevant')
+            ->addArgument(new Argument('arg-one'))
+            ->addOption(new Option('opt-one'))
+            ->addFlag(new Flag('flag-one'))
             ->setHandler($callback);
 
-        $args = ['args'];
-        $assocArgs = ['assoc' => 'args'];
-        $arguments = compact('args', 'assocArgs');
+        $args = ['apple'];
+        $assocArgs = ['opt-one' => 'banana', 'flag-one' => true];
 
-        (new DefaultHandlerInvoker())
-            ->invoke($command->getHandler(), $arguments);
+        (new LegacyHandlerInvoker())->invoke(
+            $command->getHandler(),
+            new WpCliInput($args, $assocArgs, $command),
+            new ConsoleOutput(),
+            $command
+        );
 
         $this->assertSame(1, $count);
         $this->assertSame($args, $receivedArgs);

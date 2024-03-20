@@ -7,67 +7,149 @@ namespace ApheleiaCli\Tests\Invoker;
 use ApheleiaCli\Argument;
 use ApheleiaCli\Command;
 use ApheleiaCli\Flag;
+use ApheleiaCli\Input\ArrayInput;
+use ApheleiaCli\Input\InputInterface;
+use ApheleiaCli\Input\WpCliInput;
 use ApheleiaCli\Invoker\PhpDiHandlerInvoker;
 use ApheleiaCli\Option;
+use ApheleiaCli\Output\ConsoleOutputInterface;
+use ApheleiaCli\Output\OutputInterface;
+use ApheleiaCli\Output\TestConsoleOutput;
 use PHPUnit\Framework\TestCase;
 
-// @todo InvokerInterface mocks?
 class PhpDiHandlerInvokerTest extends TestCase
 {
     use CreatesPhpDiInvoker;
 
-    public function testInvoke()
+    public function testInvokeArgsAndAssocArgs()
     {
-        $count = 0;
-        $callback = function () use (&$count) {
-            $count++;
+        $receivedArgs = $receivedAssocArgs = [];
+
+        $handler = function ($args, $assocArgs) use (&$receivedArgs, &$receivedAssocArgs) {
+            $receivedArgs = $args;
+            $receivedAssocArgs = $assocArgs;
         };
         $command = (new Command())
             ->setName('irrelevant')
-            ->setHandler($callback);
+            ->addArgument(new Argument('arg-one'))
+            ->addOption(new Option('opt-one'))
+            ->addFlag(new Flag('flag-one'))
+            ->setHandler($handler);
 
-        (new PhpDiHandlerInvoker($this->createPhpDiInvoker()))->invoke($command->getHandler(), [
-            'args' => [],
-            'assocArgs' => [],
-            'command' => $command,
-        ]);
+        $args = ['apple'];
+        $assocArgs = ['opt-one' => 'banana', 'flag-one' => true];
 
-        $this->assertSame(1, $count);
+        $this->createHandlerInvoker()
+            ->invoke(
+                $command->getHandler(),
+                new WpCliInput($args, $assocArgs, $command),
+                new TestConsoleOutput(),
+                $command
+            );
+
+        $this->assertSame($args, $receivedArgs);
+        $this->assertSame($assocArgs, $receivedAssocArgs);
     }
 
-    public function testInvokeWithArguments()
+    public function testInvokeArgumentsOptionsAndFlags()
     {
-        $count = 0;
-        $receivedArgs = null;
+        $receivedArguments = $receivedOptions = $receivedFlags = [];
 
-        $callback = function (
-            $args,
-            $assocArgs,
-            $arguments,
-            $options,
-            $argOne,
-            $argTwo,
-            $flagOne,
-            $optOne,
-            $arbitraryOptions,
-            $command
-        ) use (&$count, &$receivedArgs) {
-            $count++;
-            $receivedArgs = compact(
-                'args',
-                'assocArgs',
-                'arguments',
-                'options',
-                'argOne',
-                'argTwo',
-                'flagOne',
-                'optOne',
-                'arbitraryOptions',
-                'command'
-            );
+        $handler = function ($arguments, $options, $flags) use (&$receivedArguments, &$receivedOptions, &$receivedFlags) {
+            $receivedArguments = $arguments;
+            $receivedOptions = $options;
+            $receivedFlags = $flags;
         };
-
         $command = (new Command())
+            ->setName('irrelevant')
+            ->setHandler($handler);
+
+        $arguments = ['apple' => 'banana'];
+        $options = ['cherry' => 'date'];
+        $flags = ['elderberry' => true];
+
+        $this->createHandlerInvoker()
+            ->invoke(
+                $command->getHandler(),
+                new ArrayInput($arguments, $options, $flags),
+                new TestConsoleOutput(),
+                $command
+            );
+
+        $this->assertSame($arguments, $receivedArguments);
+        $this->assertSame($options, $receivedOptions);
+        $this->assertSame($flags, $receivedFlags);
+    }
+
+    public function testInvokeCommand()
+    {
+        $receivedCommand = $receivedTypedCommand = null;
+
+        $handler = function ($command, Command $typedCommand) use (&$receivedCommand, &$receivedTypedCommand) {
+            $receivedCommand = $command;
+            $receivedTypedCommand = $typedCommand;
+        };
+        $command = (new Command())
+            ->setName('irrelevant')
+            ->setHandler($handler);
+
+        $this->createHandlerInvoker()
+            ->invoke(
+                $command->getHandler(),
+                new ArrayInput([], [], []),
+                new TestConsoleOutput(),
+                $command
+            );
+
+        $this->assertSame($command, $receivedCommand);
+        $this->assertSame($command, $receivedTypedCommand);
+    }
+
+    public function testInvokeInput()
+    {
+        $receivedInput = $receivedTypedInput = null;
+
+        $handler = function ($input, InputInterface $typedInput) use (&$receivedInput, &$receivedTypedInput) {
+            $receivedInput = $input;
+            $receivedTypedInput = $typedInput;
+        };
+        $command = (new Command())
+            ->setName('irrelevant')
+            ->setHandler($handler);
+        $input = new WpCliInput([], [], $command);
+
+        $this->createHandlerInvoker()
+            ->invoke($command->getHandler(), $input, new TestConsoleOutput(), $command);
+
+        $this->assertSame($input, $receivedInput);
+        $this->assertSame($input, $receivedTypedInput);;
+    }
+
+    public function testInvokeOutput()
+    {
+        $receivedOutput = $receivedTypedOutput = $receivedTypedConsoleOutput = null;
+
+        $handler = function ($output, OutputInterface $typedOutput, ConsoleOutputInterface $typedConsoleOutput) use (&$receivedOutput, &$receivedTypedOutput, &$receivedTypedConsoleOutput) {
+            $receivedOutput = $output;
+            $receivedTypedOutput = $typedOutput;
+            $receivedTypedConsoleOutput = $typedConsoleOutput;
+        };
+        $command = (new Command())
+            ->setName('irrelevant')
+            ->setHandler($handler);
+        $output = new TestConsoleOutput();
+
+        $this->createHandlerInvoker()
+            ->invoke($command->getHandler(), new ArrayInput([], [], []), $output, $command);
+
+        $this->assertSame($output, $receivedOutput);
+        $this->assertSame($output, $receivedTypedOutput);
+        $this->assertSame($output, $receivedTypedConsoleOutput);
+    }
+
+    private function createCommand($handler): Command
+    {
+        return (new Command())
             ->setName('irrelevant')
             ->addArgument(new Argument('arg-one'))
             ->addArgument(
@@ -77,45 +159,11 @@ class PhpDiHandlerInvokerTest extends TestCase
             ->addFlag(new Flag('flag-one'))
             ->addOption(new Option('opt-one'))
             ->setAcceptArbitraryOptions(true)
-            ->setHandler($callback);
+            ->setHandler($handler);
+    }
 
-        $args = ['apple', 'banana', 'cherry'];
-        $assocArgs = [
-            'flag-one' => true,
-            'opt-one' => 'zebra',
-        ];
-        $arbitraryOptions = [
-            'this' => 'goes',
-            'to' => 'arbitrary-options',
-        ];
-
-        (new PhpDiHandlerInvoker($this->createPhpDiInvoker()))
-            ->invoke($command->getHandler(), $context = [
-                'args' => $args,
-                'assocArgs' => array_merge($assocArgs, $arbitraryOptions),
-                'command' => $command,
-            ]);
-
-        $this->assertSame(1, $count);
-
-        $this->assertSame([
-            'args' => $args,
-            'assocArgs' => array_merge($assocArgs, $arbitraryOptions),
-            'arguments' => $args,
-            'options' => array_merge($assocArgs, $arbitraryOptions),
-            'argOne' => $args[0],
-
-            // If the last argument is repeating, all remaining arguments are bundled together
-            'argTwo' => [$args[1], $args[2]],
-            'flagOne' => true,
-
-            'optOne' => $assocArgs['opt-one'],
-
-            // If command accepts arbitrary options, remaining options are bundled together
-            'arbitraryOptions' => $arbitraryOptions,
-
-            // Command instance is also available.
-            'command' => $command,
-        ], $receivedArgs);
+    private function createHandlerInvoker(): PhpDiHandlerInvoker
+    {
+        return new PhpDiHandlerInvoker($this->createPhpDiInvoker());
     }
 }

@@ -4,9 +4,15 @@ declare(strict_types=1);
 
 namespace ApheleiaCli;
 
+use ApheleiaCli\Input\InputInterface;
+use ApheleiaCli\Input\WpCliInput;
 use ApheleiaCli\Invoker\GenericInvokerInterface;
 use ApheleiaCli\Invoker\HandlerInvokerInterface;
 use ApheleiaCli\Invoker\InvokerFactoryInterface;
+use ApheleiaCli\Output\ConsoleOutput;
+use ApheleiaCli\Output\ConsoleOutputInterface;
+use ApheleiaCli\WpCli\WpCliConfigInterface;
+use LogicException;
 
 class CommandAddition
 {
@@ -21,9 +27,30 @@ class CommandAddition
     protected $command;
 
     /**
+     *
+     * @var WpCliConfigInterface
+     */
+    protected $config;
+
+    /**
+     * @var callable(string[], array<string, string>, Command):InputInterface
+     */
+    protected $inputFactory;
+
+    /**
      * @var InvokerFactoryInterface
      */
     protected $invokerFactory;
+
+    /**
+     * @var callable(WpCliConfigInterface):ConsoleOutputInterface
+     */
+    protected $outputFactory;
+
+    /**
+     * @var ?int
+     */
+    protected $statusCode = null;
 
     /**
      * @var WpCliAdapterInterface
@@ -33,11 +60,16 @@ class CommandAddition
     public function __construct(
         Command $command,
         InvokerFactoryInterface $invokerFactory,
-        WpCliAdapterInterface $wpCliAdapter
+        WpCliAdapterInterface $wpCliAdapter,
+        WpCliConfigInterface $config
     ) {
         $this->command = $command;
         $this->invokerFactory = $invokerFactory;
         $this->wpCliAdapter = $wpCliAdapter;
+        $this->config = $config;
+
+        $this->inputFactory = fn ($args, $assocArgs, $command) => new WpCliInput($args, $assocArgs, $command);
+        $this->outputFactory = fn ($config) => new ConsoleOutput($config->isQuiet());
     }
 
     /**
@@ -63,8 +95,20 @@ class CommandAddition
             $args['before_invoke'] = fn () => $this->createGenericInvoker()->invoke($beforeInvoke);
         }
 
-        if ($afterInvoke = $this->command->getAfterInvokeCallback()) {
-            $args['after_invoke'] = fn () => $this->createGenericInvoker()->invoke($afterInvoke);
+        if (null !== ($afterInvoke = $this->command->getAfterInvokeCallback())) {
+            $args['after_invoke'] = function () use ($afterInvoke) {
+                $this->createGenericInvoker()->invoke($afterInvoke);
+
+                if ($this->autoExit) {
+                    $this->wpCliAdapter->halt(is_int($this->statusCode) ? $this->statusCode : Status::SUCCESS);
+                }
+            };
+        } elseif (! $this->command instanceof NamespaceCommand && $this->autoExit) {
+            $args['after_invoke'] = function () {
+                if ($this->autoExit) {
+                    $this->wpCliAdapter->halt(is_int($this->statusCode) ? $this->statusCode : Status::SUCCESS);
+                }
+            };
         }
 
         if ($when = $this->command->getWhen()) {
@@ -108,6 +152,26 @@ class CommandAddition
         return $this;
     }
 
+    /**
+     * @param callable(string[], array<string, string>, Command):InputInterface $inputFactory
+     */
+    public function setInputFactory(callable $inputFactory): self
+    {
+        $this->inputFactory = $inputFactory;
+
+        return $this;
+    }
+
+    /**
+     * @param callable(WpCliConfigInterface):ConsoleOutputInterface $outputFactory
+     */
+    public function setOutputFactory(callable $outputFactory): self
+    {
+        $this->outputFactory = $outputFactory;
+
+        return $this;
+    }
+
     protected function createGenericInvoker(): GenericInvokerInterface
     {
         return $this->invokerFactory->createGenericInvoker($this->command->getGenericInvokerClass());
@@ -118,17 +182,22 @@ class CommandAddition
         return $this->invokerFactory->createHandlerInvoker($this->command->getHandlerInvokerClass());
     }
 
-    /**
-     * @return int
-     */
-    protected function handle(array $args, array $assocArgs)
+    protected function handle(array $args, array $assocArgs): int
     {
-        $status = $this->createHandlerInvoker()
-            ->invoke($this->command->getHandler(), [
-                'args' => $args,
-                'assocArgs' => $assocArgs,
-                'command' => $this->command,
-            ]);
+        $handler = $this->command->getHandler();
+
+        if (! is_callable($handler)) {
+            throw new LogicException(
+                'CommandAddition::handle() should never be called for a namespace command handler'
+            );
+        }
+
+        $status = $this->createHandlerInvoker()->invoke(
+            $handler,
+            ($this->inputFactory)($args, $assocArgs, $this->command),
+            ($this->outputFactory)($this->config),
+            $this->command,
+        );
 
         if (! is_int($status) || $status < 0) {
             $status = 0;
@@ -138,10 +207,6 @@ class CommandAddition
             $status = 255;
         }
 
-        if ($this->autoExit) {
-            $this->wpCliAdapter->halt($status);
-        } else {
-            return $status;
-        }
+        return $this->statusCode = $status;
     }
 }
