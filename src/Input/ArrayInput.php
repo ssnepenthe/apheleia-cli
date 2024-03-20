@@ -17,13 +17,13 @@ class ArrayInput implements InputInterface
     protected $flags;
 
     /**
-     * @var array<string, array<string, string>|string>
+     * @var array<string, array<string, bool|string>|bool|string>
      */
     protected $options;
 
     /**
      * @param array<string, string|string[]> $arguments
-     * @param array<string, array<string, string>|string> $options
+     * @param array<string, array<string, bool|string>|bool|string> $options
      * @param array<string, bool> $flags
      */
     public function __construct(array $arguments, array $options, array $flags)
@@ -34,8 +34,8 @@ class ArrayInput implements InputInterface
     }
 
     /**
-     * @param array<string, string>|bool|string|string[]|null $default
-     * @return array<string, string>|bool|string|string[]|null
+     * @param array<string, bool|string>|bool|string|string[]|null $default
+     * @return array<string, bool|string>|bool|string|string[]|null
      */
     public function get(string $name, $default = null)
     {
@@ -85,8 +85,8 @@ class ArrayInput implements InputInterface
     }
 
     /**
-     * @param array<string, string>|string|null $default
-     * @return array<string, string>|string|null
+     * @param array<string, bool|string>|bool|string|null $default
+     * @return array<string, bool|string>|bool|string|null
      */
     public function getOption(string $name, $default = null)
     {
@@ -94,7 +94,7 @@ class ArrayInput implements InputInterface
     }
 
     /**
-     * @return array<string, array<string, string>|string>
+     * @return array<string, array<string, bool|string>|bool|string>
      */
     public function getOptions(): array
     {

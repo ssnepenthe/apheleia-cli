@@ -88,7 +88,7 @@ class WpCliInput extends ArrayInput
 
     /**
      * @param array<string, bool|string> $assocArgs
-     * @return array{0: array<string, array<string, string>|string>, 1: array<string, bool>}
+     * @return array{0: array<string, array<string, bool|string>|bool|string>, 1: array<string, bool>}
      */
     private function processAssocArgs(array $assocArgs, Command $command): array
     {
@@ -108,7 +108,7 @@ class WpCliInput extends ArrayInput
             }
 
             if ($option instanceof Option) {
-                /** @var string $value */
+                /** @var bool|string $value */
                 $value = $assocArgs[$name];
                 $options[$name] = $value;
             } else {
@@ -122,7 +122,7 @@ class WpCliInput extends ArrayInput
 
         if (! empty($assocArgs)) {
             if ($command->getAcceptArbitraryOptions()) {
-                /** @var array<string, string> $value */
+                /** @var array<string, bool|string> $value */
                 $value = $assocArgs;
                 $assocArgs = [];
                 $options['arbitraryOptions'] = $value;

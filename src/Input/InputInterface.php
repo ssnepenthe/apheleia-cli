@@ -7,8 +7,8 @@ namespace ApheleiaCli\Input;
 interface InputInterface
 {
     /**
-     * @param array<string, string>|bool|string|string[]|null $default
-     * @return array<string, string>|bool|string|string[]|null
+     * @param array<string, bool|string>|bool|string|string[]|null $default
+     * @return array<string, bool|string>|bool|string|string[]|null
      */
     public function get(string $name, $default = null);
 
@@ -31,13 +31,13 @@ interface InputInterface
     public function getFlags(): array;
 
     /**
-     * @param array<string, string>|string|null $default
-     * @return array<string, string>|string|null
+     * @param array<string, bool|string>|bool|string|null $default
+     * @return array<string, bool|string>|bool|string|null
      */
     public function getOption(string $name, $default = null);
 
     /**
-     * @return array<string, array<string, string>|string>
+     * @return array<string, array<string, bool|string>|bool|string>
      */
     public function getOptions(): array;
 
